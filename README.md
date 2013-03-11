@@ -1,6 +1,6 @@
 Hug Community Web Application (www.hugcommunity.org)
 =============================
-A Hug Me Hug YOU! Initiative (www.hugmehugyou.org) project
+Supported by the Hug Me Hug YOU! Initiative (www.hugmehugyou.org)
 
 PROJECT
 -------
