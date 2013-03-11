@@ -1,4 +1,4 @@
 Hug-Community-Web-Application
 =============================
 
-Description goes here.
+Description goes here...
