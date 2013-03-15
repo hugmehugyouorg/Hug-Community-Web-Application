@@ -44,7 +44,7 @@ $ vagrant gem install vagrant-hostmaster
 $ mkdir hugcommunity.org
 $ cd hugcommunity.org
 $ git clone https://github.com/awelters/Hug-Community-Web-Application.git
-$ wget http://www.hugmehugyou.org/developers/hugcommunity/Vagrantfile
+$ curl -OL http://www.hugmehugyou.org/developers/hugcommunity/Vagrantfile
 $ vagrant up</code></pre>
 
 5.  Sit back and wait for the provisioned VM to download and boot...
