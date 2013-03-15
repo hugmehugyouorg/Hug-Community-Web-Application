@@ -39,13 +39,15 @@ The project is built using PHP, CodeIgniter (http://ellislab.com/codeigniter), a
 3.  Install Vagrant (http://www.vagrantup.com/)
 4.  Run some commands to get the provisioned VM and Code Repository
 
-    $ vagrant gem install vagrant-vbguest
-    $ vagrant gem install vagrant-hostmaster
-    $ mkdir hugcommunity.org
-    $ cd hugcommunity.org
-    $ git clone https://github.com/awelters/Hug-Community-Web-Application.git
-    $ wget http://www.hugmehugyou.org/developers/hugcommunity/Vagrantfile
-    $ vagrant up
+<pre><code>
+$ vagrant gem install vagrant-vbguest
+$ vagrant gem install vagrant-hostmaster
+$ mkdir hugcommunity.org
+$ cd hugcommunity.org
+$ git clone https://github.com/awelters/Hug-Community-Web-Application.git
+$ wget http://www.hugmehugyou.org/developers/hugcommunity/Vagrantfile
+$ vagrant up
+</code></pre>
 
 5.  Sit back and wait for the provisioned VM to download and boot...
 6.  Verify everything is working correctly by opening your browser and seeing the output
