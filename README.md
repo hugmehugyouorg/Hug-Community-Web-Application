@@ -57,4 +57,4 @@ http://www.hugcommunity.org/status.html - for the FPM real-time status page
 http://www.hugcommunity.org/apc.php - for the APC Cache information page
 https://www.hugcommunity.org - the Hug Community Web Application page</code></pre>
 
-7.  Use your favorite PHP IDE for developing the app, changes to the code in the shared <code>/{path_to_where_the_project_is}/hugcommunity/Hug-Community-Web-Application</code> folder will automatically be updated in the <code>/var/www/www.hugcommunity.org</code> in the VM
+7.  Use your favorite PHP IDE for developing the app, changes to the code in the shared <code>/{path_to_where_the_project_is}/hugcommunity/Hug-Community-Web-Application</code> folder will automatically be updated in the <code>/var/www/www.hugcommunity.org</code> directory on the VM
