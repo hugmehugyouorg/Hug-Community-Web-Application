@@ -50,11 +50,11 @@ $ vagrant up</code></pre>
 5.  Sit back and wait for the provisioned VM to download and boot...
 6.  Verify everything is working correctly by opening your browser and seeing the output
 
-	http://www.hugcommunity.org - for the PHP info
+	<pre><code>http://www.hugcommunity.org - for the PHP info
 	http://www.hugcommunity.org/nginx_status - for the NginX statistics
 	http://www.hugcommunity.org/status?html - for the FPM statistics
 	http://www.hugcommunity.org/status.html - for the FPM real-time status page
 	http://www.hugcommunity.org/apc.php - for the APC Cache information page
-	https://www.hugcommunity.org - the Hug Community Web Application page
+	https://www.hugcommunity.org - the Hug Community Web Application page</code></pre>
 
 7.  Use your favorite PHP IDE for developing the app, changes to the code in the shared Hug-Community-Web-Application will automatically be updated in the /var/www/www.hugcommunity.org in the VM
