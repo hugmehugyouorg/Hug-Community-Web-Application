@@ -23,9 +23,9 @@
                 <?php endforeach?>
 			</td>
 			<td><?php echo ($user->active) ? anchor("auth/deactivate/".$user->id, 'Active') : anchor("auth/activate/". $user->id, 'Inactive');?></td>
-			<td><?php echo anchor("auth/edit_user/".$user->id, 'Edit') ;?></td>
+			<td><?php echo anchor("auth/profile/".$user->id, 'Profile') ;?></td>
 		</tr>
 	<?php endforeach;?>
 </table>
 
-<p><a href="<?php echo site_url('auth/create_user');?>">Create a new user</a> | <a href="<?php echo site_url('auth/create_group');?>">Create a new group</a></p>
+<p><a href="<?php echo site_url('auth/invite_user');?>">Invite a new user</a> | <a href="<?php echo site_url('auth/create_group');?>">Create a new group</a></p>

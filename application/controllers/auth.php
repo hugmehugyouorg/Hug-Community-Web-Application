@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Auth extends CI_Controller {
+class Auth extends MY_Controller {
 
 	function __construct()
 	{
@@ -383,10 +383,10 @@ class Auth extends CI_Controller {
 		}
 	}
 
-	//create a new user
-	function create_user()
+	//create a new user via invitation
+	function invite_user()
 	{
-		$this->data['title'] = "Create User";
+		$this->data['title'] = "Invite User";
 
 		if (!$this->ion_auth->logged_in() || !$this->ion_auth->is_admin())
 		{
@@ -400,7 +400,6 @@ class Auth extends CI_Controller {
 		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
 		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
 		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'required|xss_clean|min_length[4]|max_length[4]');
-		$this->form_validation->set_rules('company', 'Company Name', 'required|xss_clean');
 		$this->form_validation->set_rules('password', 'Password', 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'required');
 
@@ -413,7 +412,6 @@ class Auth extends CI_Controller {
 			$additional_data = array(
 				'first_name' => $this->input->post('first_name'),
 				'last_name'  => $this->input->post('last_name'),
-				'company'    => $this->input->post('company'),
 				'phone'      => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
 			);
 		}
@@ -448,12 +446,6 @@ class Auth extends CI_Controller {
 				'type'  => 'text',
 				'value' => $this->form_validation->set_value('email'),
 			);
-			$this->data['company'] = array(
-				'name'  => 'company',
-				'id'    => 'company',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('company'),
-			);
 			$this->data['phone1'] = array(
 				'name'  => 'phone1',
 				'id'    => 'phone1',
@@ -485,23 +477,29 @@ class Auth extends CI_Controller {
 				'value' => $this->form_validation->set_value('password_confirm'),
 			);
 
-			$this->_render_page('auth/create_user', $this->data);
+			$this->_render_page('auth/invite_user', $this->data);
 		}
 	}
 
-	//edit a user
-	function edit_user($id)
+	//user profile
+	function profile($id)
 	{
-		$this->data['title'] = "Edit User";
+		$this->data['title'] = "Profile";
 
-		if (!$this->ion_auth->logged_in() || !$this->ion_auth->is_admin())
+		if (!$this->ion_auth->logged_in() || (!$this->ion_auth->is_admin() && !($this->ion_auth->user()->row()->id == $id)))
 		{
 			redirect('auth', 'refresh');
 		}
 
 		$user = $this->ion_auth->user($id)->row();
-		$groups=$this->ion_auth->groups()->result_array();
-		$currentGroups = $this->ion_auth->get_users_groups($id)->result();
+		if($this->ion_auth->is_admin()) {
+			$groups=$this->ion_auth->groups()->result_array();
+			$currentGroups = $this->ion_auth->get_users_groups($id)->result();
+		}
+		else {
+			$groups = array();
+			$currentGroups = array();
+		}
 
 		//process the phone number
 		if (isset($user->phone) && !empty($user->phone))
@@ -515,7 +513,6 @@ class Auth extends CI_Controller {
 		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
 		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
 		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'required|xss_clean|min_length[4]|max_length[4]');
-		$this->form_validation->set_rules('company', 'Company Name', 'required|xss_clean');
 		$this->form_validation->set_rules('groups', 'Groups', 'xss_clean');
 
 		if (isset($_POST) && !empty($_POST))
@@ -529,21 +526,22 @@ class Auth extends CI_Controller {
 			$data = array(
 				'first_name' => $this->input->post('first_name'),
 				'last_name'  => $this->input->post('last_name'),
-				'company'    => $this->input->post('company'),
 				'phone'      => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
 			);
 
-			//Update the groups user belongs to
-			$groupData = $this->input->post('groups');
-
-			if (isset($groupData) && !empty($groupData)) {
-
-				$this->ion_auth->remove_from_group('', $id);
-
-				foreach ($groupData as $grp) {
-					$this->ion_auth->add_to_group($grp, $id);
+			if($this->ion_auth->is_admin()) {
+				//Update the groups user belongs to
+				$groupData = $this->input->post('groups');
+	
+				if (isset($groupData) && !empty($groupData)) {
+	
+					$this->ion_auth->remove_from_group('', $id);
+	
+					foreach ($groupData as $grp) {
+						$this->ion_auth->add_to_group($grp, $id);
+					}
+	
 				}
-
 			}
 
 			//update the password if it was posted
@@ -561,7 +559,7 @@ class Auth extends CI_Controller {
 
 				//check to see if we are creating the user
 				//redirect them back to the admin page
-				$this->session->set_flashdata('message', "User Saved");
+				$this->session->set_flashdata('message', "Profile Updated");
 				redirect("auth", 'refresh');
 			}
 		}
@@ -588,12 +586,6 @@ class Auth extends CI_Controller {
 			'id'    => 'last_name',
 			'type'  => 'text',
 			'value' => $this->form_validation->set_value('last_name', $user->last_name),
-		);
-		$this->data['company'] = array(
-			'name'  => 'company',
-			'id'    => 'company',
-			'type'  => 'text',
-			'value' => $this->form_validation->set_value('company', $user->company),
 		);
 		$this->data['phone1'] = array(
 			'name'  => 'phone1',
@@ -624,7 +616,7 @@ class Auth extends CI_Controller {
 			'type' => 'password'
 		);
 
-		$this->_render_page('auth/edit_user', $this->data);
+		$this->_render_page('auth/profile', $this->data);
 	}
 
 	// create a new group
@@ -767,7 +759,14 @@ class Auth extends CI_Controller {
 
 		$this->viewdata = (empty($data)) ? $this->data: $data;
 
-		$view_html = $this->load->view($view, $this->viewdata, $render);
+		//standard layout if rendering
+		if(!$render) {
+			$this->load->view('partials/header', $this->headerViewData());
+			$view_html = $this->load->view($view, $this->viewdata, $render);
+			$this->load->view('partials/footer');
+		}
+		else
+			$view_html = $this->load->view($view, $this->viewdata, $render);
 
 		if (!$render) return $view_html;
 	}

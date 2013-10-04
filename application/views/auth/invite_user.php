@@ -1,9 +1,9 @@
-<h1>Create User</h1>
+<h1>Invite User</h1>
 <p>Please enter the users information below.</p>
 
 <div id="infoMessage"><?php echo $message;?></div>
 
-<?php echo form_open("auth/create_user");?>
+<?php echo form_open("auth/invite_user");?>
 
       <p>
             First Name: <br />
@@ -13,11 +13,6 @@
       <p>
             Last Name: <br />
             <?php echo form_input($last_name);?>
-      </p>
-
-      <p>
-            Company Name: <br />
-            <?php echo form_input($company);?>
       </p>
 
       <p>
@@ -41,6 +36,6 @@
       </p>
 
 
-      <p><?php echo form_submit('submit', 'Create User');?></p>
+      <p><?php echo form_submit('submit', 'Invite User');?></p>
 
 <?php echo form_close();?>

@@ -1,13 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Welcome extends CI_Controller {
-
-	function __construct()
-	{
-		parent::__construct();
-		$this->load->library('ion_auth');
-		$this->load->helper('url');
-	}
+class Welcome extends MY_Controller {
 
 	/**
 	 * Index Page for this controller.
@@ -35,8 +28,11 @@ class Welcome extends CI_Controller {
 			//redirect them to the admin page
 			redirect('auth', 'refresh');
 		}
-		else
+		else {
+			$this->load->view('partials/header', $this->headerViewData());
 			$this->load->view('welcome_message');
+			$this->load->view('partials/footer');
+		}
 	}
 }
 
