@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
+	<meta charset="utf-8" />
+	
+	<!-- fix for IE9 Google Font Issue -->
+	<meta http-equiv="X-UA-Compatible" content="IE=8" />
+
+	<!-- responsive design so don't let scaling occur -->
+	<meta name="viewport" content="width = device-width, initial-scale = 1, minimum-scale = 1, maximum-scale = 1, user-scalable = no" />
+		
+	<!-- favicon -->
+	<link rel="icon" href="//www.hugmehugyou.org/img/favicon.gif" type="image/gif"/>
 		
 	<title><?php echo $title ?></title>
    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
