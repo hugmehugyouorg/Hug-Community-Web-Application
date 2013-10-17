@@ -368,7 +368,7 @@ class Ion_auth_model extends CI_Model
 	 * @return void
 	 * @author Mathew
 	 **/
-	public function activate($id, $code = false)
+	public function activate($id, $code = false, $forInvite = false)
 	{
 		$this->trigger_events('pre_activate');
 
@@ -391,7 +391,7 @@ class Ion_auth_model extends CI_Model
 			$identity = $result->{$this->identity_column};
 
 			$data = array(
-			    'activation_code' => NULL,
+			    'forgotten_password_code' => $code,
 			    'active'          => 1
 			);
 
@@ -401,7 +401,7 @@ class Ion_auth_model extends CI_Model
 		else
 		{
 			$data = array(
-			    'activation_code' => NULL,
+			    'activation_code' => $forInvite ? $this->makeActivationCode() : NULL,
 			    'active'          => 1
 			);
 
@@ -427,6 +427,12 @@ class Ion_auth_model extends CI_Model
 		return $return;
 	}
 
+	protected function makeActivationCode() {
+		$activation_code = sha1(md5(microtime()));
+		$this->activation_code = $activation_code;
+		return $activation_code;
+	}
+
 
 	/**
 	 * Deactivate
@@ -444,8 +450,7 @@ class Ion_auth_model extends CI_Model
 			return FALSE;
 		}
 
-		$activation_code       = sha1(md5(microtime()));
-		$this->activation_code = $activation_code;
+		$activation_code = $this->makeActivationCode();
 
 		$data = array(
 		    'activation_code' => $activation_code,
@@ -755,16 +760,14 @@ class Ion_auth_model extends CI_Model
 	}
 
 	/**
-	 * register
+	 * invite
 	 *
 	 * @return bool
-	 * @author Mathew
+	 * @author Andrew Welters <awelters@hugmehugyou.org>
 	 **/
-	public function register($username, $password, $email, $additional_data = array(), $groups = array())
+	public function invite($username, $email, $additional_data = array(), $groups = array())
 	{
-		$this->trigger_events('pre_register');
-
-		$manual_activation = $this->config->item('manual_activation', 'ion_auth');
+		$this->trigger_events('pre_invite');
 
 		if ($this->identity_column == 'email' && $this->email_check($email))
 		{
@@ -793,7 +796,9 @@ class Ion_auth_model extends CI_Model
 		// IP Address
 		$ip_address = $this->_prepare_ip($this->input->ip_address());
 		$salt       = $this->store_salt ? $this->salt() : FALSE;
-		$password   = $this->hash_password($password, $salt);
+		
+		$password = Ion_auth_model::getRandomPassword();
+		$password = $this->hash_password($password, $salt);
 
 		// Users table.
 		$data = array(
@@ -803,7 +808,7 @@ class Ion_auth_model extends CI_Model
 		    'ip_address' => $ip_address,
 		    'created_on' => time(),
 		    'last_login' => time(),
-		    'active'     => ($manual_activation === false ? 1 : 0)
+		    'active'     => 1
 		);
 
 		if ($this->store_salt)
@@ -841,6 +846,37 @@ class Ion_auth_model extends CI_Model
 
 		return (isset($id)) ? $id : FALSE;
 	}
+
+	public static function getRandomPassword($length=8, $strength=8)
+    {
+        $vowels='aeuy';
+        $consonants = 'bdghjmnpqrstvz';
+        if ($strength & 1) {
+            $consonants .= 'BDGHJLMNPQRSTVWXZ';
+        }
+        if ($strength & 2) {
+            $vowels .= "AEUY";
+        }
+        if ($strength & 4) {
+            $consonants .= '23456789';
+        }
+        if ($strength & 8) {
+            $consonants .= '@#$%';
+        }
+     
+        $password = '';
+        $alt = time() % 2;
+        for ($i = 0; $i < $length; $i++) {
+            if ($alt == 1) {
+                $password .= $consonants[(rand() % strlen($consonants))];
+                $alt = 0;
+            } else {
+                $password .= $vowels[(rand() % strlen($vowels))];
+                $alt = 1;
+            }
+        }
+        return $password;
+    }
 
 	/**
 	 * login

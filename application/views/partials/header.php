@@ -6,12 +6,14 @@
 	<!-- fix for IE9 Google Font Issue -->
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-	<!-- responsive design so don't let scaling occur -->
+	<!-- responsive design so don't let scaling occur
 	<meta name="viewport" content="width = device-width, initial-scale = 1, minimum-scale = 1, maximum-scale = 1, user-scalable = no" />
-		
-	<!-- favicon -->
+	 -->
+	 
+	<!-- favicon
 	<link rel="icon" href="//www.hugmehugyou.org/img/favicon.gif" type="image/gif"/>
-		
+	 -->
+	 
 	<title><?php echo $title ?></title>
    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
    <link rel="stylesheet" href="/assets/css/bootstrap-responsive.min.css" /> 
@@ -34,11 +36,13 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </a>
-            <a class="brand" href="/"><?php echo $title ?></a>
+            <a class="brand" href="/"><img src="//www.hugmehugyou.org/img/logo.png"></a>
             <div class="nav-collapse collapse">
-              <?php if($loggedIn){ ?>
+              <?php if($user){ ?>
               <ul class="nav pull-right">
-                <li><a href="/auth/logout">Logout</a></li>
+              	<li><a href="/">Dashboard</a></li>
+                <li><a href="/auth/profile/<?php echo $user->id ?>">Profile</a></li>
+                <li><a href="/auth/sign_out">Sign Out</a></li>
               </ul>
               <?php } ?>
             </div><!-- /.nav-collapse -->

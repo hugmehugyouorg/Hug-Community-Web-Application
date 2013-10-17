@@ -1,7 +1,9 @@
 <h1>Invite User</h1>
 <p>Please enter the users information below.</p>
 
-<div id="infoMessage"><?php echo $message;?></div>
+<?php if(isset($message) && !empty($message)){ ?>
+	<div class="alert alert-message error" id="infoMessage"><?php echo $message;?></div>
+<?php } ?>
 
 <?php echo form_open("auth/invite_user");?>
 
@@ -24,17 +26,6 @@
             Phone: <br />
             <?php echo form_input($phone1);?>-<?php echo form_input($phone2);?>-<?php echo form_input($phone3);?>
       </p>
-
-      <p>
-            Password: <br />
-            <?php echo form_input($password);?>
-      </p>
-
-      <p>
-            Confirm Password: <br />
-            <?php echo form_input($password_confirm);?>
-      </p>
-
 
       <p><?php echo form_submit('submit', 'Invite User');?></p>
 

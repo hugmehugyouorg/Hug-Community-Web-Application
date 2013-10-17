@@ -284,90 +284,69 @@ class Ion_auth
 	}
 
 	/**
-	 * register
+	 * invite
 	 *
 	 * @return void
-	 * @author Mathew
+	 * @author Andrew Welters <awelters@hugmehugyou.org> 
 	 **/
-	public function register($username, $password, $email, $additional_data = array(), $group_ids = array()) //need to test email activation
+	public function invite($username, $email, $additional_data = array(), $group_ids = array()) //need to test email activation
 	{
 		$this->ion_auth_model->trigger_events('pre_account_creation');
 
-		$email_activation = $this->config->item('email_activation', 'ion_auth');
+		$id = $this->ion_auth_model->invite($username, $email, $additional_data, $group_ids);
 
-		if (!$email_activation)
+		if (!$id)
 		{
-			$id = $this->ion_auth_model->register($username, $password, $email, $additional_data, $group_ids);
-			if ($id !== FALSE)
-			{
-				$this->set_message('account_creation_successful');
-				$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_successful'));
-				return $id;
-			}
-			else
-			{
-				$this->set_error('account_creation_unsuccessful');
-				$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_unsuccessful'));
-				return FALSE;
-			}
+			$this->set_error('account_creation_unsuccessful');
+			return FALSE;
+		}
+
+		$activate = $this->ion_auth_model->activate($id, false, true);
+
+		if (!$activate)
+		{
+			$this->set_error('activate_unsuccessful');
+			$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_unsuccessful'));
+			return FALSE;
+		}
+
+		$activation_code = $this->ion_auth_model->activation_code;
+		$identity        = $this->config->item('identity', 'ion_auth');
+		$user            = $this->ion_auth_model->user($id)->row();
+
+		$data = array(
+			'identity'   => $user->{$identity},
+			'id'         => $user->id,
+			'email'      => $email,
+			'activation' => $activation_code,
+		);
+		if(!$this->config->item('use_ci_email', 'ion_auth'))
+		{
+			$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_successful', 'activation_email_successful'));
+			$this->set_message('activation_email_successful');
+				return $data;
 		}
 		else
 		{
-			$id = $this->ion_auth_model->register($username, $password, $email, $additional_data, $group_ids);
+			$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('email_activate', 'ion_auth'), $data, true);
 
-			if (!$id)
-			{
-				$this->set_error('account_creation_unsuccessful');
-				return FALSE;
-			}
+			$this->email->clear();
+			$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+			$this->email->to($email);
+			$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - ' . $this->lang->line('email_activation_subject'));
+			$this->email->message($message);
 
-			$deactivate = $this->ion_auth_model->deactivate($id);
-
-			if (!$deactivate)
-			{
-				$this->set_error('deactivate_unsuccessful');
-				$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_unsuccessful'));
-				return FALSE;
-			}
-
-			$activation_code = $this->ion_auth_model->activation_code;
-			$identity        = $this->config->item('identity', 'ion_auth');
-			$user            = $this->ion_auth_model->user($id)->row();
-
-			$data = array(
-				'identity'   => $user->{$identity},
-				'id'         => $user->id,
-				'email'      => $email,
-				'activation' => $activation_code,
-			);
-			if(!$this->config->item('use_ci_email', 'ion_auth'))
+			if ($this->email->send() == TRUE)
 			{
 				$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_successful', 'activation_email_successful'));
 				$this->set_message('activation_email_successful');
-					return $data;
+				return $id;
 			}
-			else
-			{
-				$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('email_activate', 'ion_auth'), $data, true);
-
-				$this->email->clear();
-				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
-				$this->email->to($email);
-				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - ' . $this->lang->line('email_activation_subject'));
-				$this->email->message($message);
-
-				if ($this->email->send() == TRUE)
-				{
-					$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_successful', 'activation_email_successful'));
-					$this->set_message('activation_email_successful');
-					return $id;
-				}
-			}
-
-			$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_unsuccessful', 'activation_email_unsuccessful'));
-			$this->set_error('activation_email_unsuccessful');
-			return FALSE;
 		}
+
+		$this->ion_auth_model->trigger_events(array('post_account_creation', 'post_account_creation_unsuccessful', 'activation_email_unsuccessful'));
+		$this->set_error('activation_email_unsuccessful');
+		return FALSE;
 	}
 
 	/**

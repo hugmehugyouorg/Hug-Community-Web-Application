@@ -6,7 +6,7 @@
 		<div class="row">
 		 	<div class="span10">
 		 	  <img src="//www.hugmehugyou.org/img/logo.png">
-			  <p ><small><em>Brought to you by the Hug Me Hug YOU! Initiative!</em></small></p>
+			  <p>Brought to you by the Hug Me Hug YOU! Initiative!</p>
 			</div>
 		</div>
 	</div>

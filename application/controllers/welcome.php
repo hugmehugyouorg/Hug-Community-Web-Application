@@ -22,7 +22,7 @@ class Welcome extends MY_Controller {
 		if (!$this->ion_auth->logged_in())
 		{
 			//redirect them to the login page
-			redirect('auth/login', 'refresh');
+			redirect('auth/sign_in', 'refresh');
 		}
 		else if($this->ion_auth->is_admin()) {
 			//redirect them to the admin page

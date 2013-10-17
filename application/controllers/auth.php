@@ -26,7 +26,7 @@ class Auth extends MY_Controller {
 		if (!$this->ion_auth->logged_in())
 		{
 			//redirect them to the login page
-			redirect('auth/login', 'refresh');
+			redirect('auth/sign_in', 'refresh');
 		}
 		elseif (!$this->ion_auth->is_admin())
 		{
@@ -50,9 +50,9 @@ class Auth extends MY_Controller {
 	}
 
 	//log the user in
-	function login()
+	function sign_in()
 	{
-		$this->data['title'] = "Login";
+		$this->data['title'] = "Sign In";
 
 		//validate form input
 		$this->form_validation->set_rules('identity', 'Identity', 'required');
@@ -76,7 +76,7 @@ class Auth extends MY_Controller {
 				//if the login was un-successful
 				//redirect them back to the login page
 				$this->session->set_flashdata('message', $this->ion_auth->errors());
-				redirect('auth/login', 'refresh'); //use redirects instead of loading views for compatibility with MY_Controller libraries
+				redirect('auth/sign_in', 'refresh'); //use redirects instead of loading views for compatibility with MY_Controller libraries
 			}
 		}
 		else
@@ -95,21 +95,21 @@ class Auth extends MY_Controller {
 				'type' => 'password',
 			);
 
-			$this->_render_page('auth/login', $this->data);
+			$this->_render_page('auth/sign_in', $this->data);
 		}
 	}
 
 	//log the user out
-	function logout()
+	function sign_out()
 	{
-		$this->data['title'] = "Logout";
+		$this->data['title'] = "Sign Out";
 
 		//log the user out
 		$logout = $this->ion_auth->logout();
 
 		//redirect them to the login page
 		$this->session->set_flashdata('message', $this->ion_auth->messages());
-		redirect('auth/login', 'refresh');
+		redirect('auth/sign_in', 'refresh');
 	}
 
 	//change password
@@ -121,7 +121,7 @@ class Auth extends MY_Controller {
 
 		if (!$this->ion_auth->logged_in())
 		{
-			redirect('auth/login', 'refresh');
+			redirect('auth/sign_in', 'refresh');
 		}
 
 		$user = $this->ion_auth->user()->row();
@@ -170,7 +170,7 @@ class Auth extends MY_Controller {
 			{
 				//if the password was successfully changed
 				$this->session->set_flashdata('message', $this->ion_auth->messages());
-				$this->logout();
+				$this->sign_out();
 			}
 			else
 			{
@@ -209,14 +209,20 @@ class Auth extends MY_Controller {
 			$config_tables = $this->config->item('tables', 'ion_auth');
 			$identity = $this->db->where('email', $this->input->post('email'))->limit('1')->get($config_tables['users'])->row();
 
-			//run the forgotten password method to email an activation code to the user
-			$forgotten = $this->ion_auth->forgotten_password($identity->{$this->config->item('identity', 'ion_auth')});
-
+			if(!$identity) {
+				//run the forgotten password method to email an activation code to the user
+				$forgotten = $this->ion_auth->forgotten_password(null);
+			}
+			else {
+				//run the forgotten password method to email an activation code to the user
+				$forgotten = $this->ion_auth->forgotten_password($identity->{$this->config->item('identity', 'ion_auth')});
+			}
+			
 			if ($forgotten)
 			{
 				//if there were no errors
 				$this->session->set_flashdata('message', $this->ion_auth->messages());
-				redirect("auth/login", 'refresh'); //we should display a confirmation page here instead of the login page
+				redirect("auth/sign_in", 'refresh'); //we should display a confirmation page here instead of the login page
 			}
 			else
 			{
@@ -298,7 +304,9 @@ class Auth extends MY_Controller {
 					{
 						//if the password was successfully changed
 						$this->session->set_flashdata('message', $this->ion_auth->messages());
-						$this->logout();
+						$this->ion_auth->logout();
+						$this->ion_auth->login($identity,$this->input->post('new'));
+						redirect('/', 'refresh');
 					}
 					else
 					{
@@ -331,9 +339,15 @@ class Auth extends MY_Controller {
 
 		if ($activation)
 		{
-			//redirect them to the auth page
 			$this->session->set_flashdata('message', $this->ion_auth->messages());
-			redirect("auth", 'refresh');
+			if ($code !== false) {
+				//redirect them to the reset password page
+				//redirect("auth/reset_password", 'refresh');
+				$this->reset_password($code);
+			}
+			else {
+				redirect("auth", 'refresh');
+			}
 		}
 		else
 		{
@@ -400,14 +414,12 @@ class Auth extends MY_Controller {
 		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
 		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
 		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'required|xss_clean|min_length[4]|max_length[4]');
-		$this->form_validation->set_rules('password', 'Password', 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
-		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'required');
 
 		if ($this->form_validation->run() == true)
 		{
 			$username = strtolower($this->input->post('first_name')) . ' ' . strtolower($this->input->post('last_name'));
 			$email    = $this->input->post('email');
-			$password = $this->input->post('password');
+			//$password = $this->input->post('password');
 
 			$additional_data = array(
 				'first_name' => $this->input->post('first_name'),
@@ -415,7 +427,7 @@ class Auth extends MY_Controller {
 				'phone'      => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
 			);
 		}
-		if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data))
+		if ($this->form_validation->run() == true && $this->ion_auth->invite($username, $email, $additional_data))
 		{
 			//check to see if we are creating the user
 			//redirect them back to the admin page
@@ -463,18 +475,6 @@ class Auth extends MY_Controller {
 				'id'    => 'phone3',
 				'type'  => 'text',
 				'value' => $this->form_validation->set_value('phone3'),
-			);
-			$this->data['password'] = array(
-				'name'  => 'password',
-				'id'    => 'password',
-				'type'  => 'password',
-				'value' => $this->form_validation->set_value('password'),
-			);
-			$this->data['password_confirm'] = array(
-				'name'  => 'password_confirm',
-				'id'    => 'password_confirm',
-				'type'  => 'password',
-				'value' => $this->form_validation->set_value('password_confirm'),
 			);
 
 			$this->_render_page('auth/invite_user', $this->data);

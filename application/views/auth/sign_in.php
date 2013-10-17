@@ -1,14 +1,12 @@
-	<h1>Login</h1>
+	<h1>Sign In</h1>
 	
-	<div class="alert-message info">
-		<p>Please login with your email and password below.</p>
-	</div>
+	<p>Please sign in with your email and password below.</p>
 	
 	<?php if(isset($message) && !empty($message)){ ?>
 		<div class="alert alert-message error" id="infoMessage"><?php echo $message;?></div>
 	<?php } ?>
 	
-	<?php echo form_open("auth/login", array('id'=>'login-form'));?>
+	<?php echo form_open("auth/sign_in", array('id'=>'login-form'));?>
 	
 	  <div class="clearfix">
 		<label for="identity">Email:</label>
@@ -21,15 +19,13 @@
 	  </div>
 	
 	  <div class="clearfix">
-		  <label>Remember Me</label>  
-		  <div class="input">
-			  <label for="remember"><?php echo form_checkbox('remember', '1', FALSE, 'class="input"');?></label>
-		 </div>
-		  
+	  	<label class="checkbox">
+		  <?php echo form_checkbox('remember', '1', FALSE, 'class="input"');?> Remember Me
+		</label>
 	  </div>
 	  
 	  
-	  <div class="input"><?php echo form_submit(array('class'=>'btn primary', 'value'=>'login'), 'Login');?></div>
+	  <div class="input"><?php echo form_submit(array('class'=>'btn primary', 'value'=>'Sign In'), 'Sign In');?></div>
 	
 	<?php echo form_close();?>
 	

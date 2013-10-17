@@ -5,7 +5,7 @@
  * @author Andrew Welters
  */
 class MY_Controller extends CI_Controller {
-	public $title = "Home &hearts;";
+	public $title = "&hearts;";
 
 	public function  __construct() {
 		parent::__construct();
@@ -23,7 +23,7 @@ class MY_Controller extends CI_Controller {
 		$headerData = array();
 		$headerData['title'] = $this->title;
 		$headerData['bodyID'] = strtolower($this->router->fetch_class() .'-'.$this->router->fetch_method());
-        $headerData['loggedIn'] = $this->ion_auth->logged_in();
+        $headerData['user'] = $this->ion_auth->logged_in() ? $this->ion_auth->user()->row() : FALSE;
 
 		return $headerData;
 	}

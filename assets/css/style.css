@@ -1,9 +1,35 @@
+.alert {
+	margin-top:10px;
+	margin-bottom:10px;
+}
+
+.alert p {
+	margin:0;
+}
+
+.brand img {
+	max-height:45px;
+}
+
 #main {
 	padding-bottom: 111px;
 }
 
+.navbar-fixed-bottom {
+	display: none;
+}
+
 .navbar-fixed-bottom .container {
 	padding-top:5px;
+}
+
+.navbar-fixed-bottom img {
+	max-height:45px;
+}
+
+.navbar-fixed-bottom p {
+	font-size:85%;
+	font-style:italic;
 }
 	
 @media (max-width: 979px) and (min-width: 768px) {
