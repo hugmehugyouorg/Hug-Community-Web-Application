@@ -30,22 +30,41 @@
     <div class="navbar " style="position: static;">
         <div class="navbar-inner">
           <div class="container">
-          	<?php if($user){ ?>
+          	<?php if($signInPage == 'false') { ?>
 				<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
 				  <span class="icon-bar"></span>
 				  <span class="icon-bar"></span>
 				  <span class="icon-bar"></span>
 				</a>
-            <?php } ?>
-            <a class="brand" href="/"><!--<img src="//www.hugmehugyou.org/img/logo.png">-->Dashboard</a>
-            <?php if($user){ ?>
+			<?php } ?>
+			<?php if($user && $homeLink == 'dashboard'){ ?>
+				<a class="brand" href="dashboard">
+					<!--<img src="//www.hugmehugyou.org/img/logo.png">-->
+					Dashboard
+				</a>
+            <?php } else { ?>
+            	<a class="brand" href="/">
+            	<!--<img src="//www.hugmehugyou.org/img/logo.png">-->
+            		Welcome
+            	</a>
+            <?php }  ?>
+            <?php if($signInPage == 'false') { ?>
 				<div class="nav-collapse collapse">
 				  <ul class="nav pull-right">
-					<li><a href="/auth/profile/<?php echo $user->id ?>">Profile</a></li>
-					<li><a href="/auth/sign_out">Sign Out</a></li>
+				  	<?php if($user){ ?>
+				  		<?php if($homeLink == 'dashboard'){ ?>
+							<li><a href="/">Welcome</a></li>
+						<?php } else { ?>
+							<li><a href="dashboard">Dashboard</a></li>
+						<?php } ?>
+						<li><a href="/profile/<?php echo $user->id ?>">Profile</a></li>
+						<li><a href="/sign_out">Sign Out</a></li>
+					<?php } else { ?>
+						<li><a href="/sign_in">Sign In</a></li>
+					<?php }  ?>
 				  </ul>
 				</div><!-- /.nav-collapse -->
-            <?php } ?>
+			<?php }  ?>
           </div>
         </div><!-- /navbar-inner -->
       </div>

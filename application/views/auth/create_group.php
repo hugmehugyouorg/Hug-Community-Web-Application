@@ -3,7 +3,7 @@
 
 <div id="infoMessage"><?php echo $message;?></div>
 
-<?php echo form_open("auth/create_group");?>
+<?php echo form_open("create_group");?>
 
       <p>
             Group Name: <br />

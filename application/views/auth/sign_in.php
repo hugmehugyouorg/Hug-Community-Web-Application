@@ -6,7 +6,7 @@
 		<div class="alert alert-message error" id="infoMessage"><?php echo $message;?></div>
 	<?php } ?>
 	
-	<?php echo form_open("auth/sign_in", array('id'=>'login-form'));?>
+	<?php echo form_open("sign_in", array('id'=>'login-form'));?>
 	
 	  <div class="clearfix">
 		<label for="identity">Email:</label>

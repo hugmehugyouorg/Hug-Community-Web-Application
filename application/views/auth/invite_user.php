@@ -5,7 +5,7 @@
 	<div class="alert alert-message error" id="infoMessage"><?php echo $message;?></div>
 <?php } ?>
 
-<?php echo form_open("auth/invite_user");?>
+<?php echo form_open("invite_user");?>
 
       <p>
             First Name: <br />

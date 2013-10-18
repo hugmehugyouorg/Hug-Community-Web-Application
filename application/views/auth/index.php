@@ -19,13 +19,13 @@
 			<td><?php echo $user->email;?></td>
 			<td>
 				<?php foreach ($user->groups as $group):?>
-					<?php echo anchor("auth/edit_group/".$group->id, $group->name) ;?><br />
+					<?php echo anchor("edit_group/".$group->id, $group->name) ;?><br />
                 <?php endforeach?>
 			</td>
-			<td><?php echo ($user->active) ? anchor("auth/deactivate/".$user->id, 'Active') : anchor("auth/activate/". $user->id, 'Inactive');?></td>
-			<td><?php echo anchor("auth/profile/".$user->id, 'Profile') ;?></td>
+			<td><?php echo ($user->active) ? anchor("deactivate/".$user->id, 'Active') : anchor("activate/". $user->id, 'Inactive');?></td>
+			<td><?php echo anchor("profile/".$user->id, 'Profile') ;?></td>
 		</tr>
 	<?php endforeach;?>
 </table>
 
-<p><a href="<?php echo site_url('auth/invite_user');?>">Invite a new user</a> | <a href="<?php echo site_url('auth/create_group');?>">Create a new group</a></p>
+<p><a href="<?php echo site_url('invite_user');?>">Invite a new user</a> | <a href="<?php echo site_url('create_group');?>">Create a new group</a></p>
