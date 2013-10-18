@@ -6,9 +6,8 @@
 	<!-- fix for IE9 Google Font Issue -->
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-	<!-- responsive design so don't let scaling occur
+	<!-- responsive design so don't let scaling occur -->
 	<meta name="viewport" content="width = device-width, initial-scale = 1, minimum-scale = 1, maximum-scale = 1, user-scalable = no" />
-	 -->
 	 
 	<!-- favicon
 	<link rel="icon" href="//www.hugmehugyou.org/img/favicon.gif" type="image/gif"/>
@@ -31,21 +30,23 @@
     <div class="navbar " style="position: static;">
         <div class="navbar-inner">
           <div class="container">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="/"><img src="//www.hugmehugyou.org/img/logo.png"></a>
-            <div class="nav-collapse collapse">
-              <?php if($user){ ?>
-              <ul class="nav pull-right">
-              	<li><a href="/">Dashboard</a></li>
-                <li><a href="/auth/profile/<?php echo $user->id ?>">Profile</a></li>
-                <li><a href="/auth/sign_out">Sign Out</a></li>
-              </ul>
-              <?php } ?>
-            </div><!-- /.nav-collapse -->
+          	<?php if($user){ ?>
+				<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				  <span class="icon-bar"></span>
+				  <span class="icon-bar"></span>
+				  <span class="icon-bar"></span>
+				</a>
+            <?php } ?>
+            <a class="brand" href="/"><!--<img src="//www.hugmehugyou.org/img/logo.png">-->Dashboard</a>
+            <?php if($user){ ?>
+				<div class="nav-collapse collapse">
+				  <ul class="nav pull-right">
+					<li><a href="/">Dashboard</a></li>
+					<li><a href="/auth/profile/<?php echo $user->id ?>">Profile</a></li>
+					<li><a href="/auth/sign_out">Sign Out</a></li>
+				  </ul>
+				</div><!-- /.nav-collapse -->
+            <?php } ?>
           </div>
         </div><!-- /navbar-inner -->
       </div>
