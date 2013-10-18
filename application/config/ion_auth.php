@@ -158,6 +158,14 @@ $config['email_forgot_password_complete'] = 'new_password.tpl.php';
 
 /*
  | -------------------------------------------------------------------------
+ | Emergency Alert Email Template
+ | -------------------------------------------------------------------------
+ | Default: emergency_alert.tpl.php
+ */
+$config['email_emergency_alert'] = 'emergency_alert.tpl.php';
+
+/*
+ | -------------------------------------------------------------------------
  | Salt options
  | -------------------------------------------------------------------------
  | salt_length Default: 10

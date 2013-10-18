@@ -59,3 +59,4 @@ $lang['group_name_required'] 		= 'Group name is a required field';
 $lang['email_forgotten_password_subject']    = 'Forgotten Password Verification';
 $lang['email_new_password_subject']          = 'New Password';
 $lang['email_activation_subject']            = 'Account Activation';
+$lang['email_emergency_alert_subject'] = 'Emergency Alert';

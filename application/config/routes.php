@@ -38,8 +38,10 @@
 |
 */
 
-$route['default_controller'] = "welcome";
+$route['default_controller'] = isset($_SERVER['CI_DEFAULT_CONTROLLER']) ? $_SERVER['CI_DEFAULT_CONTROLLER'] : "welcome";
 $route['404_override'] = '';
+$route['welcome'] = "welcome";
+$route['companion'] = "companion";
 $route['dashboard'] = "dashboard";
 $route['(:any)'] = "auth/$1";
 

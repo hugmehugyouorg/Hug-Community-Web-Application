@@ -266,7 +266,7 @@ $config['sess_time_to_update']	= 300;
 |
 */
 $config['cookie_prefix']	= "";
-$config['cookie_domain']	= "";
+$config['cookie_domain']	= isset($_SERVER['CI_COOKIE_DOMAIN']) ? $_SERVER['CI_COOKIE_DOMAIN'] : ".hugcommunity.org";
 $config['cookie_path']		= "/";
 $config['cookie_secure']	= TRUE;
 
@@ -279,7 +279,7 @@ $config['cookie_secure']	= TRUE;
 | COOKIE data is encountered
 |
 */
-$config['global_xss_filtering'] = TRUE;
+$config['global_xss_filtering'] = isset($_SERVER['CI_GLOBAL_XSS_FILTERING']) ? $_SERVER['CI_GLOBAL_XSS_FILTERING'] : TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -315,7 +315,7 @@ $config['csrf_expire'] = 7200;
 | by the output class.  Do not 'echo' any values with compression enabled.
 |
 */
-$config['compress_output'] = TRUE;
+$config['compress_output'] = isset($_SERVER['CI_COMPRESS_OUTPUT']) ? $_SERVER['CI_COMPRESS_OUTPUT'] : TRUE;
 
 /*
 |--------------------------------------------------------------------------
