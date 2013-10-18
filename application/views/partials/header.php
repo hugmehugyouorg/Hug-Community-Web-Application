@@ -41,7 +41,6 @@
             <?php if($user){ ?>
 				<div class="nav-collapse collapse">
 				  <ul class="nav pull-right">
-					<li><a href="/">Dashboard</a></li>
 					<li><a href="/auth/profile/<?php echo $user->id ?>">Profile</a></li>
 					<li><a href="/auth/sign_out">Sign Out</a></li>
 				  </ul>
