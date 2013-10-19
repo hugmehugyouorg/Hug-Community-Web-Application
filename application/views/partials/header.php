@@ -38,7 +38,7 @@
 				</a>
 			<?php } ?>
 			<?php if($user && $homeLink == 'dashboard'){ ?>
-				<a class="brand" href="dashboard">
+				<a class="brand" href="/dashboard">
 					<!--<img src="//www.hugmehugyou.org/img/logo.png">-->
 					Dashboard
 				</a>
@@ -55,7 +55,7 @@
 				  		<?php if($homeLink == 'dashboard'){ ?>
 							<li><a href="/">Welcome</a></li>
 						<?php } else { ?>
-							<li><a href="dashboard">Dashboard</a></li>
+							<li><a href="/dashboard">Dashboard</a></li>
 						<?php } ?>
 						<li><a href="/profile/<?php echo $user->id ?>">Profile</a></li>
 						<li><a href="/sign_out">Sign Out</a></li>

@@ -5,8 +5,8 @@
 	<div class="container">
 		<div class="row">
 		 	<div class="span10">
-		 	  <img src="//www.hugmehugyou.org/img/logo.png">
-			  <p>Brought to you by the Hug Me Hug YOU! Initiative!</p>
+		 	  <a href="http://www.hugmehugyou.org" target="_blank"><img class="hugmehugyou" src="//www.hugmehugyou.org/img/logo.png">
+			  <p>&copy;<?php echo(date("Y")); ?> Hug Me Hug YOU! Initiative</p></a>
 			</div>
 		</div>
 	</div>

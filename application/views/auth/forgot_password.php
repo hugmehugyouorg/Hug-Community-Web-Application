@@ -1,7 +1,9 @@
 <h1>Forgot Password</h1>
 <p>Please enter your <?php echo $identity_label; ?> so we can send you an email to reset your password.</p>
 
-<div id="infoMessage"><?php echo $message;?></div>
+<?php if(isset($message) && !empty($message)){ ?>
+		<div class="alert alert-message error" id="infoMessage"><?php echo $message;?></div>
+	<?php } ?>
 
 <?php echo form_open("forgot_password");?>
 

@@ -53,13 +53,13 @@ CREATE TABLE `users` (
 
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `salt`, `email`, `activation_code`, `forgotten_password_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`) VALUES
-	('1',0x7f000001,'awelters','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','awelters@hugmehugyou.org','',NULL,'1268889823','1268889823','1', 'Andrew','Welters','ADMIN','0');
+	('1',0x7f000001,'awelters','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','awelters@hugmehugyou.org','',NULL,'1268889823','1268889823','1', 'Andrew','Welters','ADMIN','111-111-1111');
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `salt`, `email`, `activation_code`, `forgotten_password_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`) VALUES
-	('2',0x7f000001,'test_admin','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_admin@test.com','',NULL,'1268889823','1268889823','1', 'TEST','ADMIN','ADMIN','0');
+	('2',0x7f000001,'test_admin','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_admin@test.com','',NULL,'1268889823','1268889823','1', 'TEST','ADMIN','ADMIN','111-111-1111');
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `salt`, `email`, `activation_code`, `forgotten_password_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`) VALUES
-	('3',0x7f000001,'test_social_worker','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_social_worker@test.com','',NULL,'1268889823','1268889823','1', 'TEST','SOCIAL WORKER','SOCIAL WORKER','0');
+	('3',0x7f000001,'test_social_worker','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_social_worker@test.com','',NULL,'1268889823','1268889823','1', 'TEST','SOCIAL WORKER','SOCIAL WORKER','111-111-1111');
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `salt`, `email`, `activation_code`, `forgotten_password_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`) VALUES
-	('4',0x7f000001,'test_community_member','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_community_member@test.com','',NULL,'1268889823','1268889823','1', 'TEST','COMMUNITY MEMBER','COMMUNITY MEMBER','0');
+	('4',0x7f000001,'test_community_member','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_community_member@test.com','',NULL,'1268889823','1268889823','1', 'TEST','COMMUNITY MEMBER','COMMUNITY MEMBER','111-111-1111');
 
 #
 # Table structure for table 'users_groups'
