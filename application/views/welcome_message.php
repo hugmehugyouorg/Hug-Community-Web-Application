@@ -28,7 +28,7 @@
 </div>
 
 <div class="container-fluid">
-	<h2>In the Future...</h2>
+	<h3>In the Future...</h3>
 	<div class="row-fluid">
 		<p class="span12">
 			In the future, other children will be added from the same county, other children from other counties, and funds continued to be raised by using the donations for a toy approach. Our expectation is that within 2 years to have 2000 therapeutic companions in use and upwards of 20,000 community members receiving and sending messages.
