@@ -25,16 +25,13 @@
 			Finally, our plan is to partially or fully fund this project with Kickstarter and expect to offer similar therapeutic companions as toys in order to raise the amount necessary to make a production run within 6 months of the start of the Kickstarter project. We expect to have upwards of 500 additional therapeutic companions made if this is the case. This would mean there would be upwards of 5000 community members receiving and sending messages.	
 		</p>
 	</div>
-	<div class="row-fluid">
-		<div class="span4">
-		</div>
-	</div>
 </div>
 
 <div class="container-fluid">
+	<h2>In the Future...</h2>
 	<div class="row-fluid">
 		<p class="span12">
-			For the future, other children will be added from the same county, other children from other counties, and funds continued to be raised by using the donations for a toy approach. Our expectation is that within 2 years to have 2000 therapeutic companions in use and upwards of 20,000 community members receiving and sending messages.
+			In the future, other children will be added from the same county, other children from other counties, and funds continued to be raised by using the donations for a toy approach. Our expectation is that within 2 years to have 2000 therapeutic companions in use and upwards of 20,000 community members receiving and sending messages.
 		</p>
 	</div>
 </div>
