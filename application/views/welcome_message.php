@@ -6,7 +6,7 @@
 		</div>
 	<div class="row-fluid">
 		<p class="lead">
-			<a href="http://www.co.carver.mn.us/departments/CSS/" target="_blank"><img src="http://www.co.carver.mn.us/images/design/logo_crop.jpg"/></a>
+			<a href="http://www.co.carver.mn.us/departments/CSS/" target="_blank"><img src="//www.co.carver.mn.us/images/design/logo_crop.jpg"/></a>
 			<a href="http://www.hugmehugyou.org" target="_blank"><img class="hugmehugyou" src="//www.hugmehugyou.org/img/logo.png"></a>
 		</p>
 	</div>
