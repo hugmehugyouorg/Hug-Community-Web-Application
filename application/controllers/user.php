@@ -1,11 +1,10 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Auth extends MY_Controller {
+class User extends MY_Controller {
 	
 	//log the user in
 	function sign_in()
 	{
-		$this->data['title'] = "Sign In";
 		$this->data['homeLink'] = "/";
 		$this->data['signInPage'] = "true";
 
@@ -50,15 +49,13 @@ class Auth extends MY_Controller {
 				'type' => 'password',
 			);
 
-			$this->_render_page('auth/sign_in', $this->data);
+			$this->_render_page('user/sign_in', $this->data);
 		}
 	}
 
 	//log the user out
 	function sign_out()
 	{
-		$this->data['title'] = "Sign Out";
-
 		//log the user out
 		$logout = $this->ion_auth->logout();
 
@@ -113,7 +110,7 @@ class Auth extends MY_Controller {
 			);
 
 			//render
-			$this->_render_page('auth/change_password', $this->data);
+			$this->_render_page('user/change_password', $this->data);
 		}
 		else
 		{
@@ -158,7 +155,7 @@ class Auth extends MY_Controller {
 
 			//set any errors and display the form
 			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
-			$this->_render_page('auth/forgot_password', $this->data);
+			$this->_render_page('user/forgot_password', $this->data);
 		}
 		else
 		{
@@ -236,7 +233,7 @@ class Auth extends MY_Controller {
 				$this->data['code'] = $code;
 
 				//render
-				$this->_render_page('auth/reset_password', $this->data);
+				$this->_render_page('user/reset_password', $this->data);
 			}
 			else
 			{
@@ -331,7 +328,7 @@ class Auth extends MY_Controller {
 			$this->data['csrf'] = $this->_get_csrf_nonce();
 			$this->data['user'] = $this->ion_auth->user($id)->row();
 
-			$this->_render_page('auth/deactivate_user', $this->data);
+			$this->_render_page('user/deactivate_user', $this->data);
 		}
 		else
 		{
@@ -356,100 +353,9 @@ class Auth extends MY_Controller {
 		}
 	}
 
-	//create a new user via invitation
-	function invite_user()
-	{
-		$this->data['title'] = "Invite User";
-
-		if (!$this->ion_auth->logged_in())
-		{
-			redirect('sign_in', 'refresh');
-		}
-		
-		if (!$this->ion_auth->is_admin())
-		{
-			redirect('dashboard', 'refresh');
-		}
-
-		//validate form input
-		$this->form_validation->set_rules('first_name', 'First Name', 'required|xss_clean');
-		$this->form_validation->set_rules('last_name', 'Last Name', 'required|xss_clean');
-		$this->form_validation->set_rules('email', 'Email Address', 'required|valid_email');
-		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
-		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
-		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'required|xss_clean|min_length[4]|max_length[4]');
-
-		if ($this->form_validation->run() == true)
-		{
-			$username = strtolower($this->input->post('first_name')) . ' ' . strtolower($this->input->post('last_name'));
-			$email    = $this->input->post('email');
-			//$password = $this->input->post('password');
-
-			$additional_data = array(
-				'first_name' => $this->input->post('first_name'),
-				'last_name'  => $this->input->post('last_name'),
-				'phone'      => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
-			);
-		}
-		if ($this->form_validation->run() == true && $this->ion_auth->invite($username, $email, $additional_data))
-		{
-			//check to see if we are creating the user
-			//redirect them back to the admin page
-			$this->session->set_flashdata('message', $this->ion_auth->messages());
-			redirect('dashboard', 'refresh');
-		}
-		else
-		{
-			//display the create user form
-			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
-
-			$this->data['first_name'] = array(
-				'name'  => 'first_name',
-				'id'    => 'first_name',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('first_name'),
-			);
-			$this->data['last_name'] = array(
-				'name'  => 'last_name',
-				'id'    => 'last_name',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('last_name'),
-			);
-			$this->data['email'] = array(
-				'name'  => 'email',
-				'id'    => 'email',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('email'),
-			);
-			$this->data['phone1'] = array(
-				'name'  => 'phone1',
-				'id'    => 'phone1',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('phone1'),
-			);
-			$this->data['phone2'] = array(
-				'name'  => 'phone2',
-				'id'    => 'phone2',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('phone2'),
-			);
-			$this->data['phone3'] = array(
-				'name'  => 'phone3',
-				'id'    => 'phone3',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('phone3'),
-			);
-
-			$this->_render_page('auth/invite_user', $this->data);
-		}
-	}
-
 	//user profile
 	function profile($id)
 	{
-		$this->data['title'] = "Profile";
-
 		if (!$this->ion_auth->logged_in())
 		{
 			redirect('sign_in', 'refresh');
@@ -591,124 +497,8 @@ class Auth extends MY_Controller {
 			'type' => 'password'
 		);
 
-		$this->_render_page('auth/profile', $this->data);
+		$this->_render_page('user/profile', $this->data);
 	}
-
-	// create a new group
-	function create_group()
-	{
-		$this->data['title'] = "Create Group";
-
-		if (!$this->ion_auth->logged_in())
-		{
-			redirect('sign_in', 'refresh');
-		}
-		
-		if (!$this->ion_auth->is_admin())
-		{
-			redirect('dashboard', 'refresh');
-		}
-
-		//validate form input
-		$this->form_validation->set_rules('group_name', 'Group name', 'required|alpha_dash|xss_clean');
-		$this->form_validation->set_rules('description', 'Description', 'xss_clean');
-
-		if ($this->form_validation->run() == TRUE)
-		{
-			$new_group_id = $this->ion_auth->create_group($this->input->post('group_name'), $this->input->post('description'));
-			if($new_group_id)
-			{
-				// check to see if we are creating the group
-				// redirect them back to the admin page
-				$this->session->set_flashdata('message', $this->ion_auth->messages());
-				redirect('dashboard', 'refresh');
-			}
-		}
-		else
-		{
-			//display the create group form
-			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
-
-			$this->data['group_name'] = array(
-				'name'  => 'group_name',
-				'id'    => 'group_name',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('group_name'),
-			);
-			$this->data['description'] = array(
-				'name'  => 'description',
-				'id'    => 'description',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('description'),
-			);
-
-			$this->_render_page('auth/create_group', $this->data);
-		}
-	}
-
-	//edit a group
-	function edit_group($id)
-	{
-		$this->data['title'] = "Edit Group";
-
-		if (!$this->ion_auth->logged_in())
-		{
-			redirect('sign_in', 'refresh');
-		}
-		
-		// bail if no group id given
-		if(!$this->ion_auth->is_admin() || !$id || empty($id))
-		{
-			redirect('dashboard', 'refresh');
-		}
-
-		$group = $this->ion_auth->group($id)->row();
-
-		//validate form input
-		$this->form_validation->set_rules('group_name', 'Group name', 'required|alpha_dash|xss_clean');
-		$this->form_validation->set_rules('group_description', 'Group Description', 'xss_clean');
-
-		if (isset($_POST) && !empty($_POST))
-		{
-			if ($this->form_validation->run() === TRUE)
-			{
-				$group_update = $this->ion_auth->update_group($id, $_POST['group_name'], $_POST['group_description']);
-
-				if($group_update)
-				{
-					$this->session->set_flashdata('message', "Group Saved");
-				}
-				else
-				{
-					$this->session->set_flashdata('message', $this->ion_auth->errors());
-				}
-				redirect('dashboard', 'refresh');
-			}
-		}
-
-		//set the flash data error message if there is one
-		$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
-
-		//pass the user to the view
-		$this->data['group'] = $group;
-
-		$this->data['group_name'] = array(
-			'name'  => 'group_name',
-			'id'    => 'group_name',
-			'type'  => 'text',
-			'value' => $this->form_validation->set_value('group_name', $group->name),
-		);
-		$this->data['group_description'] = array(
-			'name'  => 'group_description',
-			'id'    => 'group_description',
-			'type'  => 'text',
-			'value' => $this->form_validation->set_value('group_description', $group->description),
-		);
-
-		$this->_render_page('auth/edit_group', $this->data);
-	}
-
 
 	function _get_csrf_nonce()
 	{

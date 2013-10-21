@@ -43,7 +43,10 @@ $route['404_override'] = '';
 $route['welcome'] = "welcome";
 $route['companion'] = "companion";
 $route['dashboard'] = "dashboard";
-$route['(:any)'] = "auth/$1";
+$route['groups'] = "group";
+$route['group/(:num)'] = "group/index/$1";
+$route['group/(:any)'] = "group/$1";
+$route['(:any)'] = "user/$1";
 
 
 /* End of file routes.php */

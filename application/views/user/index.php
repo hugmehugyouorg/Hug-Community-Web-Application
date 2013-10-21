@@ -19,7 +19,7 @@
 			<td><?php echo $user->email;?></td>
 			<td>
 				<?php foreach ($user->groups as $group):?>
-					<?php echo anchor("edit_group/".$group->id, $group->name) ;?><br />
+					<?php echo anchor("group/".$group->id, $group->name) ;?><br />
                 <?php endforeach?>
 			</td>
 			<td><?php echo ($user->active) ? anchor("deactivate/".$user->id, 'Active') : anchor("activate/". $user->id, 'Inactive');?></td>
@@ -28,4 +28,4 @@
 	<?php endforeach;?>
 </table>
 
-<p><a href="<?php echo site_url('invite_user');?>">Invite a new user</a> | <a href="<?php echo site_url('create_group');?>">Create a new group</a></p>
+<p><a href="<?php echo site_url('invite_user');?>">Invite a New User</a> | <a href="<?php echo site_url('group/create');?>">Create a New Safety Team</a></p>

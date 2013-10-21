@@ -48,12 +48,13 @@ $lang['delete_successful']               = 'User Deleted';
 $lang['delete_unsuccessful']           = 'Unable to Delete User';
 
 // Groups
-$lang['group_creation_successful']  = 'Group created Successfully';
-$lang['group_already_exists']       = 'Group name already taken';
-$lang['group_update_successful']    = 'Group details updated';
-$lang['group_delete_successful']    = 'Group deleted';
-$lang['group_delete_unsuccessful'] 	= 'Unable to delete group';
-$lang['group_name_required'] 		= 'Group name is a required field';
+$lang['group_creation_successful']  = 'Safety Team created Successfully';
+$lang['group_already_exists']       = 'Safety Team name already taken';
+$lang['group_update_successful']    = 'Safety Team details updated';
+$lang['group_delete_successful']    = 'Safety Team deleted';
+$lang['group_delete_unsuccessful'] 	= 'Unable to delete Safety Team';
+$lang['group_name_required'] 		= 'Safety Team name is a required field';
+$lang['group_not_editable']       = 'Safety Team cannot be edited';
 
 // Email Subjects
 $lang['email_forgotten_password_subject']    = 'Forgotten Password Verification';

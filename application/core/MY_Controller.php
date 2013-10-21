@@ -32,10 +32,11 @@ class MY_Controller extends CI_Controller {
 		$headerData['title'] = $this->title;
 		$headerData['bodyID'] = strtolower($this->router->fetch_class() .'-'.$this->router->fetch_method());
         $headerData['user'] = $this->ion_auth->logged_in() ? $this->ion_auth->user()->row() : FALSE;
+        $headerData['is_admin'] = $this->ion_auth->is_admin() ? TRUE : FALSE;
+        $headerData['is_group_editor'] = $this->ion_auth->is_group_editor() ? TRUE : FALSE;
 		$headerData['homeLink'] = $data && array_key_exists('homeLink',$data) ? $data['homeLink'] : 'dashboard';	
 		$headerData['signInPage'] = $data && array_key_exists('signInPage',$data) ? ($data['signInPage'] != 'true' ? 'false' : 'true') : 'false';	
-		//echo $headerData['signInPage'];
-		//die();
+		
 		return $headerData;
 	}
 	

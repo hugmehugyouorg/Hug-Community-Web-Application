@@ -433,6 +433,21 @@ class Ion_auth
 
 		return $this->in_group($admin_group, $id);
 	}
+	
+	/**
+	 * is_group_editor
+	 *
+	 * @return bool
+	 * @author Andrew Welters
+	 **/
+	public function is_group_editor($id=false)
+	{
+		$this->ion_auth_model->trigger_events('is_group_editor');
+
+		$group_editor_group = $this->config->item('group_editor_group', 'ion_auth');
+
+		return $this->in_group($group_editor_group, $id);
+	}
 
 	/**
 	 * in_group
@@ -476,6 +491,26 @@ class Ion_auth
 		}
 
 		return FALSE;
+	}
+
+	/**
+	 * is_group_editable
+	 *
+	 * @return bool
+	 * @author Andrew Welters
+	 **/
+	public function is_group_editable($check_group)
+	{
+		$this->ion_auth_model->trigger_events('is_group_editable');
+
+		$admin_group = $this->config->item('admin_group', 'ion_auth');
+		$group_editor_group = $this->config->item('group_editor_group', 'ion_auth');
+		$default_group = $this->config->item('default_group', 'ion_auth');
+
+		if($check_group == $admin_group || $check_group == $group_editor_group || $check_group == $default_group)
+			return FALSE;
+
+		return TRUE;
 	}
 
 }

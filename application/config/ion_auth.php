@@ -85,6 +85,7 @@ $config['site_title']                 = isset($_SERVER['CI_SITE_TITLE']) ? $_SER
 $config['admin_email']                = isset($_SERVER['CI_ADMIN_EMAIL']) ? $_SERVER['CI_ADMIN_EMAIL'] : "admin@example.com"; // Admin Email, admin@example.com
 $config['default_group']              = 'community member';           // Default group, use name
 $config['admin_group']                = 'admin';             // Default administrators group, use name
+$config['group_editor_group']         = 'social worker';     // Default group editor group, use name
 $config['identity']                   = 'email';             // A database column which is used to login with
 $config['min_password_length']        = 8;                   // Minimum Required Length of Password
 $config['max_password_length']        = 20;                  // Maximum Allowed Length of Password
@@ -130,7 +131,7 @@ $config['email_config'] = array(
  | Folder where email templates are stored.
  | Default: auth/
  */
-$config['email_templates'] = 'auth/email/';
+$config['email_templates'] = 'user/email/';
 
 /*
  | -------------------------------------------------------------------------
