@@ -59,8 +59,6 @@
 						<?php } ?>
 						<?php if($is_admin || $is_group_editor) { ?>
 							<li><a href="/groups">Teams</a></li>
-						<?php } else { ?>
-							<li><a href="/dashboard">Dashboard</a></li>
 						<?php } ?>
 						<li><a href="/profile/<?php echo $user->id ?>">Profile</a></li>
 						<li><a href="/sign_out">Sign Out</a></li>
