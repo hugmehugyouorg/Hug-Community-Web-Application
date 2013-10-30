@@ -11,8 +11,12 @@ a {
 	margin:0;
 }
 
-.brand img, img.hugmehugyou {
+.brand img {
 	max-height:45px;
+}
+
+.brand img, img.hugmehugyou {
+	max-height:56px;
 }
 
 #main {
