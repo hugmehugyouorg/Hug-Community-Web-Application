@@ -1,6 +1,8 @@
 Hug Community Web Application (www.hugcommunity.org)
 =============================
-A project of the Hug Me Hug YOU! Initiative (www.hugmehugyou.org)
+A project of Carver County Community Social Services (http://www.co.carver.mn.us/departments/CSS/).
+
+In partnership with the Hug Me Hug YOU! Initiative (www.hugmehugyou.org).
 
 PROJECT
 -------
