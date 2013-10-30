@@ -11,12 +11,8 @@ a {
 	margin:0;
 }
 
-.brand img {
+.brand img, img.hugmehugyou {
 	max-height:45px;
-}
-
-img.hugmehugyou {
-	max-height:35px;
 }
 
 #main {
@@ -38,6 +34,10 @@ img.hugmehugyou {
 
 .navbar-fixed-bottom a {
 	line-height: 100%;
+}
+
+.navbar-fixed-bottom img.hugmehugyou {
+	max-height:35px;
 }
 	
 .navbar-fixed-bottom p {
