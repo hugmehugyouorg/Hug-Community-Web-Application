@@ -32,7 +32,7 @@
       
 	<?php if( count($currentGroups) != 0 ) { ?>
 	
-		 <h3>Member of groups</h3>
+		 <h3>Member of Safety Teams</h3>
 		<?php foreach ($groups as $group):?>
 		<label class="checkbox">
 		<?php

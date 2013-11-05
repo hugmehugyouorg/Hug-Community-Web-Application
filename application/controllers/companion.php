@@ -54,12 +54,15 @@ class Companion extends CI_Controller {
 					$data = implode("",$chunks);
 					
 					/*
-						# Bytes -> Data
+						# Bits -> Data
 						
-						2 -> Emotional State
-						1 -> Is Quiet Time
-						10 -> Last Said (Companion/Interaction initiated)
-						10 -> Last Message Said (Community initiated)
+						4 -> Voltage Reading (whole number, e.g. #.00) ... max value is 5
+						7 -> Voltage (after decimal point, e.g. 0.##) ... max value is 99
+						1 -> Is Charging ... if value is 0 then false, if 1 then true
+						2 -> Emotional State ... if value is 0 then Happy, if 1 then Unhappy, if 2 then Emergency (HUG protocol)
+						1 -> Is Quiet Time ... if value is 0 then false, if 1 then true
+						10 -> Last Said (Companion/Interaction initiated) ... if value is 0 then nothing said yet, represent id's in the database
+						10 -> Last Message Said (Community initiated) ... if value is 0 then nothing said yet, represent id's in the database
 					
 					*/
 				}

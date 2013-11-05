@@ -22,7 +22,13 @@ class Group extends MY_Controller {
 			redirect('dashboard', 'refresh');
 		
 		if(!$noId) {
+			
 			$group = $this->ion_auth->group($id)->row();
+		
+			//if no group by that id
+			if(count($group) == 0)
+				redirect('groups', 'refresh');
+			
 			$groupName = $group->name;
 			$isGroupEditable = $this->ion_auth->is_group_editable($groupName);
 			$isGroupEditor = $this->ion_auth->in_group($groupName);
@@ -33,14 +39,22 @@ class Group extends MY_Controller {
 				$us = $this->ion_auth->users()->result();
 				
 				$users = array();
+				$superUsers = array();
 				foreach ($us as $user)
 				{
-					if( $this->ion_auth->in_group($group->name,$user->id) )
+					if( $user->active && $this->ion_auth->in_group($group->name,$user->id) )
 					{
-						array_push($users,$user);
+						if($this->ion_auth->is_admin($user->id))
+							array_push($superUsers,$user);
+						else if($this->ion_auth->is_group_editor($user->id))
+							array_push($superUsers,$user);
+						else
+							array_push($users,$user);
 					}
 				}
 		
+				$this->data['is_admin'] = $this->ion_auth->is_admin();
+ 				$this->data['superUsers'] = $superUsers;
 				$this->data['users'] = $users;
 		
 				//validate form input
@@ -188,8 +202,13 @@ class Group extends MY_Controller {
 			redirect('sign_in', 'refresh');
 		}
 		
-		$isAdmin = $this->ion_auth->is_admin();
 		$group = $this->ion_auth->group($id)->row();
+		
+		//if no group by that id
+		if(!$id || count($group) == 0)
+			redirect('groups', 'refresh');
+			
+		$isAdmin = $this->ion_auth->is_admin();
 		$groupName = $group->name;
 		$isGroupEditable = $this->ion_auth->is_group_editable($groupName);
 		$isGroupEditor = $this->ion_auth->in_group($groupName);
@@ -270,6 +289,41 @@ class Group extends MY_Controller {
 	
 				$this->_render_page('group/invite', $this->data);
 			}
+		}
+		else {
+			redirect('dashboard', 'refresh');
+		}
+	}
+	
+	//remove the user from the group
+	function remove($id, $userId)
+	{
+		if (!$this->ion_auth->logged_in())
+		{
+			redirect('sign_in', 'refresh');
+		}
+		
+		$group = $this->ion_auth->group($id)->row();
+		
+		//if no group by that id
+		if(!$id || count($group) == 0)
+			redirect('groups', 'refresh');
+		
+		$isAdmin = $this->ion_auth->is_admin();
+		$groupName = $group->name;
+		
+		//no user in the group
+		if(!$userId || !$this->ion_auth->in_group($groupName,$userId))
+			redirect('groups', 'refresh');
+		
+		$isGroupEditable = $this->ion_auth->is_group_editable($groupName);
+		$isGroupEditor = $this->ion_auth->in_group($groupName);
+		
+		if($isAdmin || $isGroupEditable && $isGroupEditor && !$this->ion_auth->is_admin($userId) && !$this->ion_auth->is_group_editor($userId)) 
+		{
+			$this->ion_auth->remove_from_group($id, $userId);
+			$this->session->set_flashdata('message', $this->lang->line('group_update_successful'));
+			redirect('group/'.$id, 'refresh');
 		}
 		else {
 			redirect('dashboard', 'refresh');

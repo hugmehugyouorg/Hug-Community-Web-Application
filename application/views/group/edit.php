@@ -18,24 +18,52 @@
 
 <?php echo form_close();?>
 
-<h2>Users</h2>
-<p>Below is a list of the users.</p>
+<h2>Safety Team Leaders</h2>
+<p>Below is a list of the Safety Team Leaders.</p>
 
 <table cellpadding=0 cellspacing=10>
 	<tr>
 		<th>Last Name, First Name</th>
 		<th>Email</th>
-		<th>Status</th>
-		<th>Profile</th>
+		<?php if($is_admin) { ?>
+			<th>Remove</th>
+			<th>Profile</th>
+		<?php } ?>
+	</tr>
+	<?php foreach ($superUsers as $user):?>
+		<tr>
+			<td><?php echo $user->last_name;?>, <?php echo $user->first_name;?></td>
+			<td><?php echo $user->email;?></td>
+			<?php if($is_admin) { ?>
+				<td><?php echo anchor("group/remove/".$group_id."/".$user->id, 'Remove') ;?></td>
+				<td><?php echo anchor("profile/".$user->id, 'Profile') ;?></td>
+			<?php } ?>
+		</tr>
+	<?php endforeach;?>
+</table>
+
+<h2>Safety Team Community Members</h2>
+<p>Below is a list of the Safety Team Community Members.</p>
+
+<table cellpadding=0 cellspacing=10>
+	<tr>
+		<th>Last Name, First Name</th>
+		<th>Email</th>
+		<th>Remove</th>
+		<?php if($is_admin) { ?>
+			<th>Profile</th>
+		<?php } ?>
 	</tr>
 	<?php foreach ($users as $user):?>
 		<tr>
 			<td><?php echo $user->last_name;?>, <?php echo $user->first_name;?></td>
 			<td><?php echo $user->email;?></td>
-			<td><?php echo ($user->active) ? anchor("deactivate/".$user->id, 'Active') : anchor("activate/". $user->id, 'Inactive');?></td>
-			<td><?php echo anchor("profile/".$user->id, 'Profile') ;?></td>
+			<td><?php echo anchor("group/remove/".$group_id."/".$user->id, 'Remove') ;?></td>
+			<?php if($is_admin) { ?>
+				<td><?php echo anchor("profile/".$user->id, 'Profile') ;?></td>
+			<?php } ?>
 		</tr>
 	<?php endforeach;?>
 </table>
 
-<p><a href="<?php echo site_url('group/invite/'.$group_id);?>">Invite a New User</a></p>
+<p><a href="<?php echo site_url('group/invite/'.$group_id);?>">Invite a New Safety Team Member</a></p>
