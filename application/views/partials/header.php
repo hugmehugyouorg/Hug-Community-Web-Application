@@ -14,13 +14,15 @@
 	 -->
 	 
 	<title><?php echo $title ?></title>
-   <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
-   <link rel="stylesheet" href="/assets/css/bootstrap-responsive.min.css" /> 
-    <link rel="stylesheet" href="/assets/css/style.css" />
+   	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css" />
+   	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-responsive.min.css" /> 
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-select.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css" />
     
 	<script type="text/javascript" src="//www.google.com/jsapi"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-  <script type="text/javascript" src="/assets/js/bootstrap.min.js" ></script>
+  	<script type="text/javascript" src="/assets/js/bootstrap.min.js" ></script>
+  	<script type="text/javascript" src="/assets/js/bootstrap-select.min.js"></script>
 	<script type="text/javascript" src="/assets/js/script.js" ></script>
 
 </head>

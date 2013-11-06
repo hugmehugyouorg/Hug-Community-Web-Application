@@ -83,7 +83,7 @@ $config['max_rounds']     = 9;
  */
 $config['site_title']                 = isset($_SERVER['CI_SITE_TITLE']) ? $_SERVER['CI_SITE_TITLE'] : "Example.com";       // Site Title, example.com
 $config['admin_email']                = isset($_SERVER['CI_ADMIN_EMAIL']) ? $_SERVER['CI_ADMIN_EMAIL'] : "admin@example.com"; // Admin Email, admin@example.com
-$config['default_group']              = 'community member';           // Default group, use name
+$config['default_group']              = 'testers';           // Default group, use name
 $config['admin_group']                = 'admin';             // Default administrators group, use name
 $config['group_editor_group']         = 'social worker';     // Default group editor group, use name
 $config['identity']                   = 'email';             // A database column which is used to login with

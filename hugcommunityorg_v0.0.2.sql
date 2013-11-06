@@ -23,8 +23,7 @@ CREATE TABLE `groups` (
 
 INSERT INTO `groups` VALUES (1,'admin','Administrator');
 INSERT INTO `groups` VALUES (2,'social worker','Social Worker');
-INSERT INTO `groups` VALUES (3,'community member','Community Member');
-INSERT INTO `groups` VALUES (4,'testers','Testers');
+INSERT INTO `groups` VALUES (3,'testers','Testers');
 
 #
 # Table structure for table 'users'
@@ -60,7 +59,7 @@ INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `salt`, `email`
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `salt`, `email`, `activation_code`, `forgotten_password_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`) VALUES
 	('3',0x7f000001,'test_social_worker','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_social_worker@test.com','',NULL,'1268889823','1268889823','1', 'TEST','SOCIAL WORKER','SOCIAL WORKER','111-111-1111');
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `salt`, `email`, `activation_code`, `forgotten_password_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`) VALUES
-	('4',0x7f000001,'test_community_member','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_community_member@test.com','',NULL,'1268889823','1268889823','1', 'TEST','COMMUNITY MEMBER','COMMUNITY MEMBER','111-111-1111');
+	('4',0x7f000001,'test_tester_member','$2a$08$MQb/ITDkv.7MNIPO8DcaGOxikg3scPxSIB/NsesPkHVtFYKKkFT5W','9462e8eee0','test_community_member@test.com','',NULL,'1268889823','1268889823','1', 'TEST','COMMUNITY MEMBER','COMMUNITY MEMBER','111-111-1111');
 
 #
 # Table structure for table 'users_groups'
@@ -86,8 +85,6 @@ INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
 	(3,3,2);
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
 	(4,4,3);
-INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
-	(5,1,4);
 
 #
 # Table structure for table 'login_attempts'
@@ -121,15 +118,19 @@ CREATE TABLE IF NOT EXISTS  `ci_sessions` (
 
 CREATE TABLE IF NOT EXISTS  `companions` (
   `id` int(11)  unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) NOT NULL,
+  `description` varchar(100) NOT NULL,
   PRIMARY KEY  (`id`)
 );
 
-INSERT INTO `companions` (`id`) VALUES (1);
+INSERT INTO `companions` (`id`, `name`, `description`) VALUES (1, 'Prototype Companion', 'Prototype Companion');
+INSERT INTO `companions` (`id`, `name`, `description`) VALUES (2, 'Test Companion 1', 'Test Companion 1');
+INSERT INTO `companions` (`id`, `name`, `description`) VALUES (3, 'Test Companion 2', 'Test Companion 2');
 
 CREATE TABLE `companions_groups` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `companion_id` int(11) unsigned NOT NULL,
-  `group_id` int(11) unsigned NOT NULL,
+  `group_id` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_companions_groups_companions1_idx` (`companion_id`),
   KEY `fk_companions_groups_groups1_idx` (`group_id`),
@@ -139,7 +140,7 @@ CREATE TABLE `companions_groups` (
 );
 
 INSERT INTO `companions_groups` (`id`, `companion_id`, `group_id`) VALUES
-	(1,1,4);
+	(1,2,3);
 
 CREATE TABLE IF NOT EXISTS  `companion_messages` (
   `id` int(11)  unsigned NOT NULL AUTO_INCREMENT,

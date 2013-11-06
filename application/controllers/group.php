@@ -161,17 +161,47 @@ class Group extends MY_Controller {
 		//validate form input
 		$this->form_validation->set_rules('group_name', 'Group name', 'required|alpha|xss_clean');
 		$this->form_validation->set_rules('description', 'Description', 'required|xss_clean');
+		$this->form_validation->set_rules('companion', 'Therapuetic Companions (Unassigned)', 'required|xss_clean');
 
+		//load companions
+		$this->load->model('Companion_model');
+		$companions = $this->Companion_model->get_unassigned_companions()->result();
+		$companionId = $this->input->post('companion');
+		$this->data['companion_id'] = $companionId;
+		$this->data['companions'] = $companions;
+		$companionAssociationError = false;
+		
 		if ($this->form_validation->run() == TRUE)
 		{
-			$new_group_id = $this->ion_auth->create_group($this->input->post('group_name'), $this->input->post('description'));
-			if($new_group_id)
+			$companion = null;
+			foreach($companions as $c)
 			{
-				// check to see if we are creating the group
-				// redirect them back to the admin page
-				$this->session->set_flashdata('message', $this->ion_auth->messages());
-				redirect('groups', 'refresh');
+				if($companionId == $c->id)
+				{
+					$companion = $c;
+					break;
+				}
 			}
+			if($companion)
+			{
+				$new_group_id = $this->ion_auth->create_group($this->input->post('group_name'), $this->input->post('description'));
+				if($new_group_id)
+				{
+					if( $this->Companion_model->assignCompanionToGroup($companion->id, $new_group_id) )
+					{
+						// check to see if we are creating the group
+						// redirect them back to the admin page
+						$this->session->set_flashdata('message', $this->ion_auth->messages());
+						redirect('groups', 'refresh');
+					}
+					else {
+						$this->ion_auth->delete_group($new_group_id);
+						$this->session->set_flashdata('message', $this->lang->line('group_assign_companion_failed'));
+					}
+				}
+			}
+			else
+				$this->session->set_flashdata('message', $this->lang->line('group_assign_companion_failed'));
 		}
 		
 		//display the create group form
