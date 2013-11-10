@@ -10,8 +10,8 @@ class Companion_model extends CI_Model {
     
     function get_unassigned_companions()
     {
-    	//SEE http://stackoverflow.com/questions/4660871/mysql-select-all-items-from-table-a-if-not-exist-in-table-b
-		$query = $this->db->query('SELECT * FROM companions c WHERE NOT EXISTS (SELECT 1 FROM companions_groups cg WHERE c.id = cg.id)');
+    	//SEE http://stackoverflow.com/questions/354002/mysql-select-where-not-in-table
+		$query = $this->db->query('SELECT companions.id, companions.name, companions.description FROM companions LEFT JOIN companions_groups ON companions.id = companions_groups.companion_id WHERE companions_groups.companion_id is NULL');
         return $query;
     }
     
@@ -23,7 +23,7 @@ class Companion_model extends CI_Model {
 		);
     	$this->db->insert('companions_groups', $data);
     	
-    	if($this->db->affected_rows() == 0)
+    	if( $this->db->affected_rows() == 0 )
     		return false;
     	return true;
     }

@@ -162,6 +162,7 @@ class Group extends MY_Controller {
 		$this->form_validation->set_rules('group_name', 'Group name', 'required|alpha|xss_clean');
 		$this->form_validation->set_rules('description', 'Description', 'required|xss_clean');
 		$this->form_validation->set_rules('companion', 'Therapuetic Companions (Unassigned)', 'required|xss_clean');
+		$this->form_validation->set_rules('leaders', 'Group Leaders', 'required|xss_clean');
 
 		//load companions
 		$this->load->model('Companion_model');
@@ -170,6 +171,17 @@ class Group extends MY_Controller {
 		$this->data['companion_id'] = $companionId;
 		$this->data['companions'] = $companions;
 		$companionAssociationError = false;
+		
+		//load group leaders
+		$groupLeaders = $this->ion_auth->get_group_leaders()->result();
+		$currentLeaders = $this->input->post('leaders');
+		
+		if(!$currentLeaders)
+			$currentLeaders = array();
+		
+		$this->data['groupLeaders'] = $groupLeaders;
+		$this->data['currentLeaders'] = $currentLeaders;
+		$leaderAssociationError = false;
 		
 		if ($this->form_validation->run() == TRUE)
 		{
@@ -189,10 +201,19 @@ class Group extends MY_Controller {
 				{
 					if( $this->Companion_model->assignCompanionToGroup($companion->id, $new_group_id) )
 					{
-						// check to see if we are creating the group
-						// redirect them back to the admin page
-						$this->session->set_flashdata('message', $this->ion_auth->messages());
-						redirect('groups', 'refresh');
+						foreach($currentLeaders as $l)
+						{
+							$this->ion_auth->add_to_group($new_group_id, $l);
+						}
+						
+						//only successful if no ion auth errors
+						if(!$this->ion_auth->errors())
+						{
+							// check to see if we are creating the group
+							// redirect them back to the admin page
+							$this->session->set_flashdata('message', $this->ion_auth->messages());
+							redirect('groups', 'refresh');
+						}
 					}
 					else {
 						$this->ion_auth->delete_group($new_group_id);

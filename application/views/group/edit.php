@@ -25,6 +25,7 @@
 	<tr>
 		<th>Last Name, First Name</th>
 		<th>Email</th>
+		<th>Phone</th>
 		<?php if($is_admin) { ?>
 			<th>Remove</th>
 			<th>Profile</th>
@@ -34,6 +35,7 @@
 		<tr>
 			<td><?php echo $user->last_name;?>, <?php echo $user->first_name;?></td>
 			<td><?php echo $user->email;?></td>
+			<td><?php echo $user->phone;?></td>
 			<?php if($is_admin) { ?>
 				<td><?php echo anchor("group/remove/".$group_id."/".$user->id, 'Remove') ;?></td>
 				<td><?php echo anchor("profile/".$user->id, 'Profile') ;?></td>
@@ -49,6 +51,7 @@
 	<tr>
 		<th>Last Name, First Name</th>
 		<th>Email</th>
+		<th>Phone</th>
 		<th>Remove</th>
 		<?php if($is_admin) { ?>
 			<th>Profile</th>
@@ -58,6 +61,7 @@
 		<tr>
 			<td><?php echo $user->last_name;?>, <?php echo $user->first_name;?></td>
 			<td><?php echo $user->email;?></td>
+			<td><?php echo $user->phone;?></td>
 			<td><?php echo anchor("group/remove/".$group_id."/".$user->id, 'Remove') ;?></td>
 			<?php if($is_admin) { ?>
 				<td><?php echo anchor("profile/".$user->id, 'Profile') ;?></td>
