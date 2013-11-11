@@ -56,6 +56,7 @@ $lang['group_delete_unsuccessful'] 	= 'Unable to delete Safety Team';
 $lang['group_name_required'] 		= 'Safety Team name is a required field';
 $lang['group_not_editable']       = 'Safety Team cannot be edited';
 $lang['group_assign_companion_failed']       = 'Could not assign the Therapuetic Companion to the Safety Team';
+$lang['group_not_enough_group_leaders']       = 'You must have at least one Safety Team Leader at all times';
 
 // Email Subjects
 $lang['email_forgotten_password_subject']    = 'Forgotten Password Verification';
