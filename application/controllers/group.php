@@ -130,7 +130,7 @@ class Group extends MY_Controller {
 	}
 	
 	// create a new safety team
-	function create()
+	public function create()
 	{
 		if (!$this->ion_auth->logged_in())
 		{
@@ -154,7 +154,6 @@ class Group extends MY_Controller {
 		$companionId = $this->input->post('companion');
 		$this->data['companion_id'] = $companionId;
 		$this->data['companions'] = $companions;
-		$companionAssociationError = false;
 		
 		//load group leaders
 		$groupLeaders = $this->ion_auth->get_group_leaders()->result();
@@ -165,7 +164,6 @@ class Group extends MY_Controller {
 		
 		$this->data['groupLeaders'] = $groupLeaders;
 		$this->data['currentLeaders'] = $currentLeaders;
-		$leaderAssociationError = false;
 		
 		if ($this->form_validation->run() == TRUE)
 		{
@@ -232,7 +230,7 @@ class Group extends MY_Controller {
 	}
 	
 	//create a new user via invitation to the group
-	function invite($id)
+	public function invite($id)
 	{
 		if (!$this->ion_auth->logged_in())
 		{
@@ -333,7 +331,7 @@ class Group extends MY_Controller {
 	}
 	
 	//remove the user from the group
-	function remove($id, $userId)
+	public function remove($id, $userId)
 	{
 		if (!$this->ion_auth->logged_in())
 		{
@@ -364,7 +362,7 @@ class Group extends MY_Controller {
 		if($isAdmin || $isGroupEditable && $isGroupEditor && !$isRemoveUserAdmin && !$isRemoveUserGroupEditor) 
 		{
 			//TODO:  Make sure this is a transaction by putting it in ion auth library
-			if( count($this->getUsersAndSuperUsers($id)[0]) > 1)
+			if( !($isRemoveUserAdmin || $isRemoveUserGroupEditor) || count($this->getUsersAndSuperUsers($id)[0]) > 1)
 			{
 				$this->ion_auth->remove_from_group($id, $userId);
 				$this->session->set_flashdata('message', $this->lang->line('group_update_successful'));
@@ -381,22 +379,142 @@ class Group extends MY_Controller {
 		}
 	}
 	
-	protected function getUsersAndSuperUsers($id) {
-		//list the users in the group
-		$us = $this->ion_auth->users($id)->result();
+	public function add($id)
+	{
+		if (!$this->ion_auth->logged_in())
+		{
+			redirect('sign_in', 'refresh');
+		}
+		
+		$group = $this->ion_auth->group($id)->row();
+		
+		//if no group by that id
+		if(!$id || count($group) == 0)
+			redirect('groups', 'refresh');
+			
+		$isAdmin = $this->ion_auth->is_admin();
+		$groupName = $group->name;
+		$isGroupEditable = $this->ion_auth->is_group_editable($groupName);
+		$isGroupEditor = $this->ion_auth->in_group($groupName);
+		
+		if($isAdmin || $isGroupEditable && $isGroupEditor) 
+		{
+			$us = $this->getUsersAndSuperUsers($id, true);
+			
+			$groupLeaders = $us[0];
+			$groupMembers = $us[1];
+			
+			$this->data['groupLeaders'] = $groupLeaders;
+			$newLeaders = $this->input->post('leaders');
+			if(!$newLeaders)
+				$newLeaders = array();
+			$this->data['newLeaders'] = $newLeaders;
+			
+			$this->data['groupMembers'] = $groupMembers;
+			$newMembers = $this->input->post('members');
+			if(!$newMembers)
+				$newMembers = array();
+			$this->data['newMembers'] = $newMembers;
+			
+			$this->form_validation->set_rules('leaders', 'Add Group Leaders', 'xss_clean');
+			$this->form_validation->set_rules('members', 'Add Group Members', 'xss_clean');
+			
+			if ($this->form_validation->run() == true)
+			{
+				foreach($newLeaders as $l)
+				{
+					$this->ion_auth->add_to_group($id, $l);
+				}
+				
+				foreach($newMembers as $m)
+				{
+					$this->ion_auth->add_to_group($id, $m);
+				}
+				
+				if(!$this->ion_auth->errors())
+					$this->session->set_flashdata('message', $this->lang->line('group_update_successful'));
+				
+				//set the flash data error message if there is one
+				$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
+				
+				redirect('group/'.$id, 'refresh');
+			}
+			else
+			{
+				//set the flash data error message if there is one
+				$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
+				
+				$this->data['is_admin'] = $isAdmin;
+				$this->data['id'] = $id;
+				
+				$this->_render_page('group/add_users', $this->data);
+			}
+		}
+		else {
+			redirect('dashboard', 'refresh');
+		}
+	}
+	
+	protected function getUsersAndSuperUsers($id = null, $notInGroup = false) {
+		if($id)
+		{
+			//list the users in the group
+			$us = $this->ion_auth->users($id)->result();
+			
+			//list all
+			if($notInGroup)
+				$usAll = $this->ion_auth->users()->result();
+		}
+		else
+		{
+			//list all users
+			$us = $this->ion_auth->users()->result();
+		}
 		
 		$users = array();
 		$superUsers = array();
-		foreach ($us as $user)
+		
+		//don't add users if they are $us
+		if($notInGroup)
 		{
-			if( $user->active )
+			foreach ($usAll as $user)
 			{
-				if($this->ion_auth->is_admin($user->id))
-					array_push($superUsers,$user);
-				else if($this->ion_auth->is_group_editor($user->id))
-					array_push($superUsers,$user);
-				else
-					array_push($users,$user);
+				if( $user->active )
+				{
+					$inGroup = false;
+					foreach ($us as $u)
+					{
+						if($user->id == $u->id)
+						{
+							$inGroup = true;
+							break;
+						}
+					}
+					if(!$inGroup)
+					{
+						if($this->ion_auth->is_admin($user->id))
+							array_push($superUsers,$user);
+						else if($this->ion_auth->is_group_editor($user->id))
+							array_push($superUsers,$user);
+						else
+							array_push($users,$user);
+					}
+				}
+			}
+		}
+		else
+		{
+			foreach ($us as $user)
+			{
+				if( $user->active )
+				{
+					if($this->ion_auth->is_admin($user->id))
+						array_push($superUsers,$user);
+					else if($this->ion_auth->is_group_editor($user->id))
+						array_push($superUsers,$user);
+					else
+						array_push($users,$user);
+				}
 			}
 		}
 		return array($superUsers, $users);

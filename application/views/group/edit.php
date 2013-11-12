@@ -70,4 +70,5 @@
 	<?php endforeach;?>
 </table>
 
-<p><a href="<?php echo site_url('group/invite/'.$group_id);?>">Invite a New Safety Team Member</a></p>
+<p><a href="<?php echo site_url('group/invite/'.$group_id);?>">Invite a New Safety Team Community Member</a></p>
+<p><a href="<?php echo site_url('group/add/'.$group_id);?>">Add a New Safety Team <?php if($is_admin) { ?>Team Leader or <?php } ?>Community Member</a></p>

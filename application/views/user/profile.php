@@ -30,7 +30,7 @@
             <?php echo form_input($password_confirm);?>
       </p>
       
-	<?php if( count($currentGroups) != 0 ) { ?>
+	<?php if( count($currentGroups) != 0 && FALSE ) { ?>
 	
 		 <h3>Member of Safety Teams</h3>
 		<?php foreach ($groups as $group):?>

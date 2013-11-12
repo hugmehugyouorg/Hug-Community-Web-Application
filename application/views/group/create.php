@@ -28,7 +28,7 @@
 	  <p>Below is a list of all Administrators and Social Workers.&nbsp;&nbsp;Please choose one or more.</p>
 	  
 	  <select name="leaders[]" multiple data-selected-text-format="count">
-		  <?php foreach($groupLeaders as $row) { ?>
+		  <?php foreach($allGroupLeaders as $row) { ?>
 		  	<option value="<?=$row->id?>" <?php  
 		  		foreach($currentLeaders as $leader) {
 					if ($row->id == $leader) {

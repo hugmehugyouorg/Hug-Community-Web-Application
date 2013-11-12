@@ -505,9 +505,8 @@ class Ion_auth
 
 		$admin_group = $this->config->item('admin_group', 'ion_auth');
 		$group_editor_group = $this->config->item('group_editor_group', 'ion_auth');
-		$default_group = $this->config->item('default_group', 'ion_auth');
 
-		if($check_group == $admin_group || $check_group == $group_editor_group || $check_group == $default_group)
+		if($check_group == $admin_group || $check_group == $group_editor_group)
 			return FALSE;
 
 		return TRUE;

@@ -85,6 +85,8 @@ INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
 	(3,3,2);
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
 	(4,4,3);
+INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
+	(5,3,3);
 
 #
 # Table structure for table 'login_attempts'
