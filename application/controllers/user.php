@@ -377,7 +377,7 @@ class User extends MY_Controller {
 			redirect('sign_in', 'refresh');
 		}
 
-		if (!$this->ion_auth->is_admin() || $this->ion_auth->user()->row()->id != $id)
+		if ($this->ion_auth->user()->row()->id != $id || !$this->ion_auth->is_admin())
 		{
 			redirect('dashboard', 'refresh');
 		}
