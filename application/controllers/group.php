@@ -156,7 +156,8 @@ class Group extends MY_Controller {
 		$this->data['companions'] = $companions;
 		
 		//load group leaders
-		$groupLeaders = $this->ion_auth->get_group_leaders()->result();
+		$us = $this->getUsersAndSuperUsers();
+		$groupLeaders = $us[0];
 		$currentLeaders = $this->input->post('leaders');
 		
 		if(!$currentLeaders)

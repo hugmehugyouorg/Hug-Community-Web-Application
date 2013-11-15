@@ -511,21 +511,5 @@ class Ion_auth
 
 		return TRUE;
 	}
-	
-	/**
-	 * get_group_leaders
-	 *
-	 * @return array group leaders
-	 * @author Andrew Welters
-	 **/
-	public function get_group_leaders()
-	{
-		$this->ion_auth_model->trigger_events('get_group_leaders');
-
-		$admin_group = $this->config->item('admin_group', 'ion_auth');
-		$group_editor_group = $this->config->item('group_editor_group', 'ion_auth');
-
-		return $this->ion_auth_model->users_by_group_names(array($admin_group, $group_editor_group));
-	}
 
 }

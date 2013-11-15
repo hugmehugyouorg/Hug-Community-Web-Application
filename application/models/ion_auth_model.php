@@ -1178,32 +1178,6 @@ class Ion_auth_model extends CI_Model
 	}
 
 	/**
-	 * users by group names
-	 * TODO: error handling
-	 *
-	 * @return object Users
-	 * @author Andrew Welters
-	 **/
-	public function users_by_group_names($group_names)
-	{
-		$this->trigger_events('users_by_group_names');
-		$this->db->select($this->tables['groups'].'.id');
-		$this->db->from($this->tables['groups']);
-		$this->db->where_in('name', $group_names);
-		$this->db->distinct();
-		$query = $this->db->get($this->tables['users_groups']);
-		
-		$groupIds = array();
-		foreach ($query->result_array() as $row)
-		{
-		   array_push($groupIds, $row['id']);
-		}
-		$query->free_result();
-		
-		return $this->users($groupIds);
-	}
-
-	/**
 	 * users
 	 *
 	 * @return object Users
