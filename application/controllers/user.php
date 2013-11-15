@@ -3,7 +3,7 @@
 class User extends MY_Controller {
 	
 	//log the user in
-	function sign_in()
+	public function sign_in()
 	{
 		$this->data['homeLink'] = "/";
 		$this->data['signInPage'] = "true";
@@ -54,7 +54,7 @@ class User extends MY_Controller {
 	}
 
 	//log the user out
-	function sign_out()
+	public function sign_out()
 	{
 		//log the user out
 		$logout = $this->ion_auth->logout();
@@ -65,7 +65,7 @@ class User extends MY_Controller {
 	}
 
 	//change password
-	function change_password()
+	public function change_password()
 	{
 		$this->form_validation->set_rules('old', 'Old password', 'required');
 		$this->form_validation->set_rules('new', 'New Password', 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[new_confirm]');
@@ -135,7 +135,7 @@ class User extends MY_Controller {
 	}
 
 	//forgot password
-	function forgot_password()
+	public function forgot_password()
 	{
 		$this->form_validation->set_rules('email', 'Email Address', 'required');
 		if ($this->form_validation->run() == false)
@@ -282,17 +282,22 @@ class User extends MY_Controller {
 
 
 	//activate the user
-	function activate($id, $code=false)
+	public function activate($id = NULL, $code=false)
 	{
-		if ($code !== false)
+		$activation = false;
+		
+		if($id) 
 		{
-			$activation = $this->ion_auth->activate($id, $code);
+			if ($code !== false)
+			{
+				$activation = $this->ion_auth->activate($id, $code);
+			}
+			else if ($this->ion_auth->is_admin())
+			{
+				$activation = $this->ion_auth->activate($id);
+			}
 		}
-		else if ($this->ion_auth->is_admin())
-		{
-			$activation = $this->ion_auth->activate($id);
-		}
-
+		
 		if ($activation)
 		{
 			$this->session->set_flashdata('message', $this->ion_auth->messages());
@@ -314,8 +319,19 @@ class User extends MY_Controller {
 	}
 
 	//deactivate the user
-	function deactivate($id = NULL)
+	public function deactivate($id = NULL)
 	{
+		if (!$this->ion_auth->logged_in())
+		{
+			redirect('sign_in', 'refresh');
+		}
+
+		// CURRENTLY NOT ALLOWING DEACTIVATION UNTIL WE BETTER DEFINE THE LOGIC
+		//if (!$this->ion_auth->is_admin() || !id)
+		//{
+			redirect('dashboard', 'refresh');
+		//}
+		
 		$id = $this->config->item('use_mongodb', 'ion_auth') ? (string) $id : (int) $id;
 
 		$this->load->library('form_validation');
@@ -354,7 +370,7 @@ class User extends MY_Controller {
 	}
 
 	//user profile
-	function profile($id)
+	public function profile($id = NULL)
 	{
 		if (!$this->ion_auth->logged_in())
 		{
@@ -500,7 +516,7 @@ class User extends MY_Controller {
 		$this->_render_page('user/profile', $this->data);
 	}
 
-	function _get_csrf_nonce()
+	protected function _get_csrf_nonce()
 	{
 		$this->load->helper('string');
 		$key   = random_string('alnum', 8);
@@ -511,7 +527,7 @@ class User extends MY_Controller {
 		return array($key => $value);
 	}
 
-	function _valid_csrf_nonce()
+	protected function _valid_csrf_nonce()
 	{
 		if ($this->input->post($this->session->flashdata('csrfkey')) !== FALSE &&
 			$this->input->post($this->session->flashdata('csrfkey')) == $this->session->flashdata('csrfvalue'))

@@ -3,7 +3,7 @@
 class Group extends MY_Controller {
 
 	//display all groups or edit just the one if id
-	public function index($id = null)
+	public function index($id = NULL)
 	{
 		//if id and admin or social worker in the safety team then show the group view
 		//if no id and admin show groups view (create, list: name (link) and description)
@@ -231,17 +231,21 @@ class Group extends MY_Controller {
 	}
 	
 	//create a new user via invitation to the group
-	public function invite($id)
+	public function invite($id = NULL)
 	{
 		if (!$this->ion_auth->logged_in())
 		{
 			redirect('sign_in', 'refresh');
 		}
 		
+		//if no id
+		if(!$id)
+			redirect('groups', 'refresh');
+		
 		$group = $this->ion_auth->group($id)->row();
 		
 		//if no group by that id
-		if(!$id || count($group) == 0)
+		if(count($group) == 0)
 			redirect('groups', 'refresh');
 			
 		$isAdmin = $this->ion_auth->is_admin();
@@ -332,17 +336,21 @@ class Group extends MY_Controller {
 	}
 	
 	//remove the user from the group
-	public function remove($id, $userId)
+	public function remove($id = NULL, $userId = NULL)
 	{
 		if (!$this->ion_auth->logged_in())
 		{
 			redirect('sign_in', 'refresh');
 		}
 		
+		//if no id
+		if(!$id || !$userId)
+			redirect('groups', 'refresh');
+		
 		$group = $this->ion_auth->group($id)->row();
 		
 		//if no group by that id
-		if(!$id || count($group) == 0 || !$userId)
+		if(count($group) == 0)
 			redirect('groups', 'refresh');
 		
 		$isAdmin = $this->ion_auth->is_admin();
@@ -380,17 +388,21 @@ class Group extends MY_Controller {
 		}
 	}
 	
-	public function add($id)
+	public function add($id = NULL)
 	{
 		if (!$this->ion_auth->logged_in())
 		{
 			redirect('sign_in', 'refresh');
 		}
 		
+		//if no id
+		if(!$id)
+			redirect('groups', 'refresh');
+		
 		$group = $this->ion_auth->group($id)->row();
 		
 		//if no group by that id
-		if(!$id || count($group) == 0)
+		if(count($group) == 0)
 			redirect('groups', 'refresh');
 			
 		$isAdmin = $this->ion_auth->is_admin();
@@ -456,7 +468,7 @@ class Group extends MY_Controller {
 		}
 	}
 	
-	protected function getUsersAndSuperUsers($id = null, $notInGroup = false) {
+	protected function getUsersAndSuperUsers($id = NULL, $notInGroup = false) {
 		if($id)
 		{
 			//list the users in the group
