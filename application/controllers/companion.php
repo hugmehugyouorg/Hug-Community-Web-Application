@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Companion extends CI_Controller {
+class Companion extends MY_Controller {
 
 	function __construct()
 	{
@@ -111,9 +111,10 @@ class Companion extends CI_Controller {
 		}*/
 	}
 	
-	private function hexToBinHandler($errno, $errstr) {
+	protected function hexToBinHandler($errno, $errstr) {
 		throw new Exception();
 	}
+	
 }
 
 /* End of file welcome.php */

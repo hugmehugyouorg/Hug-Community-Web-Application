@@ -132,7 +132,7 @@ INSERT INTO `companions` (`id`, `name`, `description`) VALUES (3, 'Test Companio
 CREATE TABLE `companions_groups` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `companion_id` int(11) unsigned NOT NULL,
-  `group_id` int(11) unsigned DEFAULT NULL,
+  `group_id` int(11) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_companions_groups_companions1_idx` (`companion_id`),
   KEY `fk_companions_groups_groups1_idx` (`group_id`),
@@ -144,28 +144,43 @@ CREATE TABLE `companions_groups` (
 INSERT INTO `companions_groups` (`id`, `companion_id`, `group_id`) VALUES
 	(1,2,3);
 
-CREATE TABLE IF NOT EXISTS  `companion_messages` (
+CREATE TABLE IF NOT EXISTS  `companion_says` (
   `id` int(11)  unsigned NOT NULL AUTO_INCREMENT,
-  `companion_id` int(11) unsigned NOT NULL,
-  `message` varchar(160) NOT NULL,
+  `is_message` tinyint(1) NOT NULL,
+  `text` varchar(160) NOT NULL,
   PRIMARY KEY  (`id`)
 );
 
-#
-# Table structure for table `companion_update`
-#
-# NOTE:  When making an insert/update make sure you set both 'created_at' and 'updated_at' to NULL
-# SEE http://jasonbos.co/two-timestamp-columns-in-mysql/
-#
+CREATE TABLE IF NOT EXISTS  `companion_audio` (
+  `id` int(11)  unsigned NOT NULL AUTO_INCREMENT,
+  `data` MEDIUMBLOB NOT NULL,
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE `companion_says_audio` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `companion_says_id` int(11) unsigned NOT NULL,
+  `companion_audio_id` int(11) unsigned NOT NULL,
+  `audio_num` smallint(3) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_companions_says_audio_says1_idx` (`companion_says_id`),
+  KEY `fk_companions_says_audio_audio1_idx` (`companion_audio_id`),
+  KEY `fk_companions_says_audio_num1_idx` (`audio_num`),
+  CONSTRAINT `uc_companions_says_audio_num` UNIQUE (`companion_says_id`, `companion_audio_id`, `audio_num`),
+  CONSTRAINT `fk_companions_says_audio_says1` FOREIGN KEY (`companion_says_id`) REFERENCES `companion_says` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_companions_says_audio_audio1` FOREIGN KEY (`companion_audio_id`) REFERENCES `companion_audio` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+);
 
 CREATE TABLE IF NOT EXISTS  `companion_update` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `companion_id` int(11) unsigned NOT NULL,
+  `voltage_whole_number` bit(4) NOT NULL,
+  `voltage_after_decimal_point` bit(7) NOT NULL,
+  `is_charging` bit(1) NOT NULL,
   `emotional_state` bit(3) NOT NULL,
   `quiet_time` bit(1) NOT NULL,
-  `last_said` int(11) unsigned NOT NULL,
-  `last_message_said` int(11) unsigned NOT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT 0,
+  `last_said_id` int(11) unsigned NOT NULL,
+  `last_message_said_id` int(11) unsigned NOT NULL,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`)
 );
