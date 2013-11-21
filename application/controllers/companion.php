@@ -33,6 +33,7 @@ class Companion extends MY_Controller {
 	public function index()
 	{
 		$error = false;
+		$output = '';
 		$id = $this->input->get('i', TRUE);
 		$data = $this->input->get('d', TRUE);
 		
