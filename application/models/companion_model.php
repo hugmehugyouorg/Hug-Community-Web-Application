@@ -83,6 +83,10 @@ class Companion_model extends CI_Model {
 		$current+=1;
 		
 		$result = '<br/>isQuietTime = '.$isQuietTime;
+		$output .= $result;
+		if($debug)
+			echo $result;
+			
 		$lastSaid = substr($data,$current,9);
 		$current+=9;
 		
