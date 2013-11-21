@@ -162,6 +162,7 @@ CREATE TABLE `companion_says_audio` (
   `companion_says_id` int(11) unsigned NOT NULL,
   `companion_audio_id` int(11) unsigned NOT NULL,
   `audio_num` smallint(3) unsigned NOT NULL,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `fk_companions_says_audio_says1_idx` (`companion_says_id`),
   KEY `fk_companions_says_audio_audio1_idx` (`companion_audio_id`),
@@ -174,15 +175,20 @@ CREATE TABLE `companion_says_audio` (
 CREATE TABLE IF NOT EXISTS  `companion_update` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `companion_id` int(11) unsigned NOT NULL,
-  `voltage_whole_number` bit(4) NOT NULL,
-  `voltage_after_decimal_point` bit(7) NOT NULL,
-  `is_charging` bit(1) NOT NULL,
-  `emotional_state` bit(3) NOT NULL,
-  `quiet_time` bit(1) NOT NULL,
-  `last_said_id` int(11) unsigned NOT NULL,
-  `last_message_said_id` int(11) unsigned NOT NULL,
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`id`)
+  `voltage` float(3,2) NOT NULL,
+  `is_charging` tinyint(1) NOT NULL,
+  `emotional_state` tinyint(1) NOT NULL,
+  `quiet_time` tinyint(1) NOT NULL,
+  `last_said_id` int(11) unsigned DEFAULT NULL,
+  `last_message_said_id` int(11) unsigned DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`id`),
+  KEY `fk_companion_update_companions1_idx` (`companion_id`),
+  KEY `fk_companion_update_last_said1_idx` (`last_said_id`),
+  KEY `fk_companion_update_last_said_message1_idx` (`last_message_said_id`),
+  CONSTRAINT `fk_companion_update_companions1_idx` FOREIGN KEY (`companion_id`) REFERENCES `companions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_companion_update_last_said1_idx` FOREIGN KEY (`last_said_id`) REFERENCES `companion_says_audio` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  CONSTRAINT `fk_companion_update_last_said_message1_idx` FOREIGN KEY (`last_message_said_id`) REFERENCES `companion_says_audio` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION
 );
 
 #

@@ -18,6 +18,17 @@ class Companion extends MY_Controller {
 			$this->email->initialize($email_config);
 		}*/
 	}
+	
+	public function test()
+	{
+		$id = $this->input->get('i', TRUE);
+		$data = $this->input->get('d', TRUE);
+		
+		$this->load->model('Companion_model');
+		$this->Companion_model->updateCompanionState($id, $data, true);
+		
+		echo '<br/>success!';
+	}
 
 	public function index()
 	{
@@ -26,7 +37,7 @@ class Companion extends MY_Controller {
 		$data = $this->input->get('d', TRUE);
 		
 		if( $id === FALSE || $data === FALSE || ctype_alnum($id) === FALSE ) {
-			$error = true;
+			$error = 'either the id is not specified or is not alphanumeric, or the data is not specified.';
 		}
 		else {
 			//make sure it's a hex string, warning thrown if not so handle by calling
@@ -35,7 +46,7 @@ class Companion extends MY_Controller {
 			try {
 				$hexData = hex2bin($data);
 				if(!$hexData)
-					$error = true;
+					$error = $id.": ".$data." could not be converted to binary data using hex2bin()";
 				else {
 					//convert hex string to binary string (ASCII)
 					$data = base_convert($data, 16, 2);
@@ -53,22 +64,12 @@ class Companion extends MY_Controller {
 					}
 					$data = implode("",$chunks);
 					
-					/*
-						# Bits -> Data
-						
-						4 -> Voltage Reading (whole number, e.g. #.00) ... max value is 5
-						7 -> Voltage (after decimal point, e.g. 0.##) ... max value is 99
-						1 -> Is Charging ... if value is 0 then false, if 1 then true
-						2 -> Emotional State ... if value is 0 then Happy, if 1 then Unhappy, if 2 then Emergency (HUG protocol)
-						1 -> Is Quiet Time ... if value is 0 then false, if 1 then true
-						10 -> Last Said (Companion/Interaction initiated) ... if value is 0 then nothing said yet, represent id's in the database
-						10 -> Last Message Said (Community initiated) ... if value is 0 then nothing said yet, represent id's in the database
-					
-					*/
+					$this->load->model('Companion_model');
+					$output = $this->Companion_model->updateCompanionState($id, $data);
 				}
 			}
 			catch(Exception $e) {
-				$error = true;
+				$error = $e->getMessage();
 			}
 			restore_error_handler();
  		}
@@ -76,10 +77,15 @@ class Companion extends MY_Controller {
  		ob_clean();
  		
  		if($error)
- 			header('HTTP/1.0 444 No Response');
+ 		{
+ 			header('HTTP/1.1 207 '.trim(preg_replace('/\s+/', ' ', $error)));//header('HTTP/1.0 444 No Response');
+ 			//echo $error;
+ 		}
  		else
- 			header('HTTP/1.1 207 i='.$id.', d='.$data);
- 		
+ 		{
+ 			header('HTTP/1.1 207 '.trim(preg_replace('/\s+/', ' ', $output)));
+ 			//echo $output;
+ 		}
  		die();
  		
  		//need to get the user
