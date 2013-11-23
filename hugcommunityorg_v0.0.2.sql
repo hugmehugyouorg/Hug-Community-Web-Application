@@ -84,9 +84,7 @@ INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
 	(3,3,2);
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
-	(4,4,3);
-INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
-	(5,3,3);
+	(4,1,3);
 
 #
 # Table structure for table 'login_attempts'
@@ -122,6 +120,7 @@ CREATE TABLE IF NOT EXISTS  `companions` (
   `id` int(11)  unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) NOT NULL,
   `description` varchar(100) NOT NULL,
+  `emergency_alert` tinyint(1) DEFAULT 0 NOT NULL,
   PRIMARY KEY  (`id`)
 );
 
@@ -142,7 +141,7 @@ CREATE TABLE `companions_groups` (
 );
 
 INSERT INTO `companions_groups` (`id`, `companion_id`, `group_id`) VALUES
-	(1,2,3);
+	(1,1,3);
 
 CREATE TABLE IF NOT EXISTS  `companion_says` (
   `id` int(11)  unsigned NOT NULL AUTO_INCREMENT,

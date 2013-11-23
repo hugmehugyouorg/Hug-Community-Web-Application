@@ -511,5 +511,146 @@ class Ion_auth
 
 		return TRUE;
 	}
+	
+	public function getUsersAndSuperUsers($id = NULL, $notInGroup = false) {
+		$usAll = null;
+		
+		if($id)
+		{
+			//list the users in the group
+			$us = $this->users($id)->result();
+			
+			//should set an error if no users by that id no????
+			
+			//list all
+			if($notInGroup)
+				$usAll = $this->users()->result();
+		}
+		else
+		{
+			//list all users
+			$us = $this->users()->result();
+		}
+		
+		$users = array();
+		$superUsers = array();
+		
+		//if $usAll is empty null then don't add users if they are $usAll
+		if($notInGroup)
+		{
+			if($us && $usAll)
+			{
+				foreach ($usAll as $user)
+				{
+					if( $user->active )
+					{
+						$inGroup = false;
+						foreach ($us as $u)
+						{
+							if($user->id == $u->id)
+							{
+								$inGroup = true;
+								break;
+							}
+						}
+						if(!$inGroup)
+						{
+							if($this->is_admin($user->id))
+								array_push($superUsers,$user);
+							else if($this->is_group_editor($user->id))
+								array_push($superUsers,$user);
+							else
+								array_push($users,$user);
+						}
+					}
+				}
+			}
+		}
+		else if($us) //if $us is not empty
+		{
+			foreach ($us as $user)
+			{
+				if( $user->active )
+				{
+					if($this->is_admin($user->id))
+						array_push($superUsers,$user);
+					else if($this->is_group_editor($user->id))
+						array_push($superUsers,$user);
+					else
+						array_push($users,$user);
+				}
+			}
+		}
+		return array($superUsers, $users);
+	}
 
+	/**
+	 * emergency_alert
+	 *
+	 * @return void
+	 * @author Andrew Welters <awelters@hugmehugyou.org> 
+	 **/
+	public function emergency_alert($groupId)
+	{
+		$this->ion_auth_model->trigger_events('emergency_alert');
+
+		if(!$groupId)
+		{
+			$this->set_error('emergency_alert_no_group_found');
+			return FALSE;
+		}
+
+		$group = $this->group($groupId)->row();
+		
+		if(count($group) == 0)
+		{
+			$this->set_error('emergency_alert_no_group_found');
+			return FALSE;
+		}
+
+		$us = $this->ion_auth->getUsersAndSuperUsers($groupId);
+		
+		$groupLeaders = $us[0];
+		$groupMembers = $us[1];
+		
+		if(count($groupLeaders) > 0 || count($groupMembers) > 0)
+		{
+			$data = array(
+				'group_name' => $group->name
+			);
+			
+			$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('email_emergency_alert', 'ion_auth'), $data, true);
+			$this->email->clear();
+			$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+			$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - ' . $this->lang->line('email_emergency_alert_subject'));
+			$this->email->message($message);
+		
+			$users = array();
+		
+			foreach ($groupLeaders as $leader)
+			{
+				array_unshift($users,$leader->email);
+			}
+			
+			foreach ($groupMembers as $member)
+			{
+				array_unshift($users,$member->email);
+			}
+			
+			$this->email->to($users);
+			
+			if (!$this->email->send())
+			{
+				$this->set_error('emergency_alert_email_sent_error');
+				return FALSE;
+			}
+		}
+		else
+		{
+			$this->set_error('emergency_alert_no_group_members');
+			return FALSE;
+		}
+		
+		return TRUE;
+	}
 }

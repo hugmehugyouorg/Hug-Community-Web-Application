@@ -20,6 +20,38 @@ class Companion_model extends CI_Model {
 		9 -> Last Message Said (Community initiated) ... if value is 0 then nothing said yet, represent id's in the database
 	
 		Total # of bits = 32 bits
+		
+		EXAMPLE:  00100111011110010001010000000000, SPLITS LIKE THIS:  001 0011101 1 11 0 010001010 000000000
+		
+			Voltage Reading (whole number, e.g. #.00):
+			outgoing data: 4
+			001
+			Voltage (after decimal point, e.g. 0.##):
+			outgoing data: 92
+			0011101
+			Is Charging? (0 = NO, 1 = YES)
+			outgoing data: 1
+			1
+			Emotional State (0 - None, 1 - Happy, 2 - UNHAPPY, 3 - EMERGENCY)
+			outgoing data: 3
+			11
+			Is Quiet Time? (0 = NO, 1 = YES)
+			outgoing data: 0
+			0
+			Last thing Safety Sam said:
+			outgoing data: 162
+			010001010
+			Last Safety Team message Safety Sam said.
+			outgoing data: 0
+			000000000
+			bits: 00100111
+			bits: 01111001
+			bits: 00010100
+			bits: 00000000
+			
+			bits length: 32
+			bytes to write: 4
+			bytes written: 4
 	*/
 	public function updateCompanionState($id, $data, $debug = false)
 	{
@@ -45,17 +77,22 @@ class Companion_model extends CI_Model {
 		if(strspn($data,'01') != $dataLength)
 			throw new Exception($id.": ".$data." is not a binary string");
 			
+		$result = 'data = '.$data;
+		$output .= $result;
+		if($debug)
+			echo $result;	
+			
 		$current = 0;
 		
-		$voltageWholeNumber = substr($data,$current,3);
+		$voltageWholeNumber = strrev(substr($data,$current,3));
 		$current+=3;
 		
-		$result = 'voltageWholeNumber = '.$voltageWholeNumber;
+		$result = '<br/>voltageWholeNumber = '.$voltageWholeNumber;
 		$output .= $result;
 		if($debug)
 			echo $result;
 			
-		$voltageAfterDecimalPoint = substr($data,$current,7);
+		$voltageAfterDecimalPoint = strrev(substr($data,$current,7));
 		$current+=7;
 		
 		$result = '<br/>voltageAfterDecimalPoint = '.$voltageAfterDecimalPoint;
@@ -71,7 +108,7 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 			
-		$emotionalState = substr($data,$current,2);
+		$emotionalState = strrev(substr($data,$current,2));
 		$current+=2;
 		
 		$result = '<br/>emotionalState = '.$emotionalState;
@@ -87,7 +124,7 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 			
-		$lastSaid = substr($data,$current,9);
+		$lastSaid = strrev(substr($data,$current,9));
 		$current+=9;
 		
 		$result = '<br/>lastSaid = '.$lastSaid;
@@ -95,7 +132,7 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 			
-		$lastMessageSaid = substr($data,$current,9);
+		$lastMessageSaid = strrev(substr($data,$current,9));
 		$current+=9;
 		
 		$result = '<br/>lastMessageSaid = '.$lastMessageSaid;
@@ -213,17 +250,58 @@ class Companion_model extends CI_Model {
 		if( $this->db->affected_rows() < 1 )
     		throw new Exception("Couldn't update the companion_update table");
     		
-    	return $output;
+    	if($emotionState == 3)
+    	{
+    		//state of emergency
+    		$data = array(
+    			'emergency_alert' => 1
+    		);
+    		$this->db->where('id', $companion->id);
+    		$updateResult = $this->db->update('companions', $data);
+    		$newEmergency = $this->db->affected_rows();
+    		
+    		$result = '<br/>updating companion because of an emergency alert for companion id: '.$companion->id.'<br/>affected rows: '.$newEmergency.'<br/>update result: '.$updateResult .'<br/>db error: '.$this->db->_error_message();
+			$output .= $result;
+			if($debug)
+				echo $result;
+    		
+    		if( !$updateResult )
+    			throw new Exception("Couldn't update the companions table when there is an emergency alert");
+    	}
+    	else
+    		$newEmergency = 0;
+    		
+    	return array('output' => $output, 'newEmergency' => ($newEmergency < 1 ? false : true));
 	}
     
-    function get_unassigned_companions()
+    public function get_unassigned_companions()
     {
     	//SEE http://stackoverflow.com/questions/354002/mysql-select-where-not-in-table
 		$query = $this->db->query('SELECT companions.id, companions.name, companions.description FROM companions LEFT JOIN companions_groups ON companions.id = companions_groups.companion_id WHERE companions_groups.companion_id is NULL');
         return $query;
     }
     
-    function assignCompanionToGroup($id, $groupId)
+    public function get_companion_by_id($id)
+    {
+    	$result = $this->db->get_where('companions', array('id' => $id))->result();
+    	
+    	if($result)
+    		return $result[0];
+    	
+    	return null;
+    }
+    
+    public function get_group_id_by_companion_id($id)
+    {
+    	$result = $this->db->get_where('companions_groups', array('companion_id' => $id))->result();
+    	
+    	if($result)
+    		return $result[0]->group_id;
+    	
+    	return null;
+    }
+    
+    public function assignCompanionToGroup($id, $groupId)
     {
     	$data = array(
 		   'companion_id' => $id,
@@ -231,12 +309,12 @@ class Companion_model extends CI_Model {
 		);
     	$this->db->insert('companions_groups', $data);
     	
-    	if( $this->db->affected_rows() == 0 )
+    	if( $this->db->affected_rows() < 1 )
     		return false;
     	return true;
     }
     
-    function add_audio($audioNum, $text, $isMessage, $mp3, $size)
+    public function add_audio($audioNum, $text, $isMessage, $mp3, $size)
     {
     	//check if $audioNum exists in companion_says_audio
     	$exists = $this->db->get_where('companion_says_audio', array('audio_num' => $audioNum))->result();
@@ -250,7 +328,7 @@ class Companion_model extends CI_Model {
 			);
     		$this->db->insert('companion_audio', $data);
     	
-    		if( $this->db->affected_rows() == 0 )
+    		if( $this->db->affected_rows() < 1 )
     			return false;
     		
     		//TODO: this is probably not perfect, use query instead 
@@ -263,7 +341,7 @@ class Companion_model extends CI_Model {
 			);
     		$this->db->insert('companion_says', $data);
     		
-    		if( $this->db->affected_rows() == 0 )
+    		if( $this->db->affected_rows() < 1 )
     		{	
     			$this->db->where('id', $companionAudioId);
     			$this->db->delete('companion_audio'); 
@@ -282,7 +360,7 @@ class Companion_model extends CI_Model {
 			
 			$this->db->insert('companion_says_audio', $data);
     		
-    		if( $this->db->affected_rows() == 0 )
+    		if( $this->db->affected_rows() < 1 )
     		{	
     			$this->db->where('id', $companionAudioId);
     			$this->db->delete('companion_audio');
@@ -382,16 +460,6 @@ class Companion_model extends CI_Model {
 			return $absoluteURL;
 		}
 	}
-    
-    protected function get_companion_by_id($id)
-    {
-    	$result = $this->db->get_where('companions', array('id' => $id))->result();
-    	
-    	if($result)
-    		return $result[0];
-    	
-    	return null;
-    }
     
     protected function get_audio_association_by_audio_num($audioNum)
     {

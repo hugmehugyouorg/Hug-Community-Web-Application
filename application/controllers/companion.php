@@ -5,31 +5,8 @@ class Companion extends MY_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		
-		/*$this->load->config('ion_auth', TRUE);
-		$this->lang->load('welcome');
-		$this->load->helper('url');
-		$this->load->library('email');
-		
-		$email_config = $this->config->item('email_config', 'ion_auth');
-	
-		if ($this->config->item('use_ci_email', 'ion_auth') && isset($email_config) && is_array($email_config))
-		{
-			$this->email->initialize($email_config);
-		}*/
 	}
 	
-	public function test()
-	{
-		$id = $this->input->get('i', TRUE);
-		$data = $this->input->get('d', TRUE);
-		
-		$this->load->model('Companion_model');
-		$this->Companion_model->updateCompanionState($id, $data, true);
-		
-		echo '<br/>success!';
-	}
-
 	public function index()
 	{
 		$error = false;
@@ -47,14 +24,17 @@ class Companion extends MY_Controller {
 			try {
 				$hexData = hex2bin($data);
 				if(!$hexData)
-					$error = $id.": ".$data." could not be converted to binary data using hex2bin()";
+					throw new Exception($data." could not be converted to binary data using hex2bin()");
 				else {
 					//convert hex string to binary string (ASCII)
 					$data = base_convert($data, 16, 2);
+					
 					//should be a sequence of bytes, so if not divisble by 8
 					//then we need to pad in front cause that's the one losing info
 					$dataLen = strlen($data);
-					$data = str_repeat('0', 8 - $dataLen % 8) . $data;
+					$dataReminder = $dataLen % 8;
+					$data = $dataReminder != 0 ? str_repeat('0', 8 - $dataReminder) . $data : $data;
+					
 					//now chunk them bytes and reverse each cause data came in MSB first
 					//but we need LSB first before putting them back as a binary string
 					//to return
@@ -66,7 +46,23 @@ class Companion extends MY_Controller {
 					$data = implode("",$chunks);
 					
 					$this->load->model('Companion_model');
-					$output = $this->Companion_model->updateCompanionState($id, $data);
+					$data = $this->Companion_model->updateCompanionState($id, $data);
+					
+					$output = $data['output'];
+					$newEmergency = $data['newEmergency'];
+					
+					//send out an emergency alert
+					if($newEmergency)
+					{
+						$output .= "<br/>There was a new EMERGENCY ALERT!!!";
+						$result = $this->ion_auth->emergency_alert($this->Companion_model->get_group_id_by_companion_id($id));
+						if($result)
+						{
+							$output .= "<br/>Emergency Alert successfully handled";
+						}
+						else
+							throw new Exception($this->ion_auth->errors());
+					}
 				}
 			}
 			catch(Exception $e) {
@@ -79,46 +75,18 @@ class Companion extends MY_Controller {
  		
  		if($error)
  		{
- 			header('HTTP/1.1 207 '.trim(preg_replace('/\s+/', ' ', $error)));//header('HTTP/1.0 444 No Response');
- 			//echo $error;
+ 			log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output);
  		}
  		else
  		{
- 			header('HTTP/1.1 207 '.trim(preg_replace('/\s+/', ' ', $output)));
- 			//echo $output;
+ 			log_message('debug', "id: ".$id.", output: ".$output);
  		}
+ 		
+ 		header('HTTP/1.1 444 No Response');
  		die();
- 		
- 		//need to get the user
- 		/*$user = new stdClass();
- 		$user->email = 'awelters@hugmehugyou.org';
- 		
- 		$data = array(
-			'identity'		=> 'awelters@hugmehugyou.org',
-			'emergency_response_code' => '12345678'
-		);
-		
-		$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('email_emergency_alert', 'ion_auth'), $data, true);
-		$this->email->clear();
-		$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
-		$this->email->to($user->email);
-		$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - ' . $this->lang->line('email_emergency_alert_subject'));
-		$this->email->message($message);
-
-		if ($this->email->send())
-		{
-			//success
-			header('HTTP/1.1 207 THIS IS WHERE THE DATA GOES');
-			print_r($this->email);
-		}
-		else
-		{
-			//failure
-			header('HTTP/1.0 444 No Response');
-		}*/
 	}
 	
-	protected function hexToBinHandler($errno, $errstr) {
+	public function hexToBinHandler($errno, $errstr) {
 		throw new Exception();
 	}
 	

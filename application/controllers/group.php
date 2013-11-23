@@ -35,7 +35,7 @@ class Group extends MY_Controller {
 			
 			if($isAdmin || $isGroupEditable && $isGroupEditor) 
 			{
-				$us = $this->getUsersAndSuperUsers($id);
+				$us = $this->ion_auth->getUsersAndSuperUsers($id);
 		
 				$this->data['is_admin'] = $this->ion_auth->is_admin();
  				$this->data['superUsers'] = $us[0];
@@ -156,7 +156,7 @@ class Group extends MY_Controller {
 		$this->data['companions'] = $companions;
 		
 		//load group leaders
-		$us = $this->getUsersAndSuperUsers();
+		$us = $this->ion_auth->getUsersAndSuperUsers();
 		$groupLeaders = $us[0];
 		$currentLeaders = $this->input->post('leaders');
 		
@@ -371,7 +371,7 @@ class Group extends MY_Controller {
 		if($isAdmin || $isGroupEditable && $isGroupEditor && !$isRemoveUserAdmin && !$isRemoveUserGroupEditor) 
 		{
 			//TODO:  Make sure this is a transaction by putting it in ion auth library
-			if( !($isRemoveUserAdmin || $isRemoveUserGroupEditor) || count($this->getUsersAndSuperUsers($id)[0]) > 1)
+			if( !($isRemoveUserAdmin || $isRemoveUserGroupEditor) || count($this->ion_auth->getUsersAndSuperUsers($id)[0]) > 1)
 			{
 				$this->ion_auth->remove_from_group($id, $userId);
 				$this->session->set_flashdata('message', $this->lang->line('group_update_successful'));
@@ -412,7 +412,7 @@ class Group extends MY_Controller {
 		
 		if($isAdmin || $isGroupEditable && $isGroupEditor) 
 		{
-			$us = $this->getUsersAndSuperUsers($id, true);
+			$us = $this->ion_auth->getUsersAndSuperUsers($id, true);
 			
 			$groupLeaders = $us[0];
 			$groupMembers = $us[1];
@@ -466,71 +466,6 @@ class Group extends MY_Controller {
 		else {
 			redirect('dashboard', 'refresh');
 		}
-	}
-	
-	protected function getUsersAndSuperUsers($id = NULL, $notInGroup = false) {
-		if($id)
-		{
-			//list the users in the group
-			$us = $this->ion_auth->users($id)->result();
-			
-			//list all
-			if($notInGroup)
-				$usAll = $this->ion_auth->users()->result();
-		}
-		else
-		{
-			//list all users
-			$us = $this->ion_auth->users()->result();
-		}
-		
-		$users = array();
-		$superUsers = array();
-		
-		//don't add users if they are $us
-		if($notInGroup)
-		{
-			foreach ($usAll as $user)
-			{
-				if( $user->active )
-				{
-					$inGroup = false;
-					foreach ($us as $u)
-					{
-						if($user->id == $u->id)
-						{
-							$inGroup = true;
-							break;
-						}
-					}
-					if(!$inGroup)
-					{
-						if($this->ion_auth->is_admin($user->id))
-							array_push($superUsers,$user);
-						else if($this->ion_auth->is_group_editor($user->id))
-							array_push($superUsers,$user);
-						else
-							array_push($users,$user);
-					}
-				}
-			}
-		}
-		else
-		{
-			foreach ($us as $user)
-			{
-				if( $user->active )
-				{
-					if($this->ion_auth->is_admin($user->id))
-						array_push($superUsers,$user);
-					else if($this->ion_auth->is_group_editor($user->id))
-						array_push($superUsers,$user);
-					else
-						array_push($users,$user);
-				}
-			}
-		}
-		return array($superUsers, $users);
 	}
 	
 }

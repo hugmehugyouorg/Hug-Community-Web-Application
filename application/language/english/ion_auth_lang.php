@@ -62,4 +62,9 @@ $lang['group_not_enough_group_leaders']       = 'You must have at least one Safe
 $lang['email_forgotten_password_subject']    = 'Forgotten Password Verification';
 $lang['email_new_password_subject']          = 'New Password';
 $lang['email_activation_subject']            = 'Account Activation';
-$lang['email_emergency_alert_subject'] = 'Emergency Alert';
+$lang['email_emergency_alert_subject'] = 'Safety Team Alert';
+
+// Emergency Alerts
+$lang['emergency_alert_no_group_members']    = 'No group members when there is an emergency alert';
+$lang['emergency_alert_no_group_found']    = 'No group assigned when there is an emergency alert';
+$lang['emergency_alert_email_sent_error']    = 'There was an error sending an email when there is an emergency alert';
