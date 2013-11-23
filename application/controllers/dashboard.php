@@ -2,36 +2,53 @@
 
 class Dashboard extends MY_Controller {
 
+	function __construct()
+	{
+		parent::__construct();
+	}
+
 	public function index()
 	{
 		if (!$this->ion_auth->logged_in())
 		{
 			//redirect them to sign in
 			redirect('sign_in', 'refresh');
+			return;
 		}
-		elseif (!$this->ion_auth->is_admin())
+		
+		//get user groups
+		//get companions by groups
+		//display companion alerts or not
+		//display every status ordered newest to oldest
+		
+		$groups = $this->ion_auth->get_users_groups()->result();
+		$companions = array();
+		$groupToCompanion = array();
+		$companionToGroup = array();
+		$companionToUpdates = array();
+		$this->load->model('Companion_model');
+		foreach( $groups as $group )
 		{
-			$this->load->view('partials/header', $this->headerViewData());
-			$this->load->view('partials/footer');
-		}
-		else
-		{
-			/*
-			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
-
-			//list the users
-			$this->data['users'] = $this->ion_auth->users()->result();
-			
-			foreach ($this->data['users'] as $k => $user)
+			$companion = $this->Companion_model->get_companion_by_group_id($group->id);
+			if($companion)
 			{
-				$this->data['users'][$k]->groups = $this->ion_auth->get_users_groups($user->id)->result();
+				array_push($companions, $companion);
+				$groupToCompanion[$group->id] = $companion;
+				$companionToGroup[$companion->id] = $group;
+				$updates = $this->Companion_model->get_updates_by_companion_id($companion->id);
+				if($updates)
+				{
+					$companionToUpdates[$companion->id] = $updates;
+				}
 			}
-			
-			$this->_render_page('user/index', $this->data);
-			*/
-			$this->load->view('partials/header', $this->headerViewData());
-			$this->load->view('partials/footer');
-		}
+		} 
+		
+		$this->data['groups'] = $groups;
+		$this->data['companions'] = $companions;
+		$this->data['groupToCompanion'] =  $groupToCompanion;
+		$this->data['companionToGroup'] =  $companionToGroup;
+		$this->data['companionToUpdates'] =  $companionToUpdates;
+		
+		$this->_render_page('dashboard/widgets', $this->data);
 	}
 }

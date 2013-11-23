@@ -171,7 +171,7 @@ CREATE TABLE `companion_says_audio` (
   CONSTRAINT `fk_companions_says_audio_audio1` FOREIGN KEY (`companion_audio_id`) REFERENCES `companion_audio` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS  `companion_update` (
+CREATE TABLE IF NOT EXISTS  `companion_updates` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `companion_id` int(11) unsigned NOT NULL,
   `voltage` float(3,2) NOT NULL,

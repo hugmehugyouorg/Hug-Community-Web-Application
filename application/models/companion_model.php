@@ -240,7 +240,7 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 			
-		$this->db->insert('companion_update',$data);
+		$this->db->insert('companion_updates',$data);
 		
 		$result = '<br/>insert id: '.$this->db->insert_id().'<br/>affected rows: '.$this->db->affected_rows().'<br/>db error: '.$this->db->_error_message();
 		$output .= $result;
@@ -248,7 +248,7 @@ class Companion_model extends CI_Model {
 			echo $result;
 			
 		if( $this->db->affected_rows() < 1 )
-    		throw new Exception("Couldn't update the companion_update table");
+    		throw new Exception("Couldn't update the companion_updates table");
     		
     	if($emotionState == 3)
     	{
@@ -299,6 +299,28 @@ class Companion_model extends CI_Model {
     		return $result[0]->group_id;
     	
     	return null;
+    }
+    
+    //TODO:  Optimize this query
+    public function get_companion_by_group_id($groupId)
+    {
+    	$result = $this->db->get_where('companions_groups', array('group_id' => $groupId))->result();
+    	
+    	if($result)
+    	{
+    		return $this->get_companion_by_id($result[0]->companion_id);
+    	}
+    	
+    	return null;
+    }
+    
+    public function get_updates_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->order_by("created_at", "desc");
+    	$query = $this->db->get('companion_updates');
+    	return $query->result();
     }
     
     public function assignCompanionToGroup($id, $groupId)
