@@ -26,6 +26,8 @@ class Dashboard extends MY_Controller {
 		$groupToCompanion = array();
 		$companionToGroup = array();
 		$companionToUpdates = array();
+		$companionToFirstUpdate = array();
+		$hasAlerts = false;
 		$this->load->model('Companion_model');
 		foreach( $groups as $group )
 		{
@@ -39,6 +41,11 @@ class Dashboard extends MY_Controller {
 				if($updates)
 				{
 					$companionToUpdates[$companion->id] = $updates;
+					$companionToFirstUpdate[$companion->id] = $updates[0];
+				}
+				if($companion->emergency_alert)
+				{
+					$hasAlerts = true;
 				}
 			}
 		} 
@@ -48,6 +55,8 @@ class Dashboard extends MY_Controller {
 		$this->data['groupToCompanion'] =  $groupToCompanion;
 		$this->data['companionToGroup'] =  $companionToGroup;
 		$this->data['companionToUpdates'] =  $companionToUpdates;
+		$this->data['companionToFirstUpdate'] = $companionToFirstUpdate;
+		$this->data['hasAlerts'] = $hasAlerts;
 		
 		$this->_render_page('dashboard/widgets', $this->data);
 	}

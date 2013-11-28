@@ -23,7 +23,7 @@ CREATE TABLE `groups` (
 
 INSERT INTO `groups` VALUES (1,'admin','Administrator');
 INSERT INTO `groups` VALUES (2,'social worker','Social Worker');
-INSERT INTO `groups` VALUES (3,'testers','Testers');
+INSERT INTO `groups` VALUES (3,'littleandy','Little Andy');
 
 #
 # Table structure for table 'users'
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS  `companions` (
   PRIMARY KEY  (`id`)
 );
 
-INSERT INTO `companions` (`id`, `name`, `description`) VALUES (1, 'Prototype Companion', 'Prototype Companion');
+INSERT INTO `companions` (`id`, `name`, `description`, `emergency_alert`) VALUES (1, 'Little Andys Companion', 'Little Andys Awesome Companion', 1);
 INSERT INTO `companions` (`id`, `name`, `description`) VALUES (2, 'Test Companion 1', 'Test Companion 1');
 INSERT INTO `companions` (`id`, `name`, `description`) VALUES (3, 'Test Companion 2', 'Test Companion 2');
 
@@ -189,6 +189,11 @@ CREATE TABLE IF NOT EXISTS  `companion_updates` (
   CONSTRAINT `fk_companion_update_last_said1_idx` FOREIGN KEY (`last_said_id`) REFERENCES `companion_says_audio` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
   CONSTRAINT `fk_companion_update_last_said_message1_idx` FOREIGN KEY (`last_message_said_id`) REFERENCES `companion_says_audio` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION
 );
+
+INSERT INTO `companion_updates` VALUES (1,1,4.92,0,3,0,NULL,NULL,'2013-11-27 23:55:04');
+INSERT INTO `companion_updates` VALUES (2,1,3.92,0,0,0,NULL,NULL,'2013-11-27 23:55:05');
+INSERT INTO `companion_updates` VALUES (3,1,5.00,0,2,1,NULL,NULL,'2013-11-27 23:55:06');
+INSERT INTO `companion_updates` VALUES (4,1,2.81,1,1,0,NULL,NULL,'2013-11-27 23:55:07');
 
 #
 # Drop and create the user if the don't exist then give them permissions

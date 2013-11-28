@@ -1,8 +1,13 @@
 <style>
+	.childs-play 
+	{
+		
+	}
 	.alert
 	{
 		margin-left:20px;
 		padding-right: 14px;
+		min-width: 250px;
 	}
 	.alert h1
 	{
@@ -11,6 +16,14 @@
 	.alert ul
 	{
 		margin-right: 8px;
+	}
+	@media (min-width: 768px)
+	{
+		.alert
+		{
+			background-color: transparent;
+			border: none;
+		}
 	}
 	@media (max-width: 767px)
 	{
@@ -25,30 +38,55 @@
 	}
 </style>
 <?php 
-	$alertFound = false;
-	foreach ($companions as $companion) 
-	{
-		if($companion->emergency_alert)
-		{
-			if(!$alertFound)
-			{
-				$alertFound = true;
-				echo '<div class="alert alert-error pull-right"><h1>Alerts</h1><ul>';
-			}
-			echo '<li>'.$companionToGroup[$companion->id]->name.' (Serious Situation)</li>';
-		}
-	}
+	echo '<div class="pull-right">';
 	
-	if($alertFound)
+	if($hasAlerts)
 	{
+		echo '<div class="alert alert-error"><h1>Alerts</h1><ul>';
+		foreach ($companions as $companion) 
+		{
+			if($companion->emergency_alert)
+			{
+				echo '<li>'.$companionToGroup[$companion->id]->name.' reported a Serious Situation <span style="font-size:125%;">&#9785;</span></li>';
+			}
+		}
 		echo '</ul></div>';
 	}
 	else
 	{
-		echo '<div class="alert alert-success pull-right">No Alerts</div>';
+		echo '<div class="alert alert-success"><h1>No Alerts</h1></div>';
 	}
 
-	echo '<div style="pull-left;">';
+	echo "<div class='childs-play alert alert-info pull-right'><h1>Childs Play</h1><ul>";
+	foreach ($companions as $companion) 
+	{ 
+		if(array_key_exists($companion->id, $companionToGroup))
+		{
+			$group = $companionToGroup[$companion->id];
+			
+			if(array_key_exists($companion->id, $companionToFirstUpdate))
+			{
+				$firstUpdate = $companionToFirstUpdate[$companion->id];
+		
+				if($firstUpdate)
+				{
+					switch($firstUpdate->emotional_state)
+					{
+						case 0: echo '<li class="muted">'.$group->name.' has not shared with the team yet</li>'; break;
+						case 1: echo '<li class="text-success">'.$group->name.' last shared a happy moment <span style="font-size:125%;">&#9786;</span></li>'; break;
+						case 2: echo '<li class="text-warning">'.$group->name.' last shared an uhappy moment <span style="font-size:125%;">&#9785;</span></li>'; break;
+						case 3: echo '<li class="text-error"><strong>'.$group->name.' last shared a serious moment <span style="font-size:125%;">&#9785;</span></li>'; break;
+					}
+				}
+			}
+			else
+			{
+				echo '<li class="muted">'.$group->name.'  has not shared with the team yet</li>';
+			}
+		}
+	}
+	
+	echo '</ul></div></div><div style="pull-left;">';
 	foreach ($groups as $group) 
 	{ 
 		if(array_key_exists($group->id, $groupToCompanion))
