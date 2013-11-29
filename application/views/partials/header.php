@@ -14,6 +14,7 @@
 	 -->
 	 
 	<title><?php echo $title ?></title>
+	<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
    	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css" />
    	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-responsive.min.css" /> 
     <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-select.min.css">

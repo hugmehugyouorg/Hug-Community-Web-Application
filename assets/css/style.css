@@ -52,22 +52,30 @@ a {
 /* DASHBOARD WIDGETS */
 .widgets .alert.widget
 {
+	text-align:center;
+}
+
+.widgets .alert.widget
+{
 	margin-left:20px;
 	padding-right: 14px;
-	min-width: 250px;
 	background-color: transparent;
 	border: none;
 	margin-top: 0;
 	margin-bottom:0;
 	padding-top: 0;
 }
-.widgets .alert.widget h1
-{
-	text-align:center;
-}
 .widgets .alert.widget ul
 {
 	margin-right: 8px;
+}
+
+.widgets .alert.widget .close.no-link
+{
+	text-shadow: none;
+	opacity: 1;
+	color: inherit;
+	cursor:default;
 }
 
 .widgets .alert.widget .modal

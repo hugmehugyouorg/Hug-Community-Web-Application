@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS  `companions` (
   PRIMARY KEY  (`id`)
 );
 
-INSERT INTO `companions` (`id`, `name`, `description`, `emergency_alert`) VALUES (1, 'Little Andys Companion', 'Little Andys Awesome Companion', 1);
+INSERT INTO `companions` (`id`, `name`, `description`, `emergency_alert`) VALUES (1, 'Andys Sammy', 'Little Andys Awesome Companion', 1);
 INSERT INTO `companions` (`id`, `name`, `description`) VALUES (2, 'Test Companion 1', 'Test Companion 1');
 INSERT INTO `companions` (`id`, `name`, `description`) VALUES (3, 'Test Companion 2', 'Test Companion 2');
 

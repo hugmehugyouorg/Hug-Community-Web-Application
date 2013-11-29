@@ -29,13 +29,13 @@ class Dashboard extends MY_Controller {
 		$groupToCompanion = array();
 		$companionToGroup = array();
 		$companionToUpdates = array();
-		$companionToFirstUpdate = array();
+		$companionToLastUpdate = array();
 		$hasAlerts = false;
 		$this->load->model('Companion_model');
 		foreach( $groups as $group )
 		{
 			if(!$isTeamLeader)
-				$isTeamLeader = $this->ion_auth->is_group_editor($group->id);
+				$isTeamLeader = $this->ion_auth->is_group_editor($group->name);
 				
 			$companion = $this->Companion_model->get_companion_by_group_id($group->id);
 			if($companion)
@@ -47,7 +47,7 @@ class Dashboard extends MY_Controller {
 				if($updates)
 				{
 					$companionToUpdates[$companion->id] = $updates;
-					$companionToFirstUpdate[$companion->id] = $updates[0];
+					$companionToLastUpdate[$companion->id] = $updates[0];
 				}
 				
 				if($clearAlertId == $companion->id && $isTeamLeader)
@@ -71,7 +71,7 @@ class Dashboard extends MY_Controller {
 		$this->data['groupToCompanion'] =  $groupToCompanion;
 		$this->data['companionToGroup'] =  $companionToGroup;
 		$this->data['companionToUpdates'] =  $companionToUpdates;
-		$this->data['companionToFirstUpdate'] = $companionToFirstUpdate;
+		$this->data['companionToLastUpdate'] = $companionToLastUpdate;
 		$this->data['hasAlerts'] = $hasAlerts;
 		
 		$this->_render_page('dashboard/widgets', $this->data);

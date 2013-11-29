@@ -13,7 +13,7 @@
 					<?php if($leader) { ?>
 					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal" style="font-size: 200%; top: -3px;">&times;</a>
 					<?php } ?>
-					<?php echo $companionToGroup[$companion->id]->name; ?> had a serious situation moment <span style="font-size:125%;">&#9785;</span>
+					<?php echo $companionToGroup[$companion->id]->name; ?> has indicated there is a serious situation
 					<?php if($leader) { ?>
 						<!-- Modal -->
 						<div id="clear-alert-modal-<?php echo $companion->id?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="clear-alert-modal-label" aria-hidden="true">
@@ -37,36 +37,58 @@
 		echo '</div>';
 	}
 
-	echo "<div class='alert alert-info pull-right widget'><h1>Childs Play</h1>";
+	echo "<div class='alert alert-info widget'><h1>Child's Play</h1>";
 	foreach ($companions as $companion) 
 	{ 
 		if(array_key_exists($companion->id, $companionToGroup))
 		{
 			$group = $companionToGroup[$companion->id];
 			
-			if(array_key_exists($companion->id, $companionToFirstUpdate))
+			if(array_key_exists($companion->id, $companionToLastUpdate))
 			{
-				$firstUpdate = $companionToFirstUpdate[$companion->id];
+				$firstUpdate = $companionToLastUpdate[$companion->id];
 		
-				if($firstUpdate)
+				switch($firstUpdate->emotional_state)
 				{
-					switch($firstUpdate->emotional_state)
-					{
-						case 0: echo '<div class="alert alert-info">'.$group->name.' has not shared with the team yet</div>'; break;
-						case 1: echo '<div class="alert alert-success">'.$group->name.' last shared a happy moment <span style="font-size:125%;">&#9786;</span></div>'; break;
-						case 2: echo '<div class="alert">'.$group->name.' last shared an uhappy moment <span style="font-size:125%;">&#9785;</span></div>'; break;
-						case 3: echo '<div class="alert alert-error">'.$group->name.' last shared a serious moment <span style="font-size:125%;">&#9785;</span></div>'; break;
-					}
+					case 0: echo '<div class="alert"><span class="muted">'.$group->name.' has not shared with the team yet</span></div>'; break;
+					case 1: echo '<div class="alert alert-info">'.$group->name.' last shared a happy moment <span class="close no-link">&#9786;</span></div>'; break;
+					case 2: echo '<div class="alert alert-error">'.$group->name.' last shared an uhappy moment <span class="close no-link">&#9785;</span></div>'; break;
+					case 3: echo '<div class="alert alert-error">'.$group->name.' last shared a serious moment <span class="close no-link">&#9785;</span></div>'; break;
 				}
 			}
 			else
 			{
-				echo '<div class="alert alert-info">'.$group->name.'  has not shared with the team yet</div>';
+				echo '<div class="alert"><span class="muted">'.$group->name.'  has not shared with the team yet</span></div>';
 			}
 		}
 	}
+	echo '</div>';
 	
-	echo '</div></div><div style="pull-left;">';
+	echo "<div class='alert alert-success widget'><h1>Safety Sam</h1>";
+	foreach ($companions as $companion) 
+	{ 
+		if(array_key_exists($companion->id, $companionToGroup))
+		{
+			$group = $companionToGroup[$companion->id];
+			
+			if(array_key_exists($companion->id, $companionToLastUpdate))
+			{
+				$firstUpdate = $companionToLastUpdate[$companion->id];
+		
+				if(!$firstUpdate->is_charging)
+				{
+					echo '<div class="alert"><span class="muted">'.$companion->name.' is battery powered at '.$firstUpdate->voltage.' Volts </span><span class="close no-link"><i class="text-error fa fa-flash"></i></span></div>';
+				}
+				else
+				{
+					echo '<div class="alert"><span class="muted">'.$companion->name.' is recharging at '.$firstUpdate->voltage.' Volts </span><span class="close no-link"><i class="fa fa-flash text-error"></i></span></div>';
+				}
+			}
+		}
+	}
+	echo '</div>';
+	
+	echo '</div><div>';
 	foreach ($groups as $group) 
 	{ 
 		if(array_key_exists($group->id, $groupToCompanion))
