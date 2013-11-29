@@ -49,6 +49,32 @@ a {
 	margin: 0 0 5px;
 }
 
+/* DASHBOARD WIDGETS */
+.widgets .alert.widget
+{
+	margin-left:20px;
+	padding-right: 14px;
+	min-width: 250px;
+	background-color: transparent;
+	border: none;
+	margin-top: 0;
+	margin-bottom:0;
+	padding-top: 0;
+}
+.widgets .alert.widget h1
+{
+	text-align:center;
+}
+.widgets .alert.widget ul
+{
+	margin-right: 8px;
+}
+
+.widgets .alert.widget .modal
+{
+	color: #000;
+}
+
 @media (max-width: 979px) {
 	.navbar-fixed-bottom {
 		position: fixed;
@@ -68,6 +94,12 @@ a {
 	}
 }
 
+@media (min-width: 768px)
+{
+	/* DASHBOARD WIDGETS */
+	
+}
+
 @media (max-width: 767px) {
 	body {
 		padding-right: 0;
@@ -80,5 +112,15 @@ a {
 	.navbar-fixed-bottom  {
 		margin-left: 0px;
 		margin-right: 0px;
+	}
+	
+	/* DASHBOARD WIDGETS */
+	.widgets .alert.widget
+	{
+		margin-left:0px;
+	}
+	.widgets .pull-right, .widget .pull-left {
+		
+		float:none;
 	}
 }

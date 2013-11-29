@@ -1,63 +1,43 @@
-<style>
-	.childs-play 
-	{
-		
-	}
-	.alert
-	{
-		margin-left:20px;
-		padding-right: 14px;
-		min-width: 250px;
-	}
-	.alert h1
-	{
-		text-align:center;
-	}
-	.alert ul
-	{
-		margin-right: 8px;
-	}
-	@media (min-width: 768px)
-	{
-		.alert
-		{
-			background-color: transparent;
-			border: none;
-		}
-	}
-	@media (max-width: 767px)
-	{
-		.alert
-		{
-			margin-left:0px;
-		}
-		.pull-right, .pull-left {
-			
-			float:none;
-		}
-	}
-</style>
 <?php 
-	echo '<div class="pull-right">';
+	echo '<div class="widgets"><div class="pull-right">';
 	
 	if($hasAlerts)
 	{
-		echo '<div class="alert alert-error"><h1>Alerts</h1><ul>';
+		echo '<div class="alert alert-error widget"><h1>Alerts</h1>';
 		foreach ($companions as $companion) 
 		{
 			if($companion->emergency_alert)
 			{
-				echo '<li>'.$companionToGroup[$companion->id]->name.' reported a Serious Situation <span style="font-size:125%;">&#9785;</span></li>';
+				?>
+				<div class="alert alert-error">
+					<?php if($leader) { ?>
+					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal" style="font-size: 200%; top: -3px;">&times;</a>
+					<?php } ?>
+					<?php echo $companionToGroup[$companion->id]->name; ?> had a serious situation moment <span style="font-size:125%;">&#9785;</span>
+					<?php if($leader) { ?>
+						<!-- Modal -->
+						<div id="clear-alert-modal-<?php echo $companion->id?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="clear-alert-modal-label" aria-hidden="true">
+						  <div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h3 id="clear-alert-modal-label" class="text-error">Are you sure about this?</h3>
+						  </div>
+						  <div class="modal-body">
+							<p>This will clear the serious situation alert for <?php echo $companionToGroup[$companion->id]->name; ?>.</p>
+						  </div>
+						  <div class="modal-footer">
+							<button class="btn" data-dismiss="modal" aria-hidden="true">No</button>
+							<a href="/dashboard?clear_alert=<?php echo $companion->id?>" class="btn btn-primary">Yes</a>
+						  </div>
+						</div>
+					<?php } ?>
+				</div>
+				<?php
 			}
 		}
-		echo '</ul></div>';
-	}
-	else
-	{
-		echo '<div class="alert alert-success"><h1>No Alerts</h1></div>';
+		echo '</div>';
 	}
 
-	echo "<div class='childs-play alert alert-info pull-right'><h1>Childs Play</h1><ul>";
+	echo "<div class='alert alert-info pull-right widget'><h1>Childs Play</h1>";
 	foreach ($companions as $companion) 
 	{ 
 		if(array_key_exists($companion->id, $companionToGroup))
@@ -72,21 +52,21 @@
 				{
 					switch($firstUpdate->emotional_state)
 					{
-						case 0: echo '<li class="muted">'.$group->name.' has not shared with the team yet</li>'; break;
-						case 1: echo '<li class="text-success">'.$group->name.' last shared a happy moment <span style="font-size:125%;">&#9786;</span></li>'; break;
-						case 2: echo '<li class="text-warning">'.$group->name.' last shared an uhappy moment <span style="font-size:125%;">&#9785;</span></li>'; break;
-						case 3: echo '<li class="text-error"><strong>'.$group->name.' last shared a serious moment <span style="font-size:125%;">&#9785;</span></li>'; break;
+						case 0: echo '<div class="alert alert-info">'.$group->name.' has not shared with the team yet</div>'; break;
+						case 1: echo '<div class="alert alert-success">'.$group->name.' last shared a happy moment <span style="font-size:125%;">&#9786;</span></div>'; break;
+						case 2: echo '<div class="alert">'.$group->name.' last shared an uhappy moment <span style="font-size:125%;">&#9785;</span></div>'; break;
+						case 3: echo '<div class="alert alert-error">'.$group->name.' last shared a serious moment <span style="font-size:125%;">&#9785;</span></div>'; break;
 					}
 				}
 			}
 			else
 			{
-				echo '<li class="muted">'.$group->name.'  has not shared with the team yet</li>';
+				echo '<div class="alert alert-info">'.$group->name.'  has not shared with the team yet</div>';
 			}
 		}
 	}
 	
-	echo '</ul></div></div><div style="pull-left;">';
+	echo '</div></div><div style="pull-left;">';
 	foreach ($groups as $group) 
 	{ 
 		if(array_key_exists($group->id, $groupToCompanion))
@@ -127,5 +107,5 @@
 		  	}
 		}
 	}
-	echo '</div>';
+	echo '</div></div>';
 ?>	

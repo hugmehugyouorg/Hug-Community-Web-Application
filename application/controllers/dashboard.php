@@ -16,6 +16,9 @@ class Dashboard extends MY_Controller {
 			return;
 		}
 		
+		$clearAlertId = $this->input->get('clear_alert', TRUE);
+		$isTeamLeader = $this->ion_auth->is_admin();
+		
 		//get user groups
 		//get companions by groups
 		//display companion alerts or not
@@ -31,6 +34,9 @@ class Dashboard extends MY_Controller {
 		$this->load->model('Companion_model');
 		foreach( $groups as $group )
 		{
+			if(!$isTeamLeader)
+				$isTeamLeader = $this->ion_auth->is_group_editor($group->id);
+				
 			$companion = $this->Companion_model->get_companion_by_group_id($group->id);
 			if($companion)
 			{
@@ -43,6 +49,15 @@ class Dashboard extends MY_Controller {
 					$companionToUpdates[$companion->id] = $updates;
 					$companionToFirstUpdate[$companion->id] = $updates[0];
 				}
+				
+				if($clearAlertId == $companion->id && $isTeamLeader)
+				{
+					if($this->Companion_model->clear_emergency_alert($clearAlertId))
+					{
+						redirect('dashboard', 'refresh');
+					}
+				}
+				
 				if($companion->emergency_alert)
 				{
 					$hasAlerts = true;
@@ -50,6 +65,7 @@ class Dashboard extends MY_Controller {
 			}
 		} 
 		
+		$this->data['leader'] = $isTeamLeader;
 		$this->data['groups'] = $groups;
 		$this->data['companions'] = $companions;
 		$this->data['groupToCompanion'] =  $groupToCompanion;

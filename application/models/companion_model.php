@@ -336,6 +336,19 @@ class Companion_model extends CI_Model {
     	return true;
     }
     
+    public function clear_emergency_alert($id)
+    {
+    	$data = array(
+		   'emergency_alert' => 0
+		);
+    	$this->db->where('id', $id);
+    	$updateResult = $this->db->update('companions', $data);
+    	
+    	if($updateResult)
+    		return true;
+    	return false;
+    }
+    
     public function add_audio($audioNum, $text, $isMessage, $mp3, $size)
     {
     	//check if $audioNum exists in companion_says_audio
