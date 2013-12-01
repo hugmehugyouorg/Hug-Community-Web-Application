@@ -1,5 +1,6 @@
+<script type="text/javascript" src="/assets/js/highcharts/highcharts.js"></script>
 <?php 
-	echo '<div class="widgets"><div class="pull-right">';
+	echo '<div class="widgets row"><div class="pull-right span4">';
 	
 	if($hasAlerts)
 	{
@@ -11,9 +12,9 @@
 				?>
 				<div class="alert alert-error">
 					<?php if($leader) { ?>
-					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal" style="font-size: 200%; top: -3px;">&times;</a>
+					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal"><i class="fa fa-times fa-lg"></i></a>
 					<?php } ?>
-					<?php echo $companionToGroup[$companion->id]->name; ?> has indicated there is a serious situation
+					<?php echo $companionToGroup[$companion->id]->name; ?> shared a serious situation
 					<?php if($leader) { ?>
 						<!-- Modal -->
 						<div id="clear-alert-modal-<?php echo $companion->id?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="clear-alert-modal-label" aria-hidden="true">
@@ -33,6 +34,13 @@
 				</div>
 				<?php
 			}
+			
+			if(array_key_exists($companion->id, $companionToLowBattery))
+			{
+				?>
+				<div class="alert"><span class="close no-link"><i class="fa fa-dashboard text-error"></i></span><?php echo $companion->name; ?> has a low battery</div>
+				<?php
+			}
 		}
 		echo '</div>';
 	}
@@ -50,15 +58,15 @@
 		
 				switch($firstUpdate->emotional_state)
 				{
-					case 0: echo '<div class="alert"><span class="muted">'.$group->name.' has not shared with the team yet</span></div>'; break;
-					case 1: echo '<div class="alert alert-info">'.$group->name.' last shared a happy moment <span class="close no-link">&#9786;</span></div>'; break;
-					case 2: echo '<div class="alert alert-error">'.$group->name.' last shared an uhappy moment <span class="close no-link">&#9785;</span></div>'; break;
-					case 3: echo '<div class="alert alert-error">'.$group->name.' last shared a serious moment <span class="close no-link">&#9785;</span></div>'; break;
+					case 0: echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o"></i></span>'.$group->name.' has not shared with the team yet</div>'; break;
+					case 1: echo '<div class="alert alert-info"><span class="close no-link"><i class="fa fa-smile-o"></i></span>'.$group->name.' last shared a happy moment</div>'; break;
+					case 2: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o"></i></span>'.$group->name.' last shared an unhappy moment</div>'; break;
+					case 3: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o"></i></span>'.$group->name.' last shared a serious moment</div>'; break;
 				}
 			}
 			else
 			{
-				echo '<div class="alert"><span class="muted">'.$group->name.'  has not shared with the team yet</span></div>';
+				echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o"></i></span>'.$group->name.'  has not shared with the team yet</div>';
 			}
 		}
 	}
@@ -77,25 +85,81 @@
 		
 				if(!$firstUpdate->is_charging)
 				{
-					echo '<div class="alert"><span class="muted">'.$companion->name.' is battery powered at '.$firstUpdate->voltage.' Volts </span><span class="close no-link"><i class="text-error fa fa-flash"></i></span></div>';
+					echo '<div class="alert"><span class="close no-link"><i class="fa fa-dashboard"></i></span>'.$companion->name.' is battery powered at '.$firstUpdate->voltage.' Volts</div>';
 				}
 				else
 				{
-					echo '<div class="alert"><span class="muted">'.$companion->name.' is recharging at '.$firstUpdate->voltage.' Volts </span><span class="close no-link"><i class="fa fa-flash text-error"></i></span></div>';
+					echo '<div class="alert"><span class="close no-link"><i class="fa fa-flash"></i></span>'.$companion->name.' is recharging at '.$firstUpdate->voltage.' Volts</div>';
 				}
 			}
 		}
 	}
-	echo '</div>';
+	?>
+	</div></div><div class="span8">
 	
-	echo '</div><div>';
+	<?php
 	foreach ($groups as $group) 
 	{ 
 		if(array_key_exists($group->id, $groupToCompanion))
 		{
 			$companion = $groupToCompanion[$group->id];
 			
-			echo '<h2>Safety Team: '.$group->name.'</h2>';
+			echo '<h2>'.$group->name.'</h2>';
+			?>
+			<div id="chart-<?php echo $companion->id; ?>"></div>
+			<script type="text/javascript" >
+				$(function () {
+					$('#chart-<?php echo $companion->id; ?>').highcharts({
+						credits: {
+							  enabled: false
+						},
+						title: {
+							text: '<?php echo $companion->name; ?> Shared Moments',
+							x: 30 //center
+						},
+						subtitle: {
+							text: 'Source: Child & Safety Sam Interaction',
+							x: 30
+						},
+						yAxis: {
+							title: {
+								text: 'Emotional State'
+							},
+							categories: ['Serious', 'Unhappy', 'Happy'],
+							gridLineColor: '#FFFFFF'
+						},
+						tooltip: {
+							formatter:function(){
+								console.log(this);
+								return '<b>'+this.x+'<br/>'+this.key;
+							}
+						},
+						legend: {
+							enabled: false
+						},
+						xAxis: {
+							title: {
+								text: 'Time'
+							},
+							categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+								'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+						},
+						series: [{
+							name: 'Emotion',
+							data: [
+								{name: 'Happy', y:2}, 
+								{name: 'Unhappy', y:1},
+								{name: 'Unhappy', y:1}, 
+								{name: 'Unhappy', y:1}, 
+								{name: 'Serious', y:0},
+								{name: 'Serious', y:0}, 
+								{name: 'Happy', y:2}, 
+								{name: 'Unhappy', y:1}]
+						}]
+					});
+				});
+			</script>
+			<?php
 			if(array_key_exists($companion->id, $companionToUpdates))
 			{
 				$updates = $companionToUpdates[$companion->id];
@@ -130,4 +194,4 @@
 		}
 	}
 	echo '</div></div>';
-?>	
+?>

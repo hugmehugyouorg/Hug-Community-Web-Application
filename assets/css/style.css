@@ -72,7 +72,6 @@ a {
 
 .widgets .alert.widget .close.no-link
 {
-	text-shadow: none;
 	opacity: 1;
 	color: inherit;
 	cursor:default;

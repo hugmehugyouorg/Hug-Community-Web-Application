@@ -192,8 +192,8 @@ CREATE TABLE IF NOT EXISTS  `companion_updates` (
 
 INSERT INTO `companion_updates` VALUES (1,1,4.92,0,3,0,NULL,NULL,'2013-11-27 23:55:04');
 INSERT INTO `companion_updates` VALUES (2,1,3.92,0,0,0,NULL,NULL,'2013-11-27 23:55:05');
-INSERT INTO `companion_updates` VALUES (3,1,5.00,0,2,1,NULL,NULL,'2013-11-27 23:55:06');
-INSERT INTO `companion_updates` VALUES (4,1,2.81,1,1,0,NULL,NULL,'2013-11-27 23:55:07');
+INSERT INTO `companion_updates` VALUES (3,1,5.00,1,2,1,NULL,NULL,'2013-11-27 23:55:06');
+INSERT INTO `companion_updates` VALUES (4,1,2.81,0,1,0,NULL,NULL,'2013-11-27 23:55:07');
 
 #
 # Drop and create the user if the don't exist then give them permissions

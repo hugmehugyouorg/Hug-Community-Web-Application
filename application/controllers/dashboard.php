@@ -30,6 +30,7 @@ class Dashboard extends MY_Controller {
 		$companionToGroup = array();
 		$companionToUpdates = array();
 		$companionToLastUpdate = array();
+		$companionToLowBattery = array();
 		$hasAlerts = false;
 		$this->load->model('Companion_model');
 		foreach( $groups as $group )
@@ -46,8 +47,14 @@ class Dashboard extends MY_Controller {
 				$updates = $this->Companion_model->get_updates_by_companion_id($companion->id);
 				if($updates)
 				{
+					$lastUpdate = $updates[0];
 					$companionToUpdates[$companion->id] = $updates;
-					$companionToLastUpdate[$companion->id] = $updates[0];
+					$companionToLastUpdate[$companion->id] = $lastUpdate;
+					if(!$lastUpdate->is_charging && $lastUpdate->voltage <= 3.0)
+					{
+						$companionToLowBattery[$companion->id] = true;
+						$hasAlerts = true;
+					}
 				}
 				
 				if($clearAlertId == $companion->id && $isTeamLeader)
@@ -72,6 +79,7 @@ class Dashboard extends MY_Controller {
 		$this->data['companionToGroup'] =  $companionToGroup;
 		$this->data['companionToUpdates'] =  $companionToUpdates;
 		$this->data['companionToLastUpdate'] = $companionToLastUpdate;
+		$this->data['companionToLowBattery'] = $companionToLowBattery;
 		$this->data['hasAlerts'] = $hasAlerts;
 		
 		$this->_render_page('dashboard/widgets', $this->data);
