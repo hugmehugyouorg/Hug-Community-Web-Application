@@ -14,7 +14,7 @@
 					<?php if($leader) { ?>
 					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal"><i class="fa fa-times fa-lg"></i></a>
 					<?php } ?>
-					<?php echo $companionToGroup[$companion->id]->name; ?> shared a serious situation
+					<?php echo $companionToGroup[$companion->id]->name; ?> is in a Serious Situation
 					<?php if($leader) { ?>
 						<!-- Modal -->
 						<div id="clear-alert-modal-<?php echo $companion->id?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="clear-alert-modal-label" aria-hidden="true">
@@ -52,9 +52,9 @@
 		{
 			$group = $companionToGroup[$companion->id];
 			
-			if(array_key_exists($companion->id, $companionToLastUpdate))
+			if(array_key_exists($companion->id, $companionToLastUpdateWithEmotion))
 			{
-				$firstUpdate = $companionToLastUpdate[$companion->id];
+				$firstUpdate = $companionToLastUpdateWithEmotion[$companion->id];
 		
 				switch($firstUpdate->emotional_state)
 				{
@@ -105,61 +105,6 @@
 			$companion = $groupToCompanion[$group->id];
 			
 			echo '<h2>'.$group->name.'</h2>';
-			?>
-			<div id="chart-<?php echo $companion->id; ?>"></div>
-			<script type="text/javascript" >
-				$(function () {
-					$('#chart-<?php echo $companion->id; ?>').highcharts({
-						credits: {
-							  enabled: false
-						},
-						title: {
-							text: '<?php echo $companion->name; ?> Shared Moments',
-							x: 30 //center
-						},
-						subtitle: {
-							text: 'Source: Child & Safety Sam Interaction',
-							x: 30
-						},
-						yAxis: {
-							title: {
-								text: 'Emotional State'
-							},
-							categories: ['Serious', 'Unhappy', 'Happy'],
-							gridLineColor: '#FFFFFF'
-						},
-						tooltip: {
-							formatter:function(){
-								console.log(this);
-								return '<b>'+this.x+'<br/>'+this.key;
-							}
-						},
-						legend: {
-							enabled: false
-						},
-						xAxis: {
-							title: {
-								text: 'Time'
-							},
-							categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-								'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-						},
-						series: [{
-							name: 'Emotion',
-							data: [
-								{name: 'Happy', y:2}, 
-								{name: 'Unhappy', y:1},
-								{name: 'Unhappy', y:1}, 
-								{name: 'Unhappy', y:1}, 
-								{name: 'Serious', y:0},
-								{name: 'Serious', y:0}, 
-								{name: 'Happy', y:2}, 
-								{name: 'Unhappy', y:1}]
-						}]
-					});
-				});
-			</script>
-			<?php
 			if(array_key_exists($companion->id, $companionToUpdates))
 			{
 				$updates = $companionToUpdates[$companion->id];
@@ -167,24 +112,89 @@
 				$companionUpdatesFound = false;
 				foreach ($updates as $update) 
 				{ 
-					$companionUpdatesFound = true;
-					$usersTimezone = new DateTimeZone('America/Chicago');
+					if(!$companionUpdatesFound)
+					{
+						$companionUpdatesFound = true;
+						?>
+						
+						<div id="chart-<?php echo $companion->id; ?>"></div>
+						<script type="text/javascript" >
+							$(function () {
+								$('#chart-<?php echo $companion->id; ?>').highcharts({
+									chart: {
+										type: 'areaspline',
+										zoomType: 'x',
+										spacingRight: 20
+									},
+									title: {
+										text: '<?php echo $group->name; ?> updates'
+									},
+									subtitle: {
+										text: document.ontouchstart === undefined ?
+											'Click and drag in the plot area to zoom in' :
+											'Pinch the chart to zoom in'
+									},
+									xAxis: {
+										type: 'datetime',
+										dateTimeLabelFormats: {
+											millisecond: '%I:%M:%S.%L %P',
+											second: '%I:%M:%S %P',
+											minute: '%I:%M %P',
+											hour: '%I:%M %P'
+										},
+										title: {
+											text: 'Time'
+										}
+									},
+									yAxis: {
+										title: {
+											text: 'Shared Moments'
+										},
+										categories: ['Serious', 'Unhappy', 'Happy'],
+										gridLineColor: '#FFFFFF'
+									},
+									tooltip: {
+										formatter: function() {
+												return '<b>'+ Highcharts.dateFormat('%a, %d %b %Y %I:%M %P', this.x) +'</b><br/>'+this.key;
+										}
+									},
+									legend: {
+										enabled: false
+									},
+									credits: {
+										  enabled: false
+									},
+									series: [{
+										name: 'Emotion',
+										data: [<?php
+			   		}
+			   		$usersTimezone = new DateTimeZone('America/Chicago');
 					$l10nDate = new DateTime($update->created_at);
 					$l10nDate->setTimeZone($usersTimezone);
-					$date = $l10nDate->format('g:i:s A M j Y');
-					?>
-					<strong><?php echo $date;?></strong>
-					<br/>Emotional State: <?php if($update->emotional_state == 3) echo 'SERIOUS'; else if($update->emotional_state == 2)  echo 'UNHAPPY'; if($update->emotional_state == 1) echo 'HAPPY'; if($update->emotional_state == 0)  echo 'UNKNOWN'; ?> 
-					<br/><?php if($update->quiet_time) echo "It's Quiet Time"; else echo "It's Not Quiet Time"; ?>
-					<br/>Battery is <?php if($update->is_charging) echo 'being charged'; else echo 'is not being charged';?>
-					<br/>Estimating Battery at <?php echo $update->voltage;?> Volts
-					<?php if($update->last_said_id) echo '<br/>Last Said Id: '.$update->last_said_id; ?> 
-					<?php if($update->last_message_said_id) echo '<br/>Last Message Said Id: '.$update->last_message_said_id; ?> 
-					<br/><br/>
-		  <?php }
+					$timestamp = $l10nDate->format('Y-m-d H:i:s');
+			   		?>
+			   									{x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
+													switch($update->emotional_state)
+													{
+														case 3: echo 'name: "Serious", y: 0'; break;
+														case 2: echo 'name: "Unhappy", y: 1'; break;
+														case 1: echo 'name: "Happy", y: 2'; break;
+													}
+												?>},<?php
+		  		}
 		  		if(!$companionUpdatesFound)
 		  		{
 		  			echo 'No updates.';
+		  		}
+		  		else
+		  		{
+		  			?>
+										]
+									}]
+								});
+							});
+						</script>
+					<?php
 		  		}
 		  	}
 		  	else

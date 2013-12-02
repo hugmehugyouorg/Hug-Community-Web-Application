@@ -31,6 +31,7 @@ class Dashboard extends MY_Controller {
 		$companionToUpdates = array();
 		$companionToLastUpdate = array();
 		$companionToLowBattery = array();
+		$companionToLastUpdateWithEmotion = array();
 		$hasAlerts = false;
 		$this->load->model('Companion_model');
 		foreach( $groups as $group )
@@ -44,17 +45,23 @@ class Dashboard extends MY_Controller {
 				array_push($companions, $companion);
 				$groupToCompanion[$group->id] = $companion;
 				$companionToGroup[$companion->id] = $group;
-				$updates = $this->Companion_model->get_updates_by_companion_id($companion->id);
+				$updates = $this->Companion_model->get_emotion_updates_by_companion_id($companion->id);
 				if($updates)
 				{
-					$lastUpdate = $updates[0];
 					$companionToUpdates[$companion->id] = $updates;
+					$lastUpdate = $this->Companion_model->get_latest_update_by_companion_id($companion->id);
 					$companionToLastUpdate[$companion->id] = $lastUpdate;
 					if(!$lastUpdate->is_charging && $lastUpdate->voltage <= 3.0)
 					{
 						$companionToLowBattery[$companion->id] = true;
 						$hasAlerts = true;
 					}
+				}
+				
+				$lastUpdateWithEmotion = $this->Companion_model->get_latest_emotion_update_by_companion_id($companion->id);
+				if($lastUpdateWithEmotion)
+				{
+					$companionToLastUpdateWithEmotion[$companion->id] = $lastUpdateWithEmotion;
 				}
 				
 				if($clearAlertId == $companion->id && $isTeamLeader)
@@ -80,6 +87,7 @@ class Dashboard extends MY_Controller {
 		$this->data['companionToUpdates'] =  $companionToUpdates;
 		$this->data['companionToLastUpdate'] = $companionToLastUpdate;
 		$this->data['companionToLowBattery'] = $companionToLowBattery;
+		$this->data['companionToLastUpdateWithEmotion'] = $companionToLastUpdateWithEmotion;
 		$this->data['hasAlerts'] = $hasAlerts;
 		
 		$this->_render_page('dashboard/widgets', $this->data);

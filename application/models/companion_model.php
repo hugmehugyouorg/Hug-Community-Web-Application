@@ -225,11 +225,38 @@ class Companion_model extends CI_Model {
 			
 		$lastMessageSaid = $this->get_audio_association_by_audio_num($lastMessageSaid);
 		
+		if($emotionState != 0)
+		{
+			//TODO: the emotion_update should become a query instead OR consider starting a transaction so that the emotion_update
+			//		is consistent for sure
+			$lastEmotionUpdate = $this->get_latest_update_by_companion_id($companion->id);
+			
+			if($lastEmotionUpdate)
+			{
+				$lastUpdate = $this->get_latest_emotion_update_by_companion_id($companion->id);
+				if( $lastEmotionUpdate->emotional_state != $emotionState || $lastUpdate->quiet_time == $isQuietTime )
+				{
+					$emotionUpdate = 1;
+				}
+				else
+					$emotionUpdate = 0;
+			}
+			else
+			{
+				$emotionUpdate = 1;
+			}
+		}
+		else
+		{
+			$emotionUpdate = 0;
+		}
+			
 		$data = array(
 		   'companion_id' => $companion->id,
 		   'voltage' => $voltage,
 		   'is_charging' => $isCharging,
 		   'emotional_state' => $emotionState,
+		   'emotion_update' => $emotionUpdate,
 		   'quiet_time' => $isQuietTime,
 		   'last_said_id' => $lastSaid ? $lastSaid->id : NULL,
 		   'last_message_said_id' => $lastMessageSaid ? $lastMessageSaid->id : NULL
@@ -314,13 +341,43 @@ class Companion_model extends CI_Model {
     	return null;
     }
     
-    public function get_updates_by_companion_id($id)
+    public function get_emotion_updates_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('emotional_state !=', 0);
+    	$this->db->where('emotion_update', 1);
+    	$this->db->order_by("created_at", "asc");
+    	$query = $this->db->get('companion_updates');
+    	return $query->result();
+    }
+    
+    public function get_latest_update_by_companion_id($id)
     {
     	$this->db->select('*');
     	$this->db->where('companion_id', $id);
     	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
     	$query = $this->db->get('companion_updates');
-    	return $query->result();
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function get_latest_emotion_update_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('emotional_state !=', 0);
+    	$this->db->where('emotion_update', 1);
+    	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_updates');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
     }
     
     public function assignCompanionToGroup($id, $groupId)
