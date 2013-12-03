@@ -12,9 +12,9 @@
 				?>
 				<div class="alert alert-error">
 					<?php if($leader) { ?>
-					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal"><i class="fa fa-times fa-lg"></i></a>
+					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal"><i class="fa fa-times"></i></a>
 					<?php } ?>
-					<?php echo $companionToGroup[$companion->id]->name; ?> is in a Serious Situation
+					<?php echo $companion->name; ?> reported a Serious Situation with <?php echo $companionToGroup[$companion->id]->name; ?>
 					<?php if($leader) { ?>
 						<!-- Modal -->
 						<div id="clear-alert-modal-<?php echo $companion->id?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="clear-alert-modal-label" aria-hidden="true">
@@ -37,8 +37,9 @@
 			
 			if(array_key_exists($companion->id, $companionToLowBattery))
 			{
+				$timeElapsed = $companionToLastUpdateWithEmotion[$companion->id]['timeElapsed'];
 				?>
-				<div class="alert"><span class="close no-link"><i class="fa fa-dashboard text-error"></i></span><?php echo $companion->name; ?> has a low battery</div>
+				<div class="alert"><span class="close no-link"><i class="fa fa-dashboard text-error"></i></span><?php echo $companion->name; ?> has a low battery.&nbsp;&nbsp;<code><?php echo $timeElapsed; ?> ago</code></div>
 				<?php
 			}
 		}
@@ -54,19 +55,31 @@
 			
 			if(array_key_exists($companion->id, $companionToLastUpdateWithEmotion))
 			{
-				$firstUpdate = $companionToLastUpdateWithEmotion[$companion->id];
+				$firstUpdate = $companionToLastUpdateWithEmotion[$companion->id]['update'];
+				$timeElapsed = $companionToLastUpdateWithEmotion[$companion->id]['timeElapsed'];
 		
 				switch($firstUpdate->emotional_state)
 				{
-					case 0: echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o"></i></span>'.$group->name.' has not shared with the team yet</div>'; break;
-					case 1: echo '<div class="alert alert-info"><span class="close no-link"><i class="fa fa-smile-o"></i></span>'.$group->name.' last shared a happy moment</div>'; break;
-					case 2: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o"></i></span>'.$group->name.' last shared an unhappy moment</div>'; break;
-					case 3: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o"></i></span>'.$group->name.' last shared a serious moment</div>'; break;
+					case 0: echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o"></i></span>'.$group->name.' has not shared with the team yet.</div>'; break;
+					case 1: echo '<div class="alert alert-info"><span class="close no-link"><i class="fa fa-smile-o"></i></span>'.$group->name.' last shared a happy moment.&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>'; break;
+					case 2: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o"></i></span>'.$group->name.' last shared an unhappy moment.&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>'; break;
+					case 3: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o"></i></span>'.$group->name.' last shared a serious moment.&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>'; break;
+				}
+				
+				if(array_key_exists($companion->id, $companionToLastUpdate))
+				{
+					$firstUpdate = $companionToLastUpdate[$companion->id]['update'];
+					$timeElapsed = $companionToLastUpdateWithEmotion[$companion->id]['timeElapsed'];
+					
+					if($firstUpdate->quiet_time)
+					{
+						echo '<div class="alert"><span class="close no-link" style="margin-right:5px;"><i class="fa fa-volume-off"></i></span>'.$group->name.' wants some quiet time, shh!&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>';
+					}
 				}
 			}
 			else
 			{
-				echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o"></i></span>'.$group->name.'  has not shared with the team yet</div>';
+				echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o"></i></span>'.$group->name.'  has not shared with the team yet.</div>';
 			}
 		}
 	}
@@ -81,15 +94,16 @@
 			
 			if(array_key_exists($companion->id, $companionToLastUpdate))
 			{
-				$firstUpdate = $companionToLastUpdate[$companion->id];
+				$firstUpdate = $companionToLastUpdate[$companion->id]['update'];
+				$timeElapsed = $companionToLastUpdate[$companion->id]['timeElapsed'];
 		
 				if(!$firstUpdate->is_charging)
 				{
-					echo '<div class="alert"><span class="close no-link"><i class="fa fa-dashboard"></i></span>'.$companion->name.' is battery powered at '.$firstUpdate->voltage.' Volts</div>';
+					echo '<div class="alert"><span class="close no-link" style="margin-right:5px;"><i class="fa fa-dashboard"></i></span>'.$companion->name.' is battery powered at '.$firstUpdate->voltage.' Volts.&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>';
 				}
 				else
 				{
-					echo '<div class="alert"><span class="close no-link"><i class="fa fa-flash"></i></span>'.$companion->name.' is recharging at '.$firstUpdate->voltage.' Volts</div>';
+					echo '<div class="alert clearfix"><span class="close no-link" style="margin-right:5px;"><i class="fa fa-flash"></i></span>'.$companion->name.' is recharging at '.$firstUpdate->voltage.' Volts.&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>';
 				}
 			}
 		}

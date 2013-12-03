@@ -50,7 +50,8 @@ class Dashboard extends MY_Controller {
 				{
 					$companionToUpdates[$companion->id] = $updates;
 					$lastUpdate = $this->Companion_model->get_latest_update_by_companion_id($companion->id);
-					$companionToLastUpdate[$companion->id] = $lastUpdate;
+					$companionToLastUpdate[$companion->id]['update'] = $lastUpdate;
+					$companionToLastUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdate->created_at);
 					if(!$lastUpdate->is_charging && $lastUpdate->voltage <= 3.0)
 					{
 						$companionToLowBattery[$companion->id] = true;
@@ -61,7 +62,8 @@ class Dashboard extends MY_Controller {
 				$lastUpdateWithEmotion = $this->Companion_model->get_latest_emotion_update_by_companion_id($companion->id);
 				if($lastUpdateWithEmotion)
 				{
-					$companionToLastUpdateWithEmotion[$companion->id] = $lastUpdateWithEmotion;
+					$companionToLastUpdateWithEmotion[$companion->id]['update'] = $lastUpdateWithEmotion;
+					$companionToLastUpdateWithEmotion[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithEmotion->created_at);
 				}
 				
 				if($clearAlertId == $companion->id && $isTeamLeader)
@@ -91,5 +93,26 @@ class Dashboard extends MY_Controller {
 		$this->data['hasAlerts'] = $hasAlerts;
 		
 		$this->_render_page('dashboard/widgets', $this->data);
+	}
+	
+	protected function humanTiming ($time)
+	{
+		$time = time() - strtotime($time); // to get the time since that moment
+	
+		$tokens = array (
+			31536000 => 'year',
+			2592000 => 'month',
+			604800 => 'week',
+			86400 => 'day',
+			3600 => 'hour',
+			60 => 'minute',
+			1 => 'second'
+		);
+	
+		foreach ($tokens as $unit => $text) {
+			if ($time < $unit) continue;
+			$numberOfUnits = floor($time / $unit);
+			return $numberOfUnits.' '.$text.(($numberOfUnits>1)?'s':'');
+		}
 	}
 }

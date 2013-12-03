@@ -590,7 +590,7 @@ class Ion_auth
 	 * @return void
 	 * @author Andrew Welters <awelters@hugmehugyou.org> 
 	 **/
-	public function emergency_alert($groupId)
+	public function emergency_alert($companionName, $groupId)
 	{
 		$this->ion_auth_model->trigger_events('emergency_alert');
 
@@ -616,30 +616,43 @@ class Ion_auth
 		if(count($groupLeaders) > 0 || count($groupMembers) > 0)
 		{
 			$data = array(
+				'companion_name' => $companionName,
 				'group_name' => $group->name
 			);
 			
 			$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('email_emergency_alert', 'ion_auth'), $data, true);
-			$this->email->clear();
-			$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
-			$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - ' . $this->lang->line('email_emergency_alert_subject'));
-			$this->email->message($message);
 		
-			$users = array();
+			$emailSendError = FALSE;
 		
 			foreach ($groupLeaders as $leader)
 			{
-				array_unshift($users,$leader->email);
+				$this->email->clear();
+				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+				$this->email->to($leader->email);
+				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - ' . $this->lang->line('email_emergency_alert_subject'));
+				$this->email->message($message);
+				
+				if (!$this->email->send())
+				{
+					$emailSendError = TRUE;
+				}
 			}
 			
 			foreach ($groupMembers as $member)
 			{
-				array_unshift($users,$member->email);
+				$this->email->clear();
+				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+				$this->email->to($member->email);
+				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - ' . $this->lang->line('email_emergency_alert_subject'));
+				$this->email->message($message);
+				
+				if (!$this->email->send())
+				{
+					$emailSendError = TRUE;
+				}
 			}
 			
-			$this->email->to($users);
-			
-			if (!$this->email->send())
+			if ($emailSendError)
 			{
 				$this->set_error('emergency_alert_email_sent_error');
 				return FALSE;

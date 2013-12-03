@@ -55,7 +55,7 @@ class Companion extends MY_Controller {
 					if($newEmergency)
 					{
 						$output .= "<br/>There was a new EMERGENCY ALERT!!!";
-						$result = $this->ion_auth->emergency_alert($this->Companion_model->get_group_id_by_companion_id($id));
+						$result = $this->ion_auth->emergency_alert($this->Companion_model->get_companion_by_id($id)->name, $this->Companion_model->get_group_id_by_companion_id($id));
 						if($result)
 						{
 							$output .= "<br/>Emergency Alert successfully handled";
