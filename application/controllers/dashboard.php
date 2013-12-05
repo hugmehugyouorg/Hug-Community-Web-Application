@@ -28,12 +28,17 @@ class Dashboard extends MY_Controller {
 		$companions = array();
 		$groupToCompanion = array();
 		$companionToGroup = array();
-		$companionToUpdates = array();
+		$companionToEmotionUpdates = array();
 		$companionToLastUpdate = array();
 		$companionToLowBattery = array();
+		$companionToLastChargingUpdate = array();
+		$companionToLastQuietTimeOnUserUpdate = array();
 		$companionToLastUpdateWithEmotion = array();
+		$companionToLastEmergencyUpdate = array();
 		$hasAlerts = false;
+		
 		$this->load->model('Companion_model');
+		
 		foreach( $groups as $group )
 		{
 			if(!$isTeamLeader)
@@ -42,30 +47,6 @@ class Dashboard extends MY_Controller {
 			$companion = $this->Companion_model->get_companion_by_group_id($group->id);
 			if($companion)
 			{
-				array_push($companions, $companion);
-				$groupToCompanion[$group->id] = $companion;
-				$companionToGroup[$companion->id] = $group;
-				$updates = $this->Companion_model->get_emotion_updates_by_companion_id($companion->id);
-				if($updates)
-				{
-					$companionToUpdates[$companion->id] = $updates;
-					$lastUpdate = $this->Companion_model->get_latest_update_by_companion_id($companion->id);
-					$companionToLastUpdate[$companion->id]['update'] = $lastUpdate;
-					$companionToLastUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdate->created_at);
-					if(!$lastUpdate->is_charging && $lastUpdate->voltage <= 3.0)
-					{
-						$companionToLowBattery[$companion->id] = true;
-						$hasAlerts = true;
-					}
-				}
-				
-				$lastUpdateWithEmotion = $this->Companion_model->get_latest_emotion_update_by_companion_id($companion->id);
-				if($lastUpdateWithEmotion)
-				{
-					$companionToLastUpdateWithEmotion[$companion->id]['update'] = $lastUpdateWithEmotion;
-					$companionToLastUpdateWithEmotion[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithEmotion->created_at);
-				}
-				
 				if($clearAlertId == $companion->id && $isTeamLeader)
 				{
 					if($this->Companion_model->clear_emergency_alert($clearAlertId))
@@ -74,9 +55,77 @@ class Dashboard extends MY_Controller {
 					}
 				}
 				
-				if($companion->emergency_alert)
+				array_push($companions, $companion);
+				$groupToCompanion[$group->id] = $companion;
+				$companionToGroup[$companion->id] = $group;
+				
+				$lastUpdate = $this->Companion_model->get_latest_update_by_companion_id($companion->id);
+				
+				if($lastUpdate)
 				{
-					$hasAlerts = true;
+					$companionToLastUpdate[$companion->id]['update'] = $lastUpdate;
+					$companionToLastUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdate->created_at);
+					
+					/*$lastUpdateWithCharging = $this->Companion_model->get_latest_charging_update_by_companion_id($companion->id);
+					
+					if($lastUpdateWithCharging)
+					{
+						$companionToLastChargingUpdate[$companion->id]['update'] = $lastUpdateWithCharging;
+						$companionToLastChargingUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithCharging->created_at);
+					}*/
+					
+					$companionToLastChargingUpdate[$companion->id] = $companionToLastUpdate[$companion->id];
+					
+					if(!$lastUpdate->is_charging)
+					{
+						$lastUpdateWithLowBattery = $this->Companion_model->get_latest_low_battery_update_by_companion_id($companion->id);
+						if($lastUpdateWithLowBattery)
+						{
+							$companionToLowBattery[$companion->id]['update'] = $lastUpdateWithLowBattery;
+							$companionToLowBattery[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithLowBattery->created_at);
+						}
+						else if(!$lastUpdateWithCharging->is_charging)
+						{
+							$companionToLowBattery[$companion->id] = $companionToLastChargingUpdate[$companion->id];
+						}
+						else
+						{
+							$companionToLowBattery[$companion->id] = $companionToLastUpdate[$companion->id];
+						}
+						
+						$hasAlerts = true;
+					}
+					
+					if($lastUpdate->quiet_time)
+					{
+						$lastUpdateWithQuietTimeUser = $this->Companion_model->get_latest_quiet_time_update_by_user_by_companion_id($companion->id);
+						
+						if($lastUpdateWithQuietTimeUser && $lastUpdateWithQuietTimeUser->quiet_time)
+						{
+							$companionToLastQuietTimeOnUserUpdate[$companion->id]['update'] = $lastUpdateWithQuietTimeUser;
+							$companionToLastQuietTimeOnUserUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithQuietTimeUser->created_at);
+						}
+					}
+					
+					$lastUpdateWithEmotion = $this->Companion_model->get_latest_emotion_update_by_companion_id($companion->id);
+					if($lastUpdateWithEmotion)
+					{
+						$companionToLastUpdateWithEmotion[$companion->id]['update'] = $lastUpdateWithEmotion;
+						$companionToLastUpdateWithEmotion[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithEmotion->created_at);
+						$emotionUpdates = $this->Companion_model->get_emotion_updates_by_companion_id($companion->id);
+						$companionToEmotionUpdates[$companion->id] = $emotionUpdates;
+					}
+					
+					if($companion->emergency_alert)
+					{
+						$hasAlerts = true;
+						$lastUpdateWithEmergency = $this->Companion_model->get_latest_emergency_update_by_companion_id($companion->id);
+						if($lastUpdateWithEmergency)
+						{
+							$companionToLastEmergencyUpdate[$companion->id]['update'] = $lastUpdateWithEmergency;
+							$companionToLastEmergencyUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithEmergency->created_at);
+						}
+					}
 				}
 			}
 		} 
@@ -86,10 +135,13 @@ class Dashboard extends MY_Controller {
 		$this->data['companions'] = $companions;
 		$this->data['groupToCompanion'] =  $groupToCompanion;
 		$this->data['companionToGroup'] =  $companionToGroup;
-		$this->data['companionToUpdates'] =  $companionToUpdates;
+		$this->data['companionToEmotionUpdates'] =  $companionToEmotionUpdates;
 		$this->data['companionToLastUpdate'] = $companionToLastUpdate;
+		$this->data['companionToLastChargingUpdate'] = $companionToLastChargingUpdate;
 		$this->data['companionToLowBattery'] = $companionToLowBattery;
+		$this->data['companionToLastQuietTimeOnUserUpdate'] = $companionToLastQuietTimeOnUserUpdate;
 		$this->data['companionToLastUpdateWithEmotion'] = $companionToLastUpdateWithEmotion;
+		$this->data['companionToLastEmergencyUpdate'] = $companionToLastEmergencyUpdate;
 		$this->data['hasAlerts'] = $hasAlerts;
 		
 		$this->_render_page('dashboard/widgets', $this->data);

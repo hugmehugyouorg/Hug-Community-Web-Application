@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS  `companions` (
   PRIMARY KEY  (`id`)
 );
 
-INSERT INTO `companions` (`id`, `name`, `description`, `emergency_alert`) VALUES (1, 'Andys Sammy', 'Little Andys Awesome Companion', 1);
+INSERT INTO `companions` (`id`, `name`, `description`) VALUES (1, 'Andys Sammy', 'Little Andys Awesome Companion');
 INSERT INTO `companions` (`id`, `name`, `description`) VALUES (2, 'Test Companion 1', 'Test Companion 1');
 INSERT INTO `companions` (`id`, `name`, `description`) VALUES (3, 'Test Companion 2', 'Test Companion 2');
 
@@ -176,11 +176,18 @@ CREATE TABLE IF NOT EXISTS  `companion_updates` (
   `companion_id` int(11) unsigned NOT NULL,
   `voltage` float(3,2) NOT NULL,
   `is_charging` tinyint(1) NOT NULL,
+  `is_charging_update` tinyint(1) NOT NULL DEFAULT 0,
+  `low_battery_update` tinyint(1) NOT NULL DEFAULT 0,
   `emotional_state` tinyint(1) NOT NULL,
   `emotion_update` tinyint(1) NOT NULL DEFAULT 0,
+  `emergency_update` tinyint(1) NOT NULL DEFAULT 0,
   `quiet_time` tinyint(1) NOT NULL,
+  `quiet_time_update` tinyint(1) NOT NULL DEFAULT 0,
+  `quiet_time_update_by_user` tinyint(1) NOT NULL DEFAULT 0,
   `last_said_id` int(11) unsigned DEFAULT NULL,
+  `last_said_update` tinyint(1) NOT NULL DEFAULT 0,
   `last_message_said_id` int(11) unsigned DEFAULT NULL,
+  `last_message_said_update` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   KEY `fk_companion_update_companions1_idx` (`companion_id`),
@@ -191,10 +198,11 @@ CREATE TABLE IF NOT EXISTS  `companion_updates` (
   CONSTRAINT `fk_companion_update_last_said_message1_idx` FOREIGN KEY (`last_message_said_id`) REFERENCES `companion_says_audio` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION
 );
 
-INSERT INTO `companion_updates` VALUES (1,1,4.92,0,3,1,0,NULL,NULL,'2013-12-01 01:24:04');
-INSERT INTO `companion_updates` VALUES (2,1,3.92,0,0,1,0,NULL,NULL,'2013-12-01 12:55:05');
-INSERT INTO `companion_updates` VALUES (3,1,5.00,0,2,1,0,NULL,NULL,'2013-12-01 16:01:06');
-INSERT INTO `companion_updates` VALUES (4,1,2.81,1,1,1,1,NULL,NULL,'2013-12-01 23:22:07');
+#INSERT INTO `companion_updates` VALUES (1,1,4.92,0,0,1,0,NULL,NULL,'2013-12-01 01:24:04');
+#INSERT INTO `companion_updates` VALUES (2,1,4.92,0,3,1,0,NULL,NULL,'2013-12-01 01:24:04');
+#INSERT INTO `companion_updates` VALUES (2,1,3.92,0,0,1,0,NULL,NULL,'2013-12-01 12:55:05');
+#INSERT INTO `companion_updates` VALUES (3,1,5.00,0,2,1,0,NULL,NULL,'2013-12-01 16:01:06');
+#INSERT INTO `companion_updates` VALUES (4,1,2.81,1,1,1,1,NULL,NULL,'2013-12-01 23:22:07');
 
 #
 # Drop and create the user if the don't exist then give them permissions

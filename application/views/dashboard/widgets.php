@@ -14,7 +14,7 @@
 					<?php if($leader) { ?>
 					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal"><i class="fa fa-times"></i></a>
 					<?php } ?>
-					<?php echo $companion->name; ?> reported a Serious Situation with <?php echo $companionToGroup[$companion->id]->name; ?>
+					<?php echo $companion->name; ?> reported a Serious Situation with <?php echo $companionToGroup[$companion->id]->name; if($companionToLastEmergencyUpdate[$companion->id]) { ?>&nbsp;&nbsp;<code><?php echo $companionToLastEmergencyUpdate[$companion->id]['timeElapsed']; ?> ago</code><?php } ?>
 					<?php if($leader) { ?>
 						<!-- Modal -->
 						<div id="clear-alert-modal-<?php echo $companion->id?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="clear-alert-modal-label" aria-hidden="true">
@@ -37,7 +37,7 @@
 			
 			if(array_key_exists($companion->id, $companionToLowBattery))
 			{
-				$timeElapsed = $companionToLastUpdateWithEmotion[$companion->id]['timeElapsed'];
+				$timeElapsed = $companionToLowBattery[$companion->id]['timeElapsed'];
 				?>
 				<div class="alert"><span class="close no-link"><i class="fa fa-dashboard text-error"></i></span><?php echo $companion->name; ?> has a low battery.&nbsp;&nbsp;<code><?php echo $timeElapsed; ?> ago</code></div>
 				<?php
@@ -65,21 +65,18 @@
 					case 2: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o"></i></span>'.$group->name.' last shared an unhappy moment.&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>'; break;
 					case 3: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o"></i></span>'.$group->name.' last shared a serious moment.&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>'; break;
 				}
-				
-				if(array_key_exists($companion->id, $companionToLastUpdate))
-				{
-					$firstUpdate = $companionToLastUpdate[$companion->id]['update'];
-					$timeElapsed = $companionToLastUpdateWithEmotion[$companion->id]['timeElapsed'];
-					
-					if($firstUpdate->quiet_time)
-					{
-						echo '<div class="alert"><span class="close no-link" style="margin-right:5px;"><i class="fa fa-volume-off"></i></span>'.$group->name.' wants some quiet time, shh!&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>';
-					}
-				}
 			}
 			else
 			{
 				echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o"></i></span>'.$group->name.'  has not shared with the team yet.</div>';
+			}
+			
+			if(array_key_exists($companion->id, $companionToLastQuietTimeOnUserUpdate))
+			{
+				$firstUpdate = $companionToLastQuietTimeOnUserUpdate[$companion->id]['update'];
+				$timeElapsed = $companionToLastQuietTimeOnUserUpdate[$companion->id]['timeElapsed'];
+				
+				echo '<div class="alert"><span class="close no-link" style="margin-right:5px;"><i class="fa fa-volume-off"></i></span>'.$group->name.' wants some quiet time, shh!&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>';
 			}
 		}
 	}
@@ -92,10 +89,10 @@
 		{
 			$group = $companionToGroup[$companion->id];
 			
-			if(array_key_exists($companion->id, $companionToLastUpdate))
+			if(array_key_exists($companion->id, $companionToLastChargingUpdate))
 			{
-				$firstUpdate = $companionToLastUpdate[$companion->id]['update'];
-				$timeElapsed = $companionToLastUpdate[$companion->id]['timeElapsed'];
+				$firstUpdate = $companionToLastChargingUpdate[$companion->id]['update'];
+				$timeElapsed = $companionToLastChargingUpdate[$companion->id]['timeElapsed'];
 		
 				if(!$firstUpdate->is_charging)
 				{
@@ -119,9 +116,9 @@
 			$companion = $groupToCompanion[$group->id];
 			
 			echo '<h2>'.$group->name.'</h2>';
-			if(array_key_exists($companion->id, $companionToUpdates))
+			if(array_key_exists($companion->id, $companionToEmotionUpdates))
 			{
-				$updates = $companionToUpdates[$companion->id];
+				$updates = $companionToEmotionUpdates[$companion->id];
 				
 				$companionUpdatesFound = false;
 				foreach ($updates as $update) 
@@ -141,7 +138,7 @@
 										spacingRight: 20
 									},
 									title: {
-										text: '<?php echo $group->name; ?> updates'
+										text: '<?php echo $group->name; ?> emotional health'
 									},
 									subtitle: {
 										text: document.ontouchstart === undefined ?
@@ -162,7 +159,7 @@
 									},
 									yAxis: {
 										title: {
-											text: 'Shared Moments'
+											text: null
 										},
 										categories: ['Serious', 'Unhappy', 'Happy'],
 										gridLineColor: '#FFFFFF'

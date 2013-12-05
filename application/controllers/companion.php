@@ -46,10 +46,12 @@ class Companion extends MY_Controller {
 					$data = implode("",$chunks);
 					
 					$this->load->model('Companion_model');
-					$data = $this->Companion_model->updateCompanionState($id, $data);
+					$data = $this->Companion_model->updateCompanionState($id, $data, false);
 					
 					$output = $data['output'];
 					$newEmergency = $data['newEmergency'];
+					
+					//$newEmergency = 0;
 					
 					//send out an emergency alert
 					if($newEmergency)
@@ -76,10 +78,12 @@ class Companion extends MY_Controller {
  		if($error)
  		{
  			log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output);
+ 			//echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output;
  		}
  		else
  		{
  			log_message('debug', "id: ".$id.", output: ".$output);
+ 			//echo 'DEBUG... id: '.$id.', output: '.$output;
  		}
  		
  		header('HTTP/1.1 444 No Response');

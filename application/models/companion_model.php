@@ -215,7 +215,8 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 			
-		$lastSaid = $this->get_audio_association_by_audio_num($lastSaid);
+		$lastSaidAssoc = $this->get_audio_association_by_audio_num($lastSaid);
+		
 		$lastMessageSaid = bindec($lastMessageSaid);
 		
 		$result = '<br/>lastMessageSaid = '.$lastMessageSaid;
@@ -223,61 +224,335 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 			
-		$lastMessageSaid = $this->get_audio_association_by_audio_num($lastMessageSaid);
+		$lastMessageSaidAssoc = $this->get_audio_association_by_audio_num($lastMessageSaid);
 		
-		if($emotionState != 0)
+		//TODO: start a transaction so that updates happen correctly
+		
+		$lastUpdate = $this->get_latest_update_by_companion_id($companion->id);
+		
+		//if there has never been an update before
+		if(!$lastUpdate)
 		{
-			//TODO: the emotion_update should become a query instead OR consider starting a transaction so that the emotion_update
-			//		is consistent for sure
-			$lastEmotionUpdate = $this->get_latest_update_by_companion_id($companion->id);
+			$result = '<br/>no last update, there has never been an update before';
+			$output .= $result;
+			if($debug)
+				echo $result;
+		
+			//only an emotion update if the emotion state is known (user pressed on the of emotional buttons)
+			$emotionUpdate = $emotionState != 0 ? 1 : 0;
 			
-			if($lastEmotionUpdate)
+			$result = '<br/>emotionUpdate = '.$emotionUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			//we know the first update would have been not quiet time
+			$quietTimeUpdate = 1;
+			
+			$result = '<br/>quietTimeUpdate = '.$quietTimeUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			//we know the first update will be charging or not
+			$chargeUpdate = 1;
+			
+			$result = '<br/>chargeUpdate = '.$chargeUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+				
+			$lowBatteryUpdate = !$isCharging && $voltage <= 3.0 ? 1 : 0;
+			
+			$result = '<br/>lowBatteryUpdate = '.$lowBatteryUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			//only a quiet time update (also by user) if quiet time is on (user pressed the quiet time button)
+			$quietTimeUpdateByUser = $isQuietTime != 0 ? 1 : 0;
+			
+			$result = '<br/>quietTimeUpdateByUser = '.$quietTimeUpdateByUser;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			//only a message said update if last message said is known (therapuetic companion said the message)
+			$messageSaidUpdate = $lastMessageSaid != 0 ? 1 : 0;
+			
+			$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			//we know the first update would have been talking
+			$saidUpdate = 1;
+			
+			$result = '<br/>saidUpdate = '.$saidUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+		}
+		else //there has been updates in the past
+		{
+			$lastEmotionUpdate = $this->get_latest_emotion_update_by_companion_id($companion->id);
+			$lastChargeUpdate = $this->get_latest_charging_update_by_companion_id($companion->id);
+			$lastSaidUpdate = $this->get_latest_said_update_by_companion_id($companion->id);
+			$lastMessageSaidUpdate = $this->get_latest_message_said_update_by_companion_id($companion->id);
+			
+			//quiet time update simply happens if there is a change in the quiet time status
+			$quietTimeUpdate = $isQuietTime != $lastUpdate->quiet_time ? 1 : 0;
+			
+			$result = '<br/>quietTimeUpdate = '.$quietTimeUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			if(!$lastChargeUpdate) //there has never been a charge update before, so update is true
 			{
-				$lastUpdate = $this->get_latest_emotion_update_by_companion_id($companion->id);
-				if( $lastEmotionUpdate->emotional_state != $emotionState || $lastUpdate->quiet_time == $isQuietTime )
+				$chargeUpdate = 1;
+			} //if the charge state is changing
+			else if($lastChargeUpdate->is_charging != $isCharging) 
+			{ 	
+				$chargeUpdate = 1;
+			}
+			else //still need to determine if update occurred
+			{
+				$chargeUpdate = null;
+			}
+			
+			$result = '<br/>chargeUpdate = '.$chargeUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			if($isCharging) //if charging then not a low battery
+				$lowBatteryUpdate = 0;
+			else if($voltage > 3.0) //if not above the threshold then not a low battery
+				$lowBatteryUpdate = 0;
+			else if(!$lastChargeUpdate) //there has never been a charge update before, so update is true
+			{
+				$lowBatteryUpdate = 1;
+			}
+			else if($lastChargeUpdate->is_charging) //if the charge state is changing from charging to not then update is true
+				$lowBatteryUpdate = 1;
+			else
+				$lowBatteryUpdate = null;
+			
+			$result = '<br/>lowBatteryUpdate = '.$lowBatteryUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			if($emotionState == 0) //there is no user updates since it is in an unknown state
+			{
+				$result = '<br/>emotionState = 0, there is no user updates since it is in an unknown state';
+				$output .= $result;
+				if($debug)
+					echo $result;
+					
+				$emotionUpdate = 0;
+				
+				$result = '<br/>emotionUpdate = '.$emotionUpdate;
+				$output .= $result;
+				if($debug)
+					echo $result;
+				
+				$messageSaidUpdate = 0;
+				
+				$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
+				$output .= $result;
+				if($debug)
+					echo $result;
+					
+				$quietTimeUpdateByUser = 0;
+				
+				$result = '<br/>quietTimeUpdateByUser = '.$quietTimeUpdateByUser;
+				$output .= $result;
+				if($debug)
+					echo $result;
+				
+				//we know the first update says something
+				$saidUpdate = 1;
+				
+				$result = '<br/>saidUpdate = '.$saidUpdate;
+				$output .= $result;
+				if($debug)
+					echo $result;
+			}
+			else 
+			{
+				if(!$lastEmotionUpdate) //there has never been an emotional update before, so update is true
 				{
 					$emotionUpdate = 1;
+				} //if the emotional state is changing
+				else if($lastEmotionUpdate->emotional_state != $emotionState) 
+				{ 	
+					$emotionUpdate = 1;
 				}
-				else
+				else //still need to determine if update occurred
+				{
+					$emotionUpdate = null;
+				}
+					
+				$result = '<br/>emotionUpdate = '.$emotionUpdate;
+				$output .= $result;
+				if($debug)
+					echo $result;	
+					
+				//can only know for sure if it is a quiet time update by user if the last update was 0 and this one is 1
+				if($lastUpdate->quiet_time == 0 && $isQuietTime == 1) 
+				{ 	
+					$quietTimeUpdateByUser = 1;
+				}
+				else //still need to determine if update occurred
+					$quietTimeUpdateByUser = null;
+					
+				$result = '<br/>quietTimeUpdateByUser = '.$quietTimeUpdateByUser;
+				$output .= $result;
+				if($debug)
+					echo $result;	
+					
+				if(!$lastSaidUpdate)
+				{
+					//we know the first update would have been saying something
+					$saidUpdate = 1;
+				}
+				else if($lastSaidAssoc && $lastSaidUpdate->last_said_id != $lastSaidAssoc->id)
+				{
+					$saidUpdate = 1;
+				}
+				else //can't determine if an update occurred
+				{
+					$saidUpdate = 0;
+				}
+				
+				$result = '<br/>saidUpdate = '.$saidUpdate;
+				$output .= $result;
+				if($debug)
+					echo $result;
+				
+				if($lastMessageSaid == 0) //no update
+				{
+					$messageSaidUpdate = 0;
+				}
+				else if(!$lastMessageSaidUpdate) //there has never been a message said update before, so update is true
+				{
+					$messageSaidUpdate = 1;
+				} //if the last message state is changing
+				else if($lastMessageSaidAssoc && $lastMessageSaidUpdate->last_message_said_id != $lastMessageSaidAssoc->id)
+				{
+					$messageSaidUpdate = 1;
+				}
+				else //still need to determine if update occurred
+				{
+					$messageSaidUpdate = null;
+				}
+				
+				$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
+				$output .= $result;
+				if($debug)
+					echo $result;
+				
+				//if the other two states are known not to have been caused by user interaction then
+				//we can assume that was caused by the other
+				if($lowBatteryUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $quietTimeUpdateByUser === 0 && $chargeUpdate === null)
+				{
+					$result = '<br/>chargeUpdate is unknown, but the rest are not caused by user interaction.';
+					$output .= $result;
+					if($debug)
+						echo $result;
+						
+					$chargeUpdate = 1;
+					
+					$result = '<br/>chargeUpdate = '.$chargeUpdate;
+					$output .= $result;
+					if($debug)
+						echo $result;
+				}
+				
+				if($chargeUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $quietTimeUpdateByUser === 0 && $lowBatteryUpdate === null)
+				{
+					$result = '<br/>lowBatteryUpdate is unknown, but the rest are not caused by user interaction.';
+					$output .= $result;
+					if($debug)
+						echo $result;
+						
+					$lowBatteryUpdate = 1;
+					
+					$result = '<br/>lowBatteryUpdate = '.$lowBatteryUpdate;
+					$output .= $result;
+					if($debug)
+						echo $result;
+				}
+				
+				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $messageSaidUpdate === 0 && $quietTimeUpdateByUser === 0 && $emotionUpdate === null)
+				{
+					$result = '<br/>emotionUpdate is unknown, but the rest are not caused by user interaction.';
+					$output .= $result;
+					if($debug)
+						echo $result;
+						
+					$emotionUpdate = 1;
+					
+					$result = '<br/>emotionUpdate = '.$emotionUpdate;
+					$output .= $result;
+					if($debug)
+						echo $result;
+				}
+					
+				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $emotionUpdate === 0 && $quietTimeUpdateByUser === 0 && $messageSaidUpdate === null)
+				{
+					$result = '<br/>messageSaidUpdate is unknown, but the rest are not caused by user interaction.';
+					$output .= $result;
+					if($debug)
+						echo $result;
+						
+					$messageSaidUpdate = 1;
+					
+					$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
+					$output .= $result;
+					if($debug)
+						echo $result;
+				}
+					
+				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $quietTimeUpdateByUser === null)
+				{
+					$result = '<br/>quietTimeUpdateByUser is unknown, but the rest are not caused by user interaction.';
+					$output .= $result;
+					if($debug)
+						echo $result;
+						
+					$quietTimeUpdateByUser = 1;
+					
+					$result = '<br/>quietTimeUpdateByUser = '.$quietTimeUpdateByUser;
+					$output .= $result;
+					if($debug)
+						echo $result;
+				}
+				
+				//user interaction we can't say for sure and necessary to not say for sure for reporting & analytics
+				if($emotionUpdate === null)
 					$emotionUpdate = 0;
-			}
-			else
-			{
-				$emotionUpdate = 1;
+					
+				//user interaction we can't say for sure and necessary to not say for sure for reporting & analytics
+				if($messageSaidUpdate === null)
+					$messageSaidUpdate = 0;
+				
+				//user interaction we can't say for sure and necessary to not say for sure for reporting & analytics
+				if($quietTimeUpdateByUser === null)
+					$quietTimeUpdateByUser = 0;
+				
+				if($lowBatteryUpdate === null)	
+					$lowBatteryUpdate = 0;
+				
+				if($chargeUpdate === null)	
+					$chargeUpdate = 0;
 			}
 		}
-		else
-		{
-			$emotionUpdate = 0;
-		}
-			
-		$data = array(
-		   'companion_id' => $companion->id,
-		   'voltage' => $voltage,
-		   'is_charging' => $isCharging,
-		   'emotional_state' => $emotionState,
-		   'emotion_update' => $emotionUpdate,
-		   'quiet_time' => $isQuietTime,
-		   'last_said_id' => $lastSaid ? $lastSaid->id : NULL,
-		   'last_message_said_id' => $lastMessageSaid ? $lastMessageSaid->id : NULL
-		);
 		
-		$result = '<br/>'.json_encode($data);
-		$output .= $result;
-		if($debug)
-			echo $result;
-			
-		$this->db->insert('companion_updates',$data);
-		
-		$result = '<br/>insert id: '.$this->db->insert_id().'<br/>affected rows: '.$this->db->affected_rows().'<br/>db error: '.$this->db->_error_message();
-		$output .= $result;
-		if($debug)
-			echo $result;
-			
-		if( $this->db->affected_rows() < 1 )
-    		throw new Exception("Couldn't update the companion_updates table");
-    		
-    	if($emotionState == 3)
+		//update emergency status
+		if($emotionState == 3)
     	{
     		//state of emergency
     		$data = array(
@@ -297,6 +572,42 @@ class Companion_model extends CI_Model {
     	}
     	else
     		$newEmergency = 0;
+		
+		$data = array(
+		   'companion_id' => $companion->id,
+		   'voltage' => $voltage,
+		   'is_charging' => $isCharging,
+		   'is_charging_update' => $chargeUpdate,
+		   'low_battery_update' => $lowBatteryUpdate,
+		   'emotional_state' => $emotionState,
+		   'emotion_update' => $emotionUpdate,
+		   'emergency_update' => $newEmergency,
+		   'quiet_time' => $isQuietTime,
+		   'quiet_time_update' => $quietTimeUpdate,
+		   'quiet_time_update_by_user' => $quietTimeUpdateByUser,
+		   'last_said_id' => $lastSaidAssoc ? $lastSaidAssoc->id : NULL,
+		   'last_said_update' => $saidUpdate,
+		   'last_message_said_id' => $lastMessageSaidAssoc ? $lastMessageSaidAssoc->id : NULL,
+		   'last_message_said_update' => $messageSaidUpdate
+		);
+		
+		$result = '<br/>'.json_encode($data);
+		$output .= $result;
+		if($debug)
+			echo $result;
+			
+		$this->db->insert('companion_updates',$data);
+		
+		$result = '<br/>insert id: '.$this->db->insert_id().'<br/>affected rows: '.$this->db->affected_rows().'<br/>db error: '.$this->db->_error_message();
+		$output .= $result;
+		if($debug)
+			echo $result;
+			
+		if( $this->db->affected_rows() < 1 )
+		{
+			// TODO:  Delete the last update???
+    		throw new Exception("Couldn't update the companion_updates table");
+    	}
     		
     	return array('output' => $output, 'newEmergency' => ($newEmergency < 1 ? false : true));
 	}
@@ -341,6 +652,15 @@ class Companion_model extends CI_Model {
     	return null;
     }
     
+    public function get_updates_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->order_by("created_at", "asc");
+    	$query = $this->db->get('companion_updates');
+    	return $query->result();
+    }
+    
     public function get_emotion_updates_by_companion_id($id)
     {
     	$this->db->select('*');
@@ -352,10 +672,11 @@ class Companion_model extends CI_Model {
     	return $query->result();
     }
     
-    public function get_latest_update_by_companion_id($id)
+    public function get_latest_emotion_update_by_companion_id($id)
     {
     	$this->db->select('*');
     	$this->db->where('companion_id', $id);
+    	$this->db->where('emotion_update', 1);
     	$this->db->order_by("created_at", "desc");
     	$this->db->limit(1);
     	$query = $this->db->get('companion_updates');
@@ -365,12 +686,108 @@ class Companion_model extends CI_Model {
     	return $result;
     }
     
-    public function get_latest_emotion_update_by_companion_id($id)
+    public function get_latest_emergency_update_by_companion_id($id)
     {
     	$this->db->select('*');
     	$this->db->where('companion_id', $id);
-    	$this->db->where('emotional_state !=', 0);
-    	$this->db->where('emotion_update', 1);
+    	$this->db->where('emergency_update', 1);
+    	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_updates');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function get_latest_charging_update_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('is_charging_update', 1);
+    	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_updates');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function get_latest_low_battery_update_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('low_battery_update', 1);
+    	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_updates');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function get_latest_quiet_time_update_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('quiet_time_update', 1);
+    	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_updates');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function get_latest_quiet_time_update_by_user_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('quiet_time_update_by_user', 1);
+    	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_updates');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function get_latest_said_update_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('last_said_update', 1);
+    	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_updates');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function get_latest_message_said_update_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('last_message_said_update', 1);
+    	$this->db->order_by("created_at", "desc");
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_updates');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function get_latest_update_by_companion_id($id)
+    {
+    	$this->db->select('*');
+    	$this->db->where('companion_id', $id);
     	$this->db->order_by("created_at", "desc");
     	$this->db->limit(1);
     	$query = $this->db->get('companion_updates');
