@@ -79,7 +79,6 @@ class Group extends MY_Controller {
 					'id'    => 'group_name',
 					'type'  => 'text',
 					'value' => $this->form_validation->set_value('group_name', $group->name),
-					
 				);
 				
 				if(!$isGroupEditable)
@@ -121,10 +120,11 @@ class Group extends MY_Controller {
 			
 			$this->data['is_admin'] = $this->ion_auth->is_admin();
 			$this->data['groups'] = $groups;
-			
+
 			//set the flash data error message if there is one
 			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
 			
+
 			$this->_render_page('group/groups', $this->data);
 		}
 	}
