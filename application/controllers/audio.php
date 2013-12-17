@@ -67,7 +67,9 @@ class Audio extends MY_Controller {
 							
 							if($id)
 							{
-								$data = array('upload_data' => $uploadData, 'audioNum' => $audioNum, 'audioText' => $this->input->post('text'), 'audioURL' => $this->Companion_model->getAudioURL($audioNum, TRUE));
+								$data = array('audioNum' => $audioNum, 'audioText' => $this->input->post('text'), 'audioURL' => $this->Companion_model->getAudioURL($audioNum, TRUE));
+								$data['player'] = $this->load->view('audio/player', $data, TRUE);
+								$data['upload_data'] = $uploadData;
 		
 								$this->load->view('audio/upload_audio_success', $data);
 							}
@@ -99,10 +101,6 @@ class Audio extends MY_Controller {
 			$error = array('error' => validation_errors());
 			$this->load->view('audio/upload_audio', $error);
 		}
-	}
-	
-	protected function hexToBinHandler($errno, $errstr) {
-		throw new Exception();
 	}
 	
 	public function is_message_check($str)

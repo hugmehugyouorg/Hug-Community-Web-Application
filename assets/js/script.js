@@ -1,3 +1,3 @@
 $(document).ready(function(){
-    $('select').selectpicker();
+    $('select:not(.dont-auto-render)').selectpicker();
 });

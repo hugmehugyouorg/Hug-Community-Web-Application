@@ -11,6 +11,15 @@ a {
 	margin:0;
 }
 
+.modal-header .close {
+	position: inherit;
+}
+
+.modal-body p {
+	margin:0 0 10px;
+	font-weight: normal;
+}
+
 .brand img {
 	max-height:45px;
 }
@@ -49,6 +58,39 @@ a {
 	margin: 0 0 5px;
 }
 
+.close-mimic {
+  color: #000000;
+  text-shadow: 0 1px 0 #ffffff;
+  opacity: 0.2;
+  filter: alpha(opacity=20);
+  text-decoration: none;
+}
+.close-mimic:hover {
+  color: #000000;
+  text-decoration: none;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+  cursor: pointer;
+}
+
+.bootstrap-select.btn-group .dropdown-menu { width: 100%; }
+.bootstrap-select.btn-group .btn .filter-option, .bootstrap-select.btn-group .dropdown-menu li>a {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+}
+.bootstrap-select.btn-group .dropdown-menu li>a
+{
+	padding-left: 12px;
+	padding-right: 25px;
+}
+
+.companion-messages-select
+{
+	float:left !important;
+}
+
 /* DASHBOARD WIDGETS */
 .widgets .alert.widget
 {
@@ -80,6 +122,11 @@ a {
 .widgets .alert.widget .modal
 {
 	color: #000;
+}
+
+.widgets .alert.widget .alert
+{
+	min-height:40px;
 }
 
 @media (max-width: 979px) {

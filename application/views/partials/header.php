@@ -18,6 +18,7 @@
    	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css" />
    	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-responsive.min.css" /> 
     <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-select.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-modal.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/style.css" />
     
     <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="/assets/js/jqplot/excanvas.js"></script><![endif]-->
@@ -25,6 +26,8 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   	<script type="text/javascript" src="/assets/js/bootstrap.min.js" ></script>
   	<script type="text/javascript" src="/assets/js/bootstrap-select.min.js"></script>
+  	<script type="text/javascript" src="/assets/js/bootstrap-modalmanager.js"></script>
+  	<script type="text/javascript" src="/assets/js/bootstrap-modal.js"></script>
 	<script type="text/javascript" src="/assets/js/script.js" ></script>
 
 </head>

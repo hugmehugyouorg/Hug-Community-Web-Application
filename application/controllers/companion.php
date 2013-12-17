@@ -77,13 +77,13 @@ class Companion extends MY_Controller {
  		
  		if($error)
  		{
- 			log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output);
- 			//echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output;
+ 			//log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output);
+ 			echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output;
  		}
  		else
  		{
- 			log_message('debug', "id: ".$id.", output: ".$output);
- 			//echo 'DEBUG... id: '.$id.', output: '.$output;
+ 			//log_message('debug', "id: ".$id.", output: ".$output);
+ 			echo 'DEBUG... id: '.$id.', output: '.$output;
  		}
  		
  		header('HTTP/1.1 444 No Response');

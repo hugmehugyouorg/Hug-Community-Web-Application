@@ -823,6 +823,48 @@ class Companion_model extends CI_Model {
     	return false;
     }
     
+    public function get_messages()
+    {
+    	$result = $this->db->get_where('companion_says', array('is_message' => 1))->result();
+    	
+    	if($result)
+    		return $result;
+    		
+    	return null;
+    }
+    
+    public function get_audio($criteria, $content)
+    {
+    	$result = $this->get_audio_association_by($criteria,$content);
+    	if($result)
+    	{
+    		$audio = new stdClass;
+    		$audio->audio_num = $result->audio_num;
+    		
+    		$result = $this->db->get_where('companion_says', array('id' => $result->companion_says_id))->result();
+    		
+    		if($result)
+    		{
+    			$result = $result[0];
+    			$audio->text = $result->text;
+    			$audio->is_message = $result->is_message;
+    			
+    			try {
+    				$audio->audio_url = $this->getAudioURL($audio->audio_num);
+    			}
+    			catch(Exception $e) {
+    				return null;
+    			}
+    			
+    			return $audio;
+    		}
+    		else
+    			return $result;
+    	}
+    	else
+    		return $result;
+    }
+    
     public function add_audio($audioNum, $text, $isMessage, $mp3, $size)
     {
     	//check if $audioNum exists in companion_says_audio

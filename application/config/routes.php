@@ -46,6 +46,7 @@ $route['companion/(:any)'] = "companion/$1";
 $route['audio'] = "audio";
 $route['audio/(:any)'] = "audio/$1";
 $route['dashboard'] = "dashboard";
+$route['dashboard/(:any)'] = "dashboard/$1";
 $route['groups'] = "group";
 $route['group/(:num)'] = "group/index/$1";
 $route['group/(:any)'] = "group/$1";

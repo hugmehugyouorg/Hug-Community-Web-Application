@@ -19,11 +19,6 @@ class Dashboard extends MY_Controller {
 		$clearAlertId = $this->input->get('clear_alert', TRUE);
 		$isTeamLeader = $this->ion_auth->is_admin();
 		
-		//get user groups
-		//get companions by groups
-		//display companion alerts or not
-		//display every status ordered newest to oldest
-		
 		$groups = $this->ion_auth->get_users_groups()->result();
 		$companions = array();
 		$groupToCompanion = array();
@@ -33,6 +28,7 @@ class Dashboard extends MY_Controller {
 		$companionToLowBattery = array();
 		$companionToLastChargingUpdate = array();
 		$companionToLastQuietTimeOnUserUpdate = array();
+		$companionToLastSaid = array();
 		$companionToLastUpdateWithEmotion = array();
 		$companionToLastEmergencyUpdate = array();
 		$hasAlerts = false;
@@ -107,6 +103,22 @@ class Dashboard extends MY_Controller {
 						}
 					}
 					
+					$lastUpdateWithSaid = $this->Companion_model->get_latest_said_update_by_companion_id($companion->id);
+					if($lastUpdateWithSaid)
+					{
+						$said = $this->Companion_model->get_audio('id', $lastUpdateWithSaid->last_said_id);
+						if($said)
+						{
+							$companionToLastSaid[$companion->id]['update'] = $lastUpdateWithSaid;
+							$companionToLastSaid[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithSaid->created_at);
+							$companionToLastSaid[$companion->id]['text'] = $said->text;
+							
+							$playerData = array('audioNum' => $said->audio_num, 'audioText' => $said->text, 'audioURL' => $said->audio_url);
+							
+							$companionToLastSaid[$companion->id]['player'] = $this->load->view('audio/player', $playerData, TRUE);
+						}
+					}
+					
 					$lastUpdateWithEmotion = $this->Companion_model->get_latest_emotion_update_by_companion_id($companion->id);
 					if($lastUpdateWithEmotion)
 					{
@@ -140,11 +152,94 @@ class Dashboard extends MY_Controller {
 		$this->data['companionToLastChargingUpdate'] = $companionToLastChargingUpdate;
 		$this->data['companionToLowBattery'] = $companionToLowBattery;
 		$this->data['companionToLastQuietTimeOnUserUpdate'] = $companionToLastQuietTimeOnUserUpdate;
+		$this->data['companionToLastSaid'] = $companionToLastSaid;
 		$this->data['companionToLastUpdateWithEmotion'] = $companionToLastUpdateWithEmotion;
 		$this->data['companionToLastEmergencyUpdate'] = $companionToLastEmergencyUpdate;
 		$this->data['hasAlerts'] = $hasAlerts;
 		
 		$this->_render_page('dashboard/widgets', $this->data);
+	}
+	
+	public function getMessages()
+	{
+		if(!$this->input->is_ajax_request())
+		{
+			//redirect them to sign in
+			redirect('sign_in', 'refresh');
+			return;
+		}
+		
+		$this->load->model('Companion_model');
+		
+		$messages = $this->Companion_model->get_messages();
+		
+		if(!$messages)
+			$this->output->set_status_header('501');
+		else
+		{
+			if(!is_array($messages))
+				$messages = array($messages);
+		}
+			
+		echo json_encode($messages);
+	}
+	
+	public function getAudioPlayer()
+	{
+		if(!$this->input->is_ajax_request())
+		{
+			//redirect them to sign in
+			redirect('sign_in', 'refresh');
+			return;
+		}
+		
+		$audioId = $this->input->get('id', TRUE);
+		
+		if(!$audioId)
+		{
+			$this->output->set_status_header('400');
+			echo json_encode(null);
+			return;
+		}
+		
+		$this->load->model('Companion_model');
+		$audio = $this->Companion_model->get_audio('companion_says_id', $audioId);
+		if($audio) 
+		{
+			$playerData = array('audioNum' => $audio->audio_num, 'audioText' => $audio->text, 'audioURL' => $audio->audio_url);
+			echo $this->load->view('audio/player', $playerData, TRUE);
+			return;
+		}
+		else 
+		{
+			$this->output->set_status_header('400');
+			echo json_encode($audio);
+			return;
+		}
+	}
+	
+	public function sendMessage()
+	{
+		if(!$this->input->is_ajax_request())
+		{
+			//redirect them to sign in
+			redirect('sign_in', 'refresh');
+			return;
+		}
+		
+		$audioId = $this->input->post('audioId', TRUE);
+		$companionId = $this->input->post('companionId', TRUE);
+		
+		if(!$audioId || !$companionId)
+		{
+			$this->output->set_status_header('400');
+		}
+		else
+		{
+			$this->output->set_status_header('501');
+		}
+		
+		echo json_encode($this->data);
 	}
 	
 	protected function humanTiming ($time)
