@@ -204,6 +204,15 @@ CREATE TABLE IF NOT EXISTS  `companion_updates` (
 #INSERT INTO `companion_updates` VALUES (3,1,5.00,0,2,1,0,NULL,NULL,'2013-12-01 16:01:06');
 #INSERT INTO `companion_updates` VALUES (4,1,2.81,1,1,1,1,NULL,NULL,'2013-12-01 23:22:07');
 
+CREATE TABLE `companions_messages` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `companion_id` int(11) unsigned NOT NULL,
+  `is_pending` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  KEY `fk_companion_message_companions1_idx` (`companion_id`),
+  CONSTRAINT `fk_companion_message_companions1_idx` FOREIGN KEY (`companion_id`) REFERENCES `companions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
 #
 # Drop and create the user if the don't exist then give them permissions
 #

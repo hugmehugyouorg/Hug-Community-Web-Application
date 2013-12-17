@@ -38,7 +38,7 @@ The project is built using PHP, CodeIgniter (http://ellislab.com/codeigniter), a
 
 1.  Install Git (http://git-scm.com/)
 2.  Install VirtualBox (https://www.virtualbox.org/)
-3.  Install Vagrant (http://www.vagrantup.com/)
+3.  Install Vagrant v1.0.7 (http://downloads.vagrantup.com/tags/v1.0.7)
 4.  Run some commands to get the provisioned VM and Code Repository
 
 <pre><code>vagrant gem install vagrant-vbguest
