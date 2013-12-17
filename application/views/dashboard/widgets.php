@@ -136,7 +136,7 @@
 						  </div>
 						  <div class="modal-footer">
 							<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-							<button class="btn btn-primary">Send</button>
+							<button class="btn btn-primary btn-send-reply" data-companion-id="'.$companion->id.'">Send</button>
 						  </div>
 						</div>'; array_push($replyModals, $replyModal); ?>
 					</span>
@@ -274,11 +274,34 @@
 		}
 	}
 	echo '</div>';
+	?>
+		<div id="success-modal" class="modal hide fade" tabindex="-1" style="text-align:center;">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times fa-lg"></i></button>
+			<h3>Success!</h3>
+		  </div>
+		  <div class="modal-body">
+			<p><i class="fa fa-heart fa-5x fa-lg"></i></p>
+		  </div>
+		</div>
+		
+		<div id="error-modal" class="modal hide fade" tabindex="-1" style="text-align:center;">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times fa-lg"></i></button>
+			<h3>A Problem Was Encountered</h3>
+		  </div>
+		  <div class="modal-body">
+			<p><i class="fa fa-bug fa-5x fa-lg"></i></p>
+			<p>Please try again.</p>
+		  </div>
+		</div>
+	<?php
 	foreach( $replyModals as $replyModal)
 	{
 		echo $replyModal;
-		?>
-		<script type="text/javascript">
+	}
+	?>
+	<script type="text/javascript">
 			$(function () {
 				$.ajax({
 					url: "/dashboard/getMessages",
@@ -286,7 +309,7 @@
 					cache: false,
 					success: function (r) {
 						var json = $.parseJSON(r);
-						//console.log(json);
+						
 						if(json)
 						{
 							var options = "";
@@ -296,12 +319,11 @@
 							$(".companion-messages-select").html(options).selectpicker();
 							
 							$('.companion-messages-select').on('change', function(e, isTriggered) {
-								console.log('change');
-								
 								if(!this.value)
 									return;
 									
-								var ancestor = $(this).parent();
+								var selfie = $(this);
+								var ancestor = selfie.parent();
 								ancestor.find('#companion-message-audio-player').remove();
 								
 								$.ajax({
@@ -311,21 +333,44 @@
 									cache: false,
 									success: function (r) {
 										ancestor.append("<div id='companion-message-audio-player' class='span1 pull-right' style='margin-top:-5px;'>"+r+"</div>");
+										var player = $('#companion-message-audio-player').find('.jp-jplayer');
+										
 										if(!isTriggered)
 										{
-											var player = $('#companion-message-audio-player').find('.jp-jplayer');
 											player.bind($.jPlayer.event.ready, function(event) {
-												console.log('play');
 												player.jPlayer("play");
 											});
 										}
+										
+										$('.btn-send-reply').unbind('click');
+										$('.btn-send-reply').bind('click', function(e) {
+											var companionId = $(this).data('companionId');
+											
+											if(player)
+												player.jPlayer("stop");
+														
+											$.ajax({
+												url: "/dashboard/sendAudioMessage",
+												type: "GET",
+												cache: false,
+												data: { audioId : selfie.val(), companionId: companionId},
+												success: function (r) {
+													if(player)
+														player.jPlayer("stop");
+													$('#send-a-message-modal-'+companionId).modal('hide');
+													$('#success-modal').modal('show');
+												},
+												error: function( jqXhr ) {
+													if( jqXhr.status == 401 )
+														window.location = '/sign_in';
+												}
+											});
+										});
 									},
 								
 									error: function( jqXhr ) {
-										//if( jqXhr.status == 400 ) { //Validation error or other reason for Bad Request 400
-											//var json = $.parseJSON( jqXhr.responseText );
-											//console.log(json);
-										//}
+										if( jqXhr.status == 401 )
+											window.location = '/sign_in';
 									}
 								});
 							});
@@ -334,15 +379,12 @@
 					},
 				
 					error: function( jqXhr ) {
-						//if( jqXhr.status == 400 ) { //Validation error or other reason for Bad Request 400
-							var json = $.parseJSON( jqXhr.responseText );
-							console.log(json);
-						//}
+						if( jqXhr.status == 401 )
+							window.location = '/sign_in';
 					}
 				});
 			});
 		</script>
-		<?php
-	}
+	<?php
 	echo '</div>';
 ?>

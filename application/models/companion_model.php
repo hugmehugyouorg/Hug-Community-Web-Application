@@ -609,7 +609,13 @@ class Companion_model extends CI_Model {
     		throw new Exception("Couldn't update the companion_updates table");
     	}
     		
-    	return array('output' => $output, 'newEmergency' => ($newEmergency < 1 ? false : true));
+    	$pendingMessage = $this->get_pending_message_association();
+    	$result = '<br/>pendingMessage = '.json_encode($pendingMessage);
+		$output .= $result;
+		if($debug)
+			echo $result;
+    		
+    	return array('output' => $output, 'newEmergency' => ($newEmergency < 1 ? false : true), 'pendingMessage' => ($pendingMessage ? $pendingMessage->audio_num : false));
 	}
     
     public function get_unassigned_companions()
@@ -831,6 +837,61 @@ class Companion_model extends CI_Model {
     		return $result;
     		
     	return null;
+    }
+    
+    public function get_message($companionSaysId)
+    {
+    	$this->db->select('*');
+    	$this->db->where(array('id' => $companionSaysId, "is_message" => "1"));
+    	$this->db->limit(1);
+    	$query = $this->db->get('companion_says');
+    	$result = $query->result();
+    	if($result)
+    		return $result[0];
+    	return $result;
+    }
+    
+    public function set_pending_message($id, $companionSaysId)
+    {
+    	$data = array(
+		   'companion_id' => $id,
+		   'companion_says_id' => $companionSaysId
+		);
+    	$this->db->insert('companion_messages', $data);
+    	
+    	if( $this->db->affected_rows() < 1 )
+    		return false;
+    	return true;
+    }
+    
+    public function get_pending_message_association()
+    {
+    	$this->db->select('*');
+    	$this->db->order_by("id", "asc");
+    	$this->db->limit(1);
+    	$this->db->where('companion_says_id !=', 'NULL');
+    	$this->db->where('is_pending', 1);
+    	$query = $this->db->get('companion_messages');
+    	$result = $query->result();
+    	
+    	if($result)
+    	{
+    		$message = $result[0];
+    		$data = array(
+				'is_pending' => 0
+			);
+			$this->db->where('id', $message->id);
+			$updateResult = $this->db->update('companion_messages', $data);
+			
+			if($updateResult)
+			{
+				return $this->get_audio_association_by('companion_says_id',$message->companion_says_id);
+			}
+			else
+				return null;
+    	}
+    	
+    	return $result;
     }
     
     public function get_audio($criteria, $content)

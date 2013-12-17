@@ -11,6 +11,7 @@ class Companion extends MY_Controller {
 	{
 		$error = false;
 		$output = '';
+		$pendingMessage = '';
 		$id = $this->input->get('i', TRUE);
 		$data = $this->input->get('d', TRUE);
 		
@@ -50,6 +51,7 @@ class Companion extends MY_Controller {
 					
 					$output = $data['output'];
 					$newEmergency = $data['newEmergency'];
+					$pendingMessage = $data['pendingMessage'];
 					
 					//$newEmergency = 0;
 					
@@ -77,16 +79,20 @@ class Companion extends MY_Controller {
  		
  		if($error)
  		{
- 			//log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output);
- 			echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output;
+ 			log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output.', pendingMessage: '.$pendingMessage);
+ 			//echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output.', pendingMessage: '.$pendingMessage;
+ 			header('HTTP/1.1 444 No Response');
  		}
  		else
  		{
- 			//log_message('debug', "id: ".$id.", output: ".$output);
- 			echo 'DEBUG... id: '.$id.', output: '.$output;
+ 			log_message('debug', "id: ".$id.", output: ".$output.', pendingMessage: '.$pendingMessage);
+ 			//echo 'DEBUG... id: '.$id.', output: '.$output.', pendingMessage: '.$pendingMessage;
+ 			if($pendingMessage !== false)
+ 				header('HTTP/1.1 207 '.$pendingMessage);
+ 			else
+ 				header('HTTP/1.1 444 No Response');
  		}
  		
- 		header('HTTP/1.1 444 No Response');
  		die();
 	}
 	

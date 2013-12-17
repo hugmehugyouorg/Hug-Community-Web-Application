@@ -165,7 +165,14 @@ class Dashboard extends MY_Controller {
 		if(!$this->input->is_ajax_request())
 		{
 			//redirect them to sign in
-			redirect('sign_in', 'refresh');
+			redirect('/', 'refresh');
+			return;
+		}
+		
+		if (!$this->ion_auth->logged_in())
+		{
+			$this->output->set_status_header('401');
+			echo json_encode(null);
 			return;
 		}
 		
@@ -174,7 +181,11 @@ class Dashboard extends MY_Controller {
 		$messages = $this->Companion_model->get_messages();
 		
 		if(!$messages)
-			$this->output->set_status_header('501');
+		{
+			$this->output->set_status_header('401');
+			echo json_encode(null);
+			return;
+		}
 		else
 		{
 			if(!is_array($messages))
@@ -189,7 +200,14 @@ class Dashboard extends MY_Controller {
 		if(!$this->input->is_ajax_request())
 		{
 			//redirect them to sign in
-			redirect('sign_in', 'refresh');
+			redirect('/', 'refresh');
+			return;
+		}
+		
+		if (!$this->ion_auth->logged_in())
+		{
+			$this->output->set_status_header('401');
+			echo json_encode(null);
 			return;
 		}
 		
@@ -197,7 +215,7 @@ class Dashboard extends MY_Controller {
 		
 		if(!$audioId)
 		{
-			$this->output->set_status_header('400');
+			$this->output->set_status_header('401');
 			echo json_encode(null);
 			return;
 		}
@@ -212,34 +230,79 @@ class Dashboard extends MY_Controller {
 		}
 		else 
 		{
-			$this->output->set_status_header('400');
+			$this->output->set_status_header('401');
 			echo json_encode($audio);
 			return;
 		}
 	}
 	
-	public function sendMessage()
+	public function sendAudioMessage()
 	{
 		if(!$this->input->is_ajax_request())
 		{
 			//redirect them to sign in
-			redirect('sign_in', 'refresh');
+			redirect('/', 'refresh');
 			return;
 		}
 		
-		$audioId = $this->input->post('audioId', TRUE);
-		$companionId = $this->input->post('companionId', TRUE);
+		if (!$this->ion_auth->logged_in())
+		{
+			$this->output->set_status_header('401');
+			echo json_encode(null);
+			return;
+		}
+		
+		$audioId = $this->input->get('audioId', TRUE);
+		$companionId = $this->input->get('companionId', TRUE);
 		
 		if(!$audioId || !$companionId)
 		{
-			$this->output->set_status_header('400');
+			$this->output->set_status_header('401');
+			echo json_encode(null);
+			return;
 		}
 		else
 		{
-			$this->output->set_status_header('501');
+			$this->load->model('Companion_model');
+			$groupId = $this->Companion_model->get_group_id_by_companion_id($companionId);
+			
+			if($groupId)
+			{
+				$group = $this->ion_auth->group($groupId)->row();
+		
+				//if there is no group attached to the companion, the user is not in the group, or there is not message with that id then error
+				if(count($group) == 0 || !$this->ion_auth->in_group($group->name) || !$this->Companion_model->get_message($audioId))
+				{
+					$this->output->set_status_header('401');
+					echo json_encode(null);
+					return;
+				}
+				else
+				{
+					$result = $this->Companion_model->set_pending_message($companionId, $audioId);
+					
+					if($result)
+					{
+						echo json_encode(null);
+						return;
+					}
+					else
+					{
+						$this->output->set_status_header('401');
+						echo json_encode(null);
+						return;
+					}
+				}
+			}
+			else
+			{
+				$this->output->set_status_header('401');
+				echo json_encode(null);
+				return;
+			}
 		}
 		
-		echo json_encode($this->data);
+		echo json_encode(null);
 	}
 	
 	protected function humanTiming ($time)
