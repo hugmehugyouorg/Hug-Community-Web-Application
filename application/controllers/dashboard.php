@@ -172,7 +172,7 @@ class Dashboard extends MY_Controller {
 		if (!$this->ion_auth->logged_in())
 		{
 			$this->output->set_status_header('401');
-			echo json_encode(null);
+			$this->output->set_output(json_encode(null));
 			return;
 		}
 		
@@ -183,7 +183,7 @@ class Dashboard extends MY_Controller {
 		if(!$messages)
 		{
 			$this->output->set_status_header('401');
-			echo json_encode(null);
+			$this->output->set_output(json_encode(null));
 			return;
 		}
 		else
@@ -192,10 +192,7 @@ class Dashboard extends MY_Controller {
 				$messages = array($messages);
 		}
 			
-		echo json_encode($messages);
-		
-		//can't explain this one, dies silently on production otherwise
-		die();
+		$this->output->set_output(json_encode($messages));
 	}
 	
 	public function getAudioPlayer()
@@ -210,7 +207,7 @@ class Dashboard extends MY_Controller {
 		if (!$this->ion_auth->logged_in())
 		{
 			$this->output->set_status_header('401');
-			echo json_encode(null);
+			$this->output->set_output(json_encode(null));
 			return;
 		}
 		
@@ -219,7 +216,7 @@ class Dashboard extends MY_Controller {
 		if(!$audioId)
 		{
 			$this->output->set_status_header('401');
-			echo json_encode(null);
+			$this->output->set_output(json_encode(null));
 			return;
 		}
 		
@@ -228,13 +225,13 @@ class Dashboard extends MY_Controller {
 		if($audio) 
 		{
 			$playerData = array('audioNum' => $audio->audio_num, 'audioText' => $audio->text, 'audioURL' => $audio->audio_url);
-			echo $this->load->view('audio/player', $playerData, TRUE);
+			$this->output->set_output($this->load->view('audio/player', $playerData, TRUE));
 			return;
 		}
 		else 
 		{
 			$this->output->set_status_header('401');
-			echo json_encode($audio);
+			$this->output->set_output(json_encode($audio));
 			return;
 		}
 	}
@@ -251,7 +248,7 @@ class Dashboard extends MY_Controller {
 		if (!$this->ion_auth->logged_in())
 		{
 			$this->output->set_status_header('401');
-			echo json_encode(null);
+			$this->output->set_output(json_encode(null));
 			return;
 		}
 		
@@ -261,7 +258,7 @@ class Dashboard extends MY_Controller {
 		if(!$audioId || !$companionId)
 		{
 			$this->output->set_status_header('401');
-			echo json_encode(null);
+			$this->output->set_output(json_encode(null));
 			return;
 		}
 		else
@@ -277,7 +274,7 @@ class Dashboard extends MY_Controller {
 				if(count($group) == 0 || !$this->ion_auth->in_group($group->name) || !$this->Companion_model->get_message($audioId))
 				{
 					$this->output->set_status_header('401');
-					echo json_encode(null);
+					$this->output->set_output(json_encode(null));
 					return;
 				}
 				else
@@ -286,13 +283,13 @@ class Dashboard extends MY_Controller {
 					
 					if($result)
 					{
-						echo json_encode(null);
+						$this->output->set_output(json_encode(null));
 						return;
 					}
 					else
 					{
 						$this->output->set_status_header('401');
-						echo json_encode(null);
+						$this->output->set_output(json_encode(null));
 						return;
 					}
 				}
@@ -300,12 +297,12 @@ class Dashboard extends MY_Controller {
 			else
 			{
 				$this->output->set_status_header('401');
-				echo json_encode(null);
+				$this->output->set_output(json_encode(null));
 				return;
 			}
 		}
 		
-		echo json_encode(null);
+		$this->output->set_output(json_encode(null));
 	}
 	
 	protected function humanTiming ($time)
