@@ -140,8 +140,7 @@ CREATE TABLE `companions_groups` (
   CONSTRAINT `fk_companions_groups_groups1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-INSERT INTO `companions_groups` (`id`, `companion_id`, `group_id`) VALUES
-	(1,1,3);
+INSERT INTO `companions_groups` (`id`, `companion_id`, `group_id`) VALUES (1,1,3);
 
 CREATE TABLE IF NOT EXISTS  `companion_says` (
   `id` int(11)  unsigned NOT NULL AUTO_INCREMENT,
