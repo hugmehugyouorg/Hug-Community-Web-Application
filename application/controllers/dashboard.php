@@ -193,6 +193,9 @@ class Dashboard extends MY_Controller {
 		}
 			
 		echo json_encode($messages);
+		
+		//can't explain this one, dies silently on production otherwise
+		die();
 	}
 	
 	public function getAudioPlayer()
