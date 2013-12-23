@@ -43,9 +43,9 @@ class Group extends MY_Controller {
 		
 				//validate form input
 				if($isGroupEditable)
-					$this->form_validation->set_rules('group_name', 'Group name', 'required|alpha|xss_clean');
+					$this->form_validation->set_rules('group_name', 'Child\'s Name/Nickname', 'required|xss_clean');
 					
-				$this->form_validation->set_rules('group_description', 'Group Description', 'required|xss_clean');
+				$this->form_validation->set_rules('group_description', 'Team Description', 'required|xss_clean');
 		
 				if (isset($_POST) && !empty($_POST))
 				{
@@ -143,10 +143,10 @@ class Group extends MY_Controller {
 		}
 
 		//validate form input
-		$this->form_validation->set_rules('group_name', 'Group name', 'required|alpha|xss_clean');
+		$this->form_validation->set_rules('group_name', 'Team Name', 'required|xss_clean');
 		$this->form_validation->set_rules('description', 'Description', 'required|xss_clean');
 		$this->form_validation->set_rules('companion', 'Therapuetic Companions (Unassigned)', 'required|xss_clean');
-		$this->form_validation->set_rules('leaders', 'Group Leaders', 'required|xss_clean');
+		$this->form_validation->set_rules('leaders', 'Team Leaders', 'required|xss_clean');
 
 		//load companions
 		$this->load->model('Companion_model');
@@ -281,7 +281,7 @@ class Group extends MY_Controller {
 			{
 				//redirect them back to the group edit page
 				$this->session->set_flashdata('message', $this->ion_auth->messages());
-				redirect('group/'.$id, 'refresh');
+				redirect('group/'.$id.'#add-invite', 'refresh');
 			}
 			else
 			{
@@ -450,7 +450,7 @@ class Group extends MY_Controller {
 				//set the flash data error message if there is one
 				$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
 				
-				redirect('group/'.$id, 'refresh');
+				redirect('group/'.$id.'#add-invite', 'refresh');
 			}
 			else
 			{

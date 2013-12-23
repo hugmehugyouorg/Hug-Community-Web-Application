@@ -246,8 +246,7 @@ class Companion_model extends CI_Model {
 			if($debug)
 				echo $result;
 			
-			//we know the first update would not have been to play a message
-			$playMessageUpdate = 1;
+			$playMessageUpdate = $shouldPlayMessage;
 			
 			$result = '<br/>playMessageUpdate = '.$playMessageUpdate;
 			$output .= $result;
@@ -270,7 +269,7 @@ class Companion_model extends CI_Model {
 				echo $result;
 			
 			//only a play message update (also by user) if play message is on (user pressed the play message button)
-			$playMessageUpdateByUser = $shouldPlayMessage != 0 ? 1 : 0;
+			$playMessageUpdateByUser = $shouldPlayMessage;
 			
 			$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
 			$output .= $result;

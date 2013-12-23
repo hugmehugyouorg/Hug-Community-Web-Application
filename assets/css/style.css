@@ -2,6 +2,14 @@ a {
 	text-decoration: none !important;
 }
 
+.tabbable {
+	margin-top:25px;
+}
+
+.well {
+   background-color: rgba(255, 255, 255, 1.0);
+}
+
 .alert {
 	margin-top:10px;
 	margin-bottom:10px;

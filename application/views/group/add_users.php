@@ -1,6 +1,8 @@
 <h1>Add New Members to the Safety Team</h1>
 
-<div id="infoMessage"><?php echo $message;?></div>
+<?php if(isset($message) && !empty($message)){ ?>
+		<div class="alert alert-message error" id="infoMessage"><?php echo $message;?></div>
+	<?php } ?>
 
 <?php echo form_open("group/add/".$id);?>
 
@@ -43,6 +45,6 @@
 	  </select>
 	  
       <p><?php echo form_submit('submit', 'Add');?></p>
-      <p><a href="<?php echo site_url('group/'.$id);?>">Cancel</a></p>
+      <p><a href="<?php echo site_url('group/'.$id.'#add-invite');?>">Cancel</a></p>
 
 <?php echo form_close();?>

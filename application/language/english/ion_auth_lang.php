@@ -65,6 +65,6 @@ $lang['email_activation_subject']            = 'Account Activation';
 $lang['email_emergency_alert_subject'] = 'Safety Team Alert';
 
 // Emergency Alerts
-$lang['emergency_alert_no_group_members']    = 'No group members when there is an emergency alert';
-$lang['emergency_alert_no_group_found']    = 'No group assigned when there is an emergency alert';
+$lang['emergency_alert_no_group_members']    = 'No team members when there is an emergency alert';
+$lang['emergency_alert_no_group_found']    = 'No team assigned when there is an emergency alert';
 $lang['emergency_alert_email_sent_error']    = 'There was an error sending an email when there is an emergency alert';

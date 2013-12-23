@@ -1,7 +1,9 @@
 <h1>Create a Safety Team</h1>
 <p>Please enter the Safety Team information below.</p>
 
-<div id="infoMessage"><?php echo $message;?></div>
+<?php if(isset($message) && !empty($message)){ ?>
+		<div class="alert alert-message error" id="infoMessage"><?php echo $message;?></div>
+	<?php } ?>
 
 <?php echo form_open("group/create");?>
 
