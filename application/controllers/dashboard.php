@@ -27,7 +27,7 @@ class Dashboard extends MY_Controller {
 		$companionToLastUpdate = array();
 		$companionToLowBattery = array();
 		$companionToLastChargingUpdate = array();
-		$companionToLastQuietTimeOnUserUpdate = array();
+		$companionToLastPlayMessageOnUserUpdate = array();
 		$companionToLastSaid = array();
 		$companionToLastUpdateWithEmotion = array();
 		$companionToLastEmergencyUpdate = array();
@@ -92,15 +92,12 @@ class Dashboard extends MY_Controller {
 						$hasAlerts = true;
 					}
 					
-					if($lastUpdate->quiet_time)
+					$lastUpdateWithPlayMessageUser = $this->Companion_model->get_latest_play_message_update_by_user_by_companion_id($companion->id);
+					
+					if($lastUpdateWithPlayMessageUser && $lastUpdateWithPlayMessageUser->play_message)
 					{
-						$lastUpdateWithQuietTimeUser = $this->Companion_model->get_latest_quiet_time_update_by_user_by_companion_id($companion->id);
-						
-						if($lastUpdateWithQuietTimeUser && $lastUpdateWithQuietTimeUser->quiet_time)
-						{
-							$companionToLastQuietTimeOnUserUpdate[$companion->id]['update'] = $lastUpdateWithQuietTimeUser;
-							$companionToLastQuietTimeOnUserUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithQuietTimeUser->created_at);
-						}
+						$companionToLastPlayMessageOnUserUpdate[$companion->id]['update'] = $lastUpdateWithPlayMessageUser;
+						$companionToLastPlayMessageOnUserUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithPlayMessageUser->created_at);
 					}
 					
 					$lastUpdateWithSaid = $this->Companion_model->get_latest_said_update_by_companion_id($companion->id);
@@ -151,7 +148,7 @@ class Dashboard extends MY_Controller {
 		$this->data['companionToLastUpdate'] = $companionToLastUpdate;
 		$this->data['companionToLastChargingUpdate'] = $companionToLastChargingUpdate;
 		$this->data['companionToLowBattery'] = $companionToLowBattery;
-		$this->data['companionToLastQuietTimeOnUserUpdate'] = $companionToLastQuietTimeOnUserUpdate;
+		$this->data['companionToLastPlayMessageOnUserUpdate'] = $companionToLastPlayMessageOnUserUpdate;
 		$this->data['companionToLastSaid'] = $companionToLastSaid;
 		$this->data['companionToLastUpdateWithEmotion'] = $companionToLastUpdateWithEmotion;
 		$this->data['companionToLastEmergencyUpdate'] = $companionToLastEmergencyUpdate;

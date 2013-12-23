@@ -15,7 +15,7 @@ class Companion_model extends CI_Model {
 		7 -> Voltage (after decimal point, e.g. 0.##) ... max value is 99
 		1 -> Is Charging ... if value is 0 then false, if 1 then true
 		2 -> Emotional State ... if value is 0 then None, 1 then Happy, if 2 then Unhappy, if 3 then Emergency (HUG protocol)
-		1 -> Is Quiet Time ... if value is 0 then false, if 1 then true
+		1 -> Should Play Message ... if value is 0 then false, if 1 then true
 		9 -> Last Said (Companion/Interaction initiated) ... if value is 0 then nothing said yet, represent id's in the database
 		9 -> Last Message Said (Community initiated) ... if value is 0 then nothing said yet, represent id's in the database
 	
@@ -35,7 +35,7 @@ class Companion_model extends CI_Model {
 			Emotional State (0 - None, 1 - Happy, 2 - UNHAPPY, 3 - EMERGENCY)
 			outgoing data: 3
 			11
-			Is Quiet Time? (0 = NO, 1 = YES)
+			Should Play Message? (0 = NO, 1 = YES)
 			outgoing data: 0
 			0
 			Last thing Safety Sam said:
@@ -116,10 +116,10 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 			
-		$isQuietTime = substr($data,$current,1);
+		$shouldPlayMessage = substr($data,$current,1);
 		$current+=1;
 		
-		$result = '<br/>isQuietTime = '.$isQuietTime;
+		$result = '<br/>shouldPlayMessage = '.$shouldPlayMessage;
 		$output .= $result;
 		if($debug)
 			echo $result;
@@ -201,9 +201,9 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 			
-		$isQuietTime = bindec($isQuietTime);
+		$shouldPlayMessage = bindec($shouldPlayMessage);
 		
-		$result = '<br/>isQuietTime = '.$isQuietTime;
+		$result = '<br/>shouldPlayMessage = '.$shouldPlayMessage;
 		$output .= $result;
 		if($debug)
 			echo $result;
@@ -246,10 +246,10 @@ class Companion_model extends CI_Model {
 			if($debug)
 				echo $result;
 			
-			//we know the first update would have been not quiet time
-			$quietTimeUpdate = 1;
+			//we know the first update would not have been to play a message
+			$playMessageUpdate = 1;
 			
-			$result = '<br/>quietTimeUpdate = '.$quietTimeUpdate;
+			$result = '<br/>playMessageUpdate = '.$playMessageUpdate;
 			$output .= $result;
 			if($debug)
 				echo $result;
@@ -269,10 +269,10 @@ class Companion_model extends CI_Model {
 			if($debug)
 				echo $result;
 			
-			//only a quiet time update (also by user) if quiet time is on (user pressed the quiet time button)
-			$quietTimeUpdateByUser = $isQuietTime != 0 ? 1 : 0;
+			//only a play message update (also by user) if play message is on (user pressed the play message button)
+			$playMessageUpdateByUser = $shouldPlayMessage != 0 ? 1 : 0;
 			
-			$result = '<br/>quietTimeUpdateByUser = '.$quietTimeUpdateByUser;
+			$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
 			$output .= $result;
 			if($debug)
 				echo $result;
@@ -300,10 +300,10 @@ class Companion_model extends CI_Model {
 			$lastSaidUpdate = $this->get_latest_said_update_by_companion_id($companion->id);
 			$lastMessageSaidUpdate = $this->get_latest_message_said_update_by_companion_id($companion->id);
 			
-			//quiet time update simply happens if there is a change in the quiet time status
-			$quietTimeUpdate = $isQuietTime != $lastUpdate->quiet_time ? 1 : 0;
+			//play message update simply happens if there is a change in the play message status
+			$playMessageUpdate = $shouldPlayMessage != $lastUpdate->play_message ? 1 : 0;
 			
-			$result = '<br/>quietTimeUpdate = '.$quietTimeUpdate;
+			$result = '<br/>playMessageUpdate = '.$playMessageUpdate;
 			$output .= $result;
 			if($debug)
 				echo $result;
@@ -365,9 +365,9 @@ class Companion_model extends CI_Model {
 				if($debug)
 					echo $result;
 					
-				$quietTimeUpdateByUser = 0;
+				$playMessageUpdateByUser = 0;
 				
-				$result = '<br/>quietTimeUpdateByUser = '.$quietTimeUpdateByUser;
+				$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
 				$output .= $result;
 				if($debug)
 					echo $result;
@@ -400,15 +400,15 @@ class Companion_model extends CI_Model {
 				if($debug)
 					echo $result;	
 					
-				//can only know for sure if it is a quiet time update by user if the last update was 0 and this one is 1
-				if($lastUpdate->quiet_time == 0 && $isQuietTime == 1) 
+				//can only know for sure if it is a play message update by user if the last update was 0 and this one is 1
+				if($lastUpdate->play_message == 0 && $shouldPlayMessage == 1) 
 				{ 	
-					$quietTimeUpdateByUser = 1;
+					$playMessageUpdateByUser = 1;
 				}
 				else //still need to determine if update occurred
-					$quietTimeUpdateByUser = null;
+					$playMessageUpdateByUser = null;
 					
-				$result = '<br/>quietTimeUpdateByUser = '.$quietTimeUpdateByUser;
+				$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
 				$output .= $result;
 				if($debug)
 					echo $result;	
@@ -456,7 +456,7 @@ class Companion_model extends CI_Model {
 				
 				//if the other two states are known not to have been caused by user interaction then
 				//we can assume that was caused by the other
-				if($lowBatteryUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $quietTimeUpdateByUser === 0 && $chargeUpdate === null)
+				if($lowBatteryUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $playMessageUpdateByUser === 0 && $chargeUpdate === null)
 				{
 					$result = '<br/>chargeUpdate is unknown, but the rest are not caused by user interaction.';
 					$output .= $result;
@@ -471,7 +471,7 @@ class Companion_model extends CI_Model {
 						echo $result;
 				}
 				
-				if($chargeUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $quietTimeUpdateByUser === 0 && $lowBatteryUpdate === null)
+				if($chargeUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $playMessageUpdateByUser === 0 && $lowBatteryUpdate === null)
 				{
 					$result = '<br/>lowBatteryUpdate is unknown, but the rest are not caused by user interaction.';
 					$output .= $result;
@@ -486,7 +486,7 @@ class Companion_model extends CI_Model {
 						echo $result;
 				}
 				
-				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $messageSaidUpdate === 0 && $quietTimeUpdateByUser === 0 && $emotionUpdate === null)
+				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $messageSaidUpdate === 0 && $playMessageUpdateByUser === 0 && $emotionUpdate === null)
 				{
 					$result = '<br/>emotionUpdate is unknown, but the rest are not caused by user interaction.';
 					$output .= $result;
@@ -501,7 +501,7 @@ class Companion_model extends CI_Model {
 						echo $result;
 				}
 					
-				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $emotionUpdate === 0 && $quietTimeUpdateByUser === 0 && $messageSaidUpdate === null)
+				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $emotionUpdate === 0 && $playMessageUpdateByUser === 0 && $messageSaidUpdate === null)
 				{
 					$result = '<br/>messageSaidUpdate is unknown, but the rest are not caused by user interaction.';
 					$output .= $result;
@@ -516,16 +516,16 @@ class Companion_model extends CI_Model {
 						echo $result;
 				}
 					
-				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $quietTimeUpdateByUser === null)
+				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $playMessageUpdateByUser === null)
 				{
-					$result = '<br/>quietTimeUpdateByUser is unknown, but the rest are not caused by user interaction.';
+					$result = '<br/>playMessageUpdateByUser is unknown, but the rest are not caused by user interaction.';
 					$output .= $result;
 					if($debug)
 						echo $result;
 						
-					$quietTimeUpdateByUser = 1;
+					$playMessageUpdateByUser = 1;
 					
-					$result = '<br/>quietTimeUpdateByUser = '.$quietTimeUpdateByUser;
+					$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
 					$output .= $result;
 					if($debug)
 						echo $result;
@@ -540,8 +540,8 @@ class Companion_model extends CI_Model {
 					$messageSaidUpdate = 0;
 				
 				//user interaction we can't say for sure and necessary to not say for sure for reporting & analytics
-				if($quietTimeUpdateByUser === null)
-					$quietTimeUpdateByUser = 0;
+				if($playMessageUpdateByUser === null)
+					$playMessageUpdateByUser = 0;
 				
 				if($lowBatteryUpdate === null)	
 					$lowBatteryUpdate = 0;
@@ -582,9 +582,9 @@ class Companion_model extends CI_Model {
 		   'emotional_state' => $emotionState,
 		   'emotion_update' => $emotionUpdate,
 		   'emergency_update' => $newEmergency,
-		   'quiet_time' => $isQuietTime,
-		   'quiet_time_update' => $quietTimeUpdate,
-		   'quiet_time_update_by_user' => $quietTimeUpdateByUser,
+		   'play_message' => $shouldPlayMessage,
+		   'play_message_update' => $playMessageUpdate,
+		   'play_message_update_by_user' => $playMessageUpdateByUser,
 		   'last_said_id' => $lastSaidAssoc ? $lastSaidAssoc->id : NULL,
 		   'last_said_update' => $saidUpdate,
 		   'last_message_said_id' => $lastMessageSaidAssoc ? $lastMessageSaidAssoc->id : NULL,
@@ -609,7 +609,12 @@ class Companion_model extends CI_Model {
     		throw new Exception("Couldn't update the companion_updates table");
     	}
     		
-    	$pendingMessage = $this->get_pending_message_association();
+    	//only return a pending message if currently asking for one
+    	if($shouldPlayMessage)
+    		$pendingMessage = $this->get_pending_message_association();
+    	else
+    		$pendingMessage = null;
+    		
     	$result = '<br/>pendingMessage = '.json_encode($pendingMessage);
 		$output .= $result;
 		if($debug)
@@ -734,11 +739,11 @@ class Companion_model extends CI_Model {
     	return $result;
     }
     
-    public function get_latest_quiet_time_update_by_companion_id($id)
+    public function get_latest_play_message_update_by_companion_id($id)
     {
     	$this->db->select('*');
     	$this->db->where('companion_id', $id);
-    	$this->db->where('quiet_time_update', 1);
+    	$this->db->where('play_message_update', 1);
     	$this->db->order_by("created_at", "desc");
     	$this->db->limit(1);
     	$query = $this->db->get('companion_updates');
@@ -748,11 +753,11 @@ class Companion_model extends CI_Model {
     	return $result;
     }
     
-    public function get_latest_quiet_time_update_by_user_by_companion_id($id)
+    public function get_latest_play_message_update_by_user_by_companion_id($id)
     {
     	$this->db->select('*');
     	$this->db->where('companion_id', $id);
-    	$this->db->where('quiet_time_update_by_user', 1);
+    	$this->db->where('play_message_update_by_user', 1);
     	$this->db->order_by("created_at", "desc");
     	$this->db->limit(1);
     	$query = $this->db->get('companion_updates');

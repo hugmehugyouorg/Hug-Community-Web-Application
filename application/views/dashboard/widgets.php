@@ -74,12 +74,12 @@
 				echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o fa-2x"></i></span>'.$group->name.'  has not shared with the team yet.</div>';
 			}
 			
-			if(array_key_exists($companion->id, $companionToLastQuietTimeOnUserUpdate))
+			if(array_key_exists($companion->id, $companionToLastPlayMessageOnUserUpdate))
 			{
-				$firstUpdate = $companionToLastQuietTimeOnUserUpdate[$companion->id]['update'];
-				$timeElapsed = $companionToLastQuietTimeOnUserUpdate[$companion->id]['timeElapsed'];
+				$firstUpdate = $companionToLastPlayMessageOnUserUpdate[$companion->id]['update'];
+				$timeElapsed = $companionToLastPlayMessageOnUserUpdate[$companion->id]['timeElapsed'];
 				
-				echo '<div class="alert"><span class="close no-link"><i class="fa fa-microphone-slash fa-2x"></i></span>'.$group->name.' wants some quiet time, shh!&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>';
+				echo '<div class="alert"><span class="close no-link" style="right: -24px;"><i class="fa fa-volume-up fa-2x"></i></span>'.$group->name.' was listening to messages.&nbsp;&nbsp;<code>'.$timeElapsed.' ago</code></div>';
 			}
 		}
 	}
@@ -142,7 +142,7 @@
 					</span>
 					<?php echo $companion->name;?> had this to say, <em>"<?php echo $text; ?>"</em>
 					&nbsp;&nbsp;
-					<code><?php echo $timeElapsed; ?>ago</code>
+					<code><?php echo $timeElapsed; ?> ago</code>
 				</div>
 				<?php
 			}

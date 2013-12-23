@@ -11,7 +11,7 @@ class Companion extends MY_Controller {
 	{
 		$error = false;
 		$output = '';
-		$pendingMessage = '';
+		$pendingMessage = false;
 		$id = $this->input->get('i', TRUE);
 		$data = $this->input->get('d', TRUE);
 		
