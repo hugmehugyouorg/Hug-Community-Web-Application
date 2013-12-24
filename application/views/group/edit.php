@@ -4,15 +4,15 @@
 	<?php } ?>
 <div class="tabbable">
 	<ul class="nav nav-pills">
-		<li class="active"><a href="#basic" data-toggle="tab" data-value="#basic">Basic Info</a></li>
-		<li><a href="#add-invite" data-toggle="tab" data-value="#add-invite">Add/Invite</a></li>
-		<li><a href="#leaders" data-toggle="tab" data-value="#leaders">Leaders</a></li>
-		<li><a href="#community" data-toggle="tab" data-value="#community">Community</a></li>
+		<li class="active"><a href="#basic" data-toggle="tab">Basic Info</a></li>
+		<li><a href="#add-invite" data-toggle="tab">Add/Invite</a></li>
+		<li><a href="#leaders" data-toggle="tab">Leaders</a></li>
+		<li><a href="#community" data-toggle="tab">Community</a></li>
 	</ul>
 	<div class="tab-content well">
-		<div class="tab-pane active" id="basic">
+		<div class="tab-pane active" id="basix">
 			<fieldset>
-				<legend>Safety Team Basic Information</legend>
+				<legend>Safety Team's Basic Information</legend>
 				
 				<p class="muted">Edit the Safety Team's most basic information.</p>
 				
@@ -21,6 +21,10 @@
 					  <p>
 							Child's Name/Nickname: <br />
 							<?php echo form_input($group_name); ?>
+					  </p>
+					  <p>
+					  		Safety Sam's Nickname: <br />
+							<?php echo form_input($companion_name); ?>
 					  </p>
 					  <p>
 							Team Description: <br />
@@ -47,7 +51,7 @@
 				<legend>Safety Team Leaders</legend>
 				<p class="muted">Below is a list of the Safety Team Leaders.</p>
 				
-				<table class="table table-striped table-bordered table-condensed footable toggle-circle-filled toggle-medium">
+				<table class="table table-striped table-bordered table-condensed footable toggle-arrow toggle-medium">
 					<thead>
 						<tr>
 							<th>Last Name, First Name</th>
@@ -75,7 +79,7 @@
 											<h3 id="remove-group-user-modal-label-<?php echo $group_id;?>-<?php echo $user->id;?>" class="text-error">Are you sure about this?</h3>
 										  </div>
 										  <div class="modal-body">
-											<p>This will remove the user from the Safety Team.</p>
+											<p>This will remove <strong><?php echo $user->last_name.', '.$user->first_name; ?></strong> from the Safety Team.</p>
 										  </div>
 										  <div class="modal-footer">
 											<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
@@ -96,7 +100,7 @@
 				<legend>Safety Team Community Members</legend>
 				<p class="muted">Below is a list of the Safety Team Community Members.</p>
 			
-				<table class="table table-striped table-bordered table-condensed footable toggle-circle-filled toggle-medium">
+				<table class="table table-striped table-bordered table-condensed footable toggle-arrow toggle-medium">
 					<thead>
 						<tr>
 							<th>Last Name, First Name</th>

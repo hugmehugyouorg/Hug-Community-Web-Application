@@ -820,6 +820,19 @@ class Companion_model extends CI_Model {
     	return true;
     }
     
+    public function change_name($id, $name)
+    {
+    	$data = array(
+		   'name' => $name
+		);
+    	$this->db->where('id', $id);
+    	$updateResult = $this->db->update('companions', $data);
+    	
+    	if($updateResult)
+    		return true;
+    	return false;
+    }
+    
     public function clear_emergency_alert($id)
     {
     	$data = array(
