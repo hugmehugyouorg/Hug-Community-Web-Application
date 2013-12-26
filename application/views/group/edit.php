@@ -10,7 +10,7 @@
 		<li><a href="#community" data-toggle="tab">Community</a></li>
 	</ul>
 	<div class="tab-content well">
-		<div class="tab-pane active" id="basix">
+		<div class="tab-pane active" id="basic">
 			<fieldset>
 				<legend>Safety Team's Basic Information</legend>
 				

@@ -81,7 +81,15 @@ a {
   cursor: pointer;
 }
 
-.bootstrap-select.btn-group .dropdown-menu { width: 100%; }
+.bootstrap-select.btn-group .dropdown-menu { 
+	width: 100%; 
+}
+
+.well .bootstrap-select.btn-group .dropdown-menu.open { 
+	z-index: 999;
+	position: relative;
+}
+
 .bootstrap-select.btn-group .btn .filter-option, .bootstrap-select.btn-group .dropdown-menu li>a {
 	white-space: nowrap;
 	overflow: hidden;
@@ -137,6 +145,21 @@ a {
 	min-height:40px;
 }
 
+.send-message-steps {
+	text-align: right; width:100%;font-size:1.1em;
+}
+
+.send-message-steps div {
+	width:30%;padding:5px; border-right: 1px solid #ccc; padding-right:2%;
+}
+.send-message-steps div.last {
+	border-right: 0; padding-right:0;
+}
+
+.send-message-steps p.text-warning {
+	font-size:1.15em;
+}
+
 @media (max-width: 979px) {
 	.navbar-fixed-bottom {
 		position: fixed;
@@ -184,5 +207,23 @@ a {
 	.widgets .pull-right, .widget .pull-left {
 		
 		float:none;
+	}
+}
+
+@media (max-width: 389px) {
+	.send-message-instructions {
+		display:none;
+	}
+	.send-message-steps {
+		text-align:left;
+	}
+	.send-message-steps div {
+		width:100%;
+		border-right:0;
+		padding-right:0;
+		padding-bottom:5px;
+	}
+	.send-message-steps div.last {
+		padding-bottom:0px;
 	}
 }

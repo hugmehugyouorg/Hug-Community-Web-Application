@@ -121,17 +121,19 @@
 									<select class="dont-auto-render span11 companion-messages-select" id="companion-messages-'.$companion->id.'"></select>
 								</div>
 							</div>
-							<hr/>
-						  	<div style="text-align: right; width:100%;font-size:1.1em;">
-						  		<div class="pull-left" style="width:30%;padding:5px; border-right: 1px solid #ccc; padding-right:2%;"><p class="text-warning" style="font-size:1.15em;">Step 1 <i class="fa fa-reply"></i></p><p>You can reply to '.$group->name.' by selecting a message to send.</p></div>
-						  		<div class="pull-left" style="width:30%;padding:5px; border-right: 1px solid #ccc; padding-right:2%;"><p class="text-warning" style="font-size:1.15em;">Step 2 <i class="fa fa-cloud"></i></p><p>We\'ll have our CloudCarriers&#153; deliver it to '.$companion->name.'.</p></div>
-						  		<div class="pull-left" style="width:30%;padding:5px; "><p class="text-warning" style="font-size:1.15em;">Step 3 <i class="fa fa-volume-up"></i></p><p>'.$companion->name.' will play it back for '.$group->name.', it\'s as simple as that.</p></div>
-						  		<div class="clearfix"></div>
-						  	</div>
-							<div class="row-fluid">
+							<div class="send-message-instructions">
 								<hr/>
-								<span class="text-info pull-right">That\'s the power of the Hug Community.</span>
-								<p>&nbsp;</p>
+								<div class="send-message-steps">
+									<div class="pull-left"><p class="text-warning">Step 1 <i class="fa fa-reply"></i></p><p>You can reply to '.$group->name.' by selecting a message to send.</p></div>
+									<div class="pull-left"><p class="text-warning">Step 2 <i class="fa fa-cloud"></i></p><p>We\'ll have our CloudCarriers&#153; deliver it to '.$companion->name.'.</p></div>
+									<div class="pull-left last"><p class="text-warning">Step 3 <i class="fa fa-volume-up"></i></p><p>'.$companion->name.' will play it back for '.$group->name.', it\'s as simple as that.</p></div>
+									<span class="clearfix"></span>
+								</div>
+								<div class="row-fluid send-message-tagline">
+									<hr/>
+									<span class="text-info pull-right">That\'s the power of the Hug Community.</span>
+									<p>&nbsp;</p>
+								</div>
 							</div>
 						  </div>
 						  <div class="modal-footer">

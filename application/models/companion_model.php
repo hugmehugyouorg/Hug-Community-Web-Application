@@ -820,6 +820,18 @@ class Companion_model extends CI_Model {
     	return true;
     }
     
+    public function unassignCompanion($id)
+    {
+    	$data = array(
+		   'companion_id' => $id
+		);
+    	$this->db->delete('companions_groups', $data);
+    	
+    	if( $this->db->affected_rows() < 1 )
+    		return false;
+    	return true;
+    }
+    
     public function change_name($id, $name)
     {
     	$data = array(

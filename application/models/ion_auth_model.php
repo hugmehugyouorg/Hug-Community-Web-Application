@@ -1829,8 +1829,11 @@ class Ion_auth_model extends CI_Model
 	/**
 	* delete_group
 	*
+	* 12/26/2013 awelters - no longer need transactions here because of the db schema handling cascading on delete
+	*
 	* @return bool
 	* @author aditya menon
+	* @author andrew welters <awelters@hugmehugyou.org>
 	**/
 	public function delete_group($group_id = FALSE)
 	{
@@ -1842,22 +1845,11 @@ class Ion_auth_model extends CI_Model
 
 		$this->trigger_events('pre_delete_group');
 
-		$this->db->trans_begin();
-
-		// remove all users from this group
-		$this->db->delete($this->tables['users_groups'], array($this->join['groups'] => $group_id));
 		// remove the group itself
 		$this->db->delete($this->tables['groups'], array('id' => $group_id));
 
-		if ($this->db->trans_status() === FALSE)
-		{
-			$this->db->trans_rollback();
-			$this->trigger_events(array('post_delete_group', 'post_delete_group_unsuccessful'));
-			$this->set_error('group_delete_unsuccessful');
-			return FALSE;
-		}
-
-		$this->db->trans_commit();
+		if( $this->db->affected_rows() < 1 )
+    		return FALSE;
 
 		$this->trigger_events(array('post_delete_group', 'post_delete_group_successful'));
 		$this->set_message('group_delete_successful');

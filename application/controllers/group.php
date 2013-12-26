@@ -169,9 +169,10 @@ class Group extends MY_Controller {
 		}
 
 		//validate form input
-		$this->form_validation->set_rules('group_name', 'Team Name', 'required|xss_clean');
-		$this->form_validation->set_rules('description', 'Description', 'required|xss_clean');
+		$this->form_validation->set_rules('group_name', 'Child\'s Name/Nickname', 'required|xss_clean');
+		$this->form_validation->set_rules('description', 'Team Description', 'required|xss_clean');
 		$this->form_validation->set_rules('companion', 'Therapuetic Companions (Unassigned)', 'required|xss_clean');
+		$this->form_validation->set_rules('companion_name', 'Safety Sam\'s Nickname', 'required|xss_clean');
 		$this->form_validation->set_rules('leaders', 'Team Leaders', 'required|xss_clean');
 
 		//load companions
@@ -192,6 +193,7 @@ class Group extends MY_Controller {
 		$this->data['groupLeaders'] = $groupLeaders;
 		$this->data['currentLeaders'] = $currentLeaders;
 		
+		$companion_update = true;
 		if ($this->form_validation->run() == TRUE)
 		{
 			$companion = null;
@@ -218,13 +220,23 @@ class Group extends MY_Controller {
 						//only successful if no ion auth errors
 						if(!$this->ion_auth->errors())
 						{
-							// check to see if we are creating the group
-							// redirect them back to the admin page
-							$this->session->set_flashdata('message', $this->ion_auth->messages());
-							redirect('groups', 'refresh');
+							$companion_update = $this->Companion_model->change_name($companion->id, $_POST['companion_name']);
+						
+							if(!$companion_update) {
+								$this->ion_auth->delete_group($new_group_id);
+								$this->data['message'] = $this->lang->line('group_change_companion_name_failed');
+							}
+							else {
+								// check to see if we are creating the group
+								// redirect them back to the admin page
+								$this->session->set_flashdata('message', $this->ion_auth->messages());
+								redirect('groups', 'refresh');
+							}
 						}
 						else
+						{
 							$this->ion_auth->delete_group($new_group_id);
+						}
 					}
 					else {
 						$this->ion_auth->delete_group($new_group_id);
@@ -236,9 +248,13 @@ class Group extends MY_Controller {
 				$this->session->set_flashdata('message', $this->lang->line('group_assign_companion_failed'));
 		}
 		
-		//display the create group form
+		
 		//set the flash data error message if there is one
-		$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
+		if(!$companion_update)
+			$this->data['message'] .= '<br/>';
+		else
+			$this->data['message'] = '';
+		$this->data['message'] .= (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
 
 		$this->data['group_name'] = array(
 			'name'  => 'group_name',
@@ -251,6 +267,13 @@ class Group extends MY_Controller {
 			'id'    => 'description',
 			'type'  => 'text',
 			'value' => $this->form_validation->set_value('description'),
+		);
+
+		$this->data['companion_name'] = array(
+			'name'  => 'companion_name',
+			'id'    => 'companion_name',
+			'type'  => 'text',
+			'value' => $this->form_validation->set_value('companion_name'),
 		);
 
 		$this->_render_page('group/create', $this->data);
