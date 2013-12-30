@@ -135,6 +135,15 @@ $config['email_templates'] = 'user/email/';
 
 /*
  | -------------------------------------------------------------------------
+ | SMS templates.
+ | -------------------------------------------------------------------------
+ | Folder where sms templates are stored.
+ | Default: auth/
+ */
+$config['sms_templates'] = 'user/sms/';
+
+/*
+ | -------------------------------------------------------------------------
  | Activate Account Email Template
  | -------------------------------------------------------------------------
  | Default: activate.tpl.php
@@ -164,6 +173,14 @@ $config['email_forgot_password_complete'] = 'new_password.tpl.php';
  | Default: emergency_alert.tpl.php
  */
 $config['email_emergency_alert'] = 'emergency_alert.tpl.php';
+
+/*
+ | -------------------------------------------------------------------------
+ | Emergency Alert SMS Template
+ | -------------------------------------------------------------------------
+ | Default: emergency_alert.tpl.php
+ */
+$config['sms_emergency_alert'] = 'emergency_alert.tpl.php';
 
 /*
  | -------------------------------------------------------------------------

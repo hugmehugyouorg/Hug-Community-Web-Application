@@ -615,17 +615,30 @@ class Ion_auth
 		
 		if(count($groupLeaders) > 0 || count($groupMembers) > 0)
 		{
+			$this->load->library('twilio');
+			
 			$data = array(
 				'companion_name' => $companionName,
 				'group_name' => $group->name
 			);
 			
+			$smsMessage = $this->load->view($this->config->item('sms_templates', 'ion_auth').$this->config->item('sms_emergency_alert', 'ion_auth'), $data, true);
 			$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('email_emergency_alert', 'ion_auth'), $data, true);
-		
+			
+			$smsSendError = FALSE;
 			$emailSendError = FALSE;
 		
 			foreach ($groupLeaders as $leader)
 			{
+				if($leader->mobile_alerts)
+				{
+					$response = $this->twilio->sms($this->twilio->getPhone(), $leader->phone, $smsMessage);
+					if($response->IsError) {
+						$smsSendError = TRUE;
+						$this->set_error($response->ErrorMessage);
+					}
+				}
+			
 				$this->email->clear();
 				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
 				$this->email->to($leader->email);
@@ -640,6 +653,15 @@ class Ion_auth
 			
 			foreach ($groupMembers as $member)
 			{
+				if($member->mobile_alerts)
+				{
+					$response = $this->twilio->sms($this->twilio->getPhone(), $member->phone, $smsMessage);
+					if($response->IsError) {
+						$smsSendError = TRUE;
+						$this->set_error($response->ErrorMessage);
+					}
+				}
+				
 				$this->email->clear();
 				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
 				$this->email->to($member->email);
@@ -657,6 +679,8 @@ class Ion_auth
 				$this->set_error('emergency_alert_email_sent_error');
 				return FALSE;
 			}
+			else if($smsSendError)
+				return FALSE;
 		}
 		else
 		{

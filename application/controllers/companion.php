@@ -62,10 +62,12 @@ class Companion extends MY_Controller {
 						$result = $this->ion_auth->emergency_alert($this->Companion_model->get_companion_by_id($id)->name, $this->Companion_model->get_group_id_by_companion_id($id));
 						if($result)
 						{
-							$output .= "<br/>Emergency Alert successfully handled";
+							//$output .= "<br/>Emergency Alert successfully handled";
 						}
-						else
-							throw new Exception($this->ion_auth->errors());
+						else {
+							//throw new Exception($this->ion_auth->errors());
+							log_message('error', "id: ".$id.", Error: ".$this->ion_auth->errors());
+						}
 					}
 				}
 			}

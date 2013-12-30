@@ -404,6 +404,7 @@ class User extends MY_Controller {
 		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
 		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
 		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'required|xss_clean|min_length[4]|max_length[4]');
+		$this->form_validation->set_rules('mobile_alerts', 'Would you like to receive alerts on your phone?', 'xss_clean');
 		$this->form_validation->set_rules('groups', 'Groups', 'xss_clean');
 
 		if (isset($_POST) && !empty($_POST))
@@ -413,11 +414,12 @@ class User extends MY_Controller {
 			{
 				show_error('This form post did not pass our security checks.');
 			}
-
+			
 			$data = array(
 				'first_name' => $this->input->post('first_name'),
 				'last_name'  => $this->input->post('last_name'),
 				'phone'      => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
+				'mobile_alerts' => $this->input->post('mobile_alerts') == '1' ? 1 : 0
 			);
 
 			if($this->ion_auth->is_admin()) {
@@ -501,6 +503,10 @@ class User extends MY_Controller {
 			'id'    => 'phone3',
 			'type'  => 'text',
 			'value' => $this->form_validation->set_value('phone3', $user->phone[2]),
+		);
+		$this->data['mobile_alerts'] = array(
+			'name'        => 'mobile_alerts',
+			'id'          => 'mobile_alerts'
 		);
 		$this->data['password'] = array(
 			'name' => 'password',

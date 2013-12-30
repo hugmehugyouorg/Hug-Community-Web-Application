@@ -16,12 +16,23 @@
             Last Name: <br />
             <?php echo form_input($last_name);?>
       </p>
-
-      <p>
+	  
+       <div class="control-group">
+		<div class="controls">
             Phone: <br />
             <?php echo form_input($phone1);?>-<?php echo form_input($phone2);?>-<?php echo form_input($phone3);?>
-      </p>
-
+            <div class="row-fluid">
+				<div class="span5">
+					<label class="checkbox" for="phone_alerts">
+						<input id="mobile_alerts" name="mobile_alerts" type="checkbox" value="1" <?php echo set_checkbox('mobile_alerts', '1', $user->mobile_alerts ? TRUE : FALSE); ?>>
+						Would you like to receive alerts on your phone?
+						<span class="help-block"><span class="text-info"><small>If you would like to receive alerts on your phone, please verify your number is for a mobile device.&nbsp;&nbsp;Alerts are sent as SMS messages and only mobile phones are able to receive such alerts.</small></span></span>
+					</label>
+				</div>
+			</div>
+	  	</div>
+	  </div>
+	<div class="clearfix"></div>
       <p>
             Password: (if changing password)<br />
             <?php echo form_input($password);?>
