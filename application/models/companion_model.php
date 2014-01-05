@@ -11,6 +11,7 @@ class Companion_model extends CI_Model {
     /*
 		# Bits -> Data
 		
+		6 -> Update Flags Update Flags (32 = said update, 16 = message said update, 8 = battery update, 4 = emotion update, 2 = play messages update, 1 = ready to play update... flags can be combined obviously)
 		3 -> Voltage Reading (whole number, e.g. #.00) ... max value is 5
 		7 -> Voltage (after decimal point, e.g. 0.##) ... max value is 99
 		1 -> Is Charging ... if value is 0 then false, if 1 then true
@@ -19,10 +20,13 @@ class Companion_model extends CI_Model {
 		9 -> Last Said (Companion/Interaction initiated) ... if value is 0 then nothing said yet, represent id's in the database
 		9 -> Last Message Said (Community initiated) ... if value is 0 then nothing said yet, represent id's in the database
 	
-		Total # of bits = 32 bits
+		Total # of bits = 38 bits
 		
-		EXAMPLE:  00100111011110010001010000000000, SPLITS LIKE THIS:  001 0011101 1 11 0 010001010 000000000
+		EXAMPLE:  00000000100111011110010001010000000000, SPLITS LIKE THIS:  000001 001 0011101 1 11 0 010001010 000000000
 		
+			Update Flags Update Flags (32 = said update, 16 = message said update, 8 = battery update, 4 = emotion update, 2 = play messages update, 1 = ready to play update... flags can be combined obviously)
+			outgoing data: 1
+			000001
 			Voltage Reading (whole number, e.g. #.00):
 			outgoing data: 4
 			001
@@ -44,14 +48,15 @@ class Companion_model extends CI_Model {
 			Last Safety Team message Safety Sam said.
 			outgoing data: 0
 			000000000
+			bits: 00000001
 			bits: 00100111
 			bits: 01111001
 			bits: 00010100
 			bits: 00000000
 			
-			bits length: 32
-			bytes to write: 4
-			bytes written: 4
+			bits length: 36
+			bytes to write: 5
+			bytes written: 5
 	*/
 	public function updateCompanionState($id, $data, $debug = false)
 	{
@@ -69,10 +74,10 @@ class Companion_model extends CI_Model {
 			throw new Exception($id.": ".$data." is not a string");
 			
 		$dataLength = strlen($data);
-		if($dataLength < 32)
-			throw new Exception($id.": ".$data." has a length ".$dataLength.", which is less than 32");
-		if($dataLength > 32)
-			throw new Exception($id.": ".$data." has a length ".$dataLength.", which is greater than 32");
+		if($dataLength < 40)
+			throw new Exception($id.": ".$data." has a length ".$dataLength.", which is less than 40");
+		if($dataLength > 40)
+			throw new Exception($id.": ".$data." has a length ".$dataLength.", which is greater than 40");
 		
 		if(strspn($data,'01') != $dataLength)
 			throw new Exception($id.": ".$data." is not a binary string");
@@ -82,7 +87,29 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;	
 			
+		/**
+		*
+		* PARSE BINARY STRING AND CHANGE FROM LSB TO MSB
+		*
+		**/
+			
 		$current = 0;
+		
+		$padding = strrev(substr($data,$current,2));
+		$current+=2;
+		
+		$result = '<br/>padding = '.$padding;
+		$output .= $result;
+		if($debug)
+			echo $result;
+		
+		$updateFlags = strrev(substr($data,$current,6));
+		$current+=6;
+		
+		$result = '<br/>updateFlags = '.$updateFlags;
+		$output .= $result;
+		if($debug)
+			echo $result;
 		
 		$voltageWholeNumber = strrev(substr($data,$current,3));
 		$current+=3;
@@ -136,6 +163,56 @@ class Companion_model extends CI_Model {
 		$current+=9;
 		
 		$result = '<br/>lastMessageSaid = '.$lastMessageSaid;
+		$output .= $result;
+		if($debug)
+			echo $result;
+	
+		/**
+		*
+		* CONVERT BINARY STRINGS TO PHP VALUES WE CAN OPERATE ON
+		*
+		**/
+	
+		if($padding != '0000')
+			throw new Exception($id.": ".$padding." is not zero padded which is not possible");
+	
+		if($updateFlags == '000000')
+			throw new Exception($id.": ".$updateFlags." specifies no update which is not possible");
+	
+		$updateFlags = bindec($updateFlags);
+		$saidUpdateFlagged = ($updateFlags & 32) >> 5;
+		$messageSaidUpdateFlagged = ($updateFlags & 16) >> 4;
+		$batteryUpdateFlagged = ($updateFlags & 8) >> 3;
+		$emotionUpdateFlagged = ($updateFlags & 4) >> 2;
+		$playMessagesUpdateFlagged = ($updateFlags & 2) >> 1;
+		$readyToPlayUpdateFlagged = ($updateFlags & 1);
+		
+		$result = '<br/>saidUpdateFlagged = '.$batteryUpdateFlagged;
+		$output .= $result;
+		if($debug)
+			echo $result;
+			
+		$result = '<br/>messageSaidUpdateFlagged = '.$batteryUpdateFlagged;
+		$output .= $result;
+		if($debug)
+			echo $result;
+		
+		$result = '<br/>batteryUpdateFlagged = '.$batteryUpdateFlagged;
+		$output .= $result;
+		if($debug)
+			echo $result;
+			
+		$result = '<br/>emotionUpdateFlagged = '.$emotionUpdateFlagged;
+		$output .= $result;
+		if($debug)
+			echo $result;
+			
+		$result = '<br/>playMessagesUpdateFlagged = '.$playMessagesUpdateFlagged;
+		$output .= $result;
+		if($debug)
+			echo $result;
+			
+		$result = '<br/>readyToPlayUpdateFlagged = '.$readyToPlayUpdateFlagged;
 		$output .= $result;
 		if($debug)
 			echo $result;
@@ -239,14 +316,14 @@ class Companion_model extends CI_Model {
 				echo $result;
 		
 			//only an emotion update if the emotion state is known (user pressed on the of emotional buttons)
-			$emotionUpdate = $emotionState != 0 ? 1 : 0;
+			$emotionUpdate = $emotionUpdateFlagged == 1 || $emotionState != 0 ? 1 : 0;
 			
 			$result = '<br/>emotionUpdate = '.$emotionUpdate;
 			$output .= $result;
 			if($debug)
 				echo $result;
 			
-			$playMessageUpdate = $shouldPlayMessage;
+			$playMessageUpdate = $playMessagesUpdateFlagged || $shouldPlayMessage;
 			
 			$result = '<br/>playMessageUpdate = '.$playMessageUpdate;
 			$output .= $result;
@@ -269,7 +346,7 @@ class Companion_model extends CI_Model {
 				echo $result;
 			
 			//only a play message update (also by user) if play message is on (user pressed the play message button)
-			$playMessageUpdateByUser = $shouldPlayMessage;
+			$playMessageUpdateByUser = $playMessagesUpdate;
 			
 			$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
 			$output .= $result;
@@ -277,7 +354,7 @@ class Companion_model extends CI_Model {
 				echo $result;
 			
 			//only a message said update if last message said is known (therapuetic companion said the message)
-			$messageSaidUpdate = $lastMessageSaid != 0 ? 1 : 0;
+			$messageSaidUpdate = $lastMessageSaid != 0 && $lastMessageSaidAssoc ? 1 : 0;
 			
 			$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
 			$output .= $result;
@@ -285,7 +362,7 @@ class Companion_model extends CI_Model {
 				echo $result;
 			
 			//we know the first update would have been talking
-			$saidUpdate = 1;
+			$saidUpdate = $lastSaidAssoc ? 1 : 0;
 			
 			$result = '<br/>saidUpdate = '.$saidUpdate;
 			$output .= $result;
@@ -300,7 +377,7 @@ class Companion_model extends CI_Model {
 			$lastMessageSaidUpdate = $this->get_latest_message_said_update_by_companion_id($companion->id);
 			
 			//play message update simply happens if there is a change in the play message status
-			$playMessageUpdate = $shouldPlayMessage != $lastUpdate->play_message ? 1 : 0;
+			$playMessageUpdate = $playMessagesUpdateFlagged || $shouldPlayMessage != $lastUpdate->play_message ? 1 : 0;
 			
 			$result = '<br/>playMessageUpdate = '.$playMessageUpdate;
 			$output .= $result;
@@ -317,7 +394,7 @@ class Companion_model extends CI_Model {
 			}
 			else //still need to determine if update occurred
 			{
-				$chargeUpdate = null;
+				$chargeUpdate = $batteryUpdateFlagged;
 			}
 			
 			$result = '<br/>chargeUpdate = '.$chargeUpdate;
@@ -335,53 +412,17 @@ class Companion_model extends CI_Model {
 			}
 			else if($lastChargeUpdate->is_charging) //if the charge state is changing from charging to not then update is true
 				$lowBatteryUpdate = 1;
-			else
-				$lowBatteryUpdate = null;
+			else //low battery yes, but the last charge update was not charging so don't want to reupdate
+				$lowBatteryUpdate = 0;
 			
 			$result = '<br/>lowBatteryUpdate = '.$lowBatteryUpdate;
 			$output .= $result;
 			if($debug)
 				echo $result;
-			
-			if($emotionState == 0) //there is no user updates since it is in an unknown state
+				
+			if($emotionState != 0)
 			{
-				$result = '<br/>emotionState = 0, there is no user updates since it is in an unknown state';
-				$output .= $result;
-				if($debug)
-					echo $result;
-					
-				$emotionUpdate = 0;
-				
-				$result = '<br/>emotionUpdate = '.$emotionUpdate;
-				$output .= $result;
-				if($debug)
-					echo $result;
-				
-				$messageSaidUpdate = 0;
-				
-				$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
-				$output .= $result;
-				if($debug)
-					echo $result;
-					
-				$playMessageUpdateByUser = 0;
-				
-				$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
-				$output .= $result;
-				if($debug)
-					echo $result;
-				
-				//we know the first update says something
-				$saidUpdate = 1;
-				
-				$result = '<br/>saidUpdate = '.$saidUpdate;
-				$output .= $result;
-				if($debug)
-					echo $result;
-			}
-			else 
-			{
-				if(!$lastEmotionUpdate) //there has never been an emotional update before, so update is true
+				if(!$lastEmotionUpdate) //there has never been an emotional update before
 				{
 					$emotionUpdate = 1;
 				} //if the emotional state is changing
@@ -391,46 +432,51 @@ class Companion_model extends CI_Model {
 				}
 				else //still need to determine if update occurred
 				{
-					$emotionUpdate = null;
+					$emotionUpdate = $emotionUpdateFlagged;
 				}
-					
-				$result = '<br/>emotionUpdate = '.$emotionUpdate;
-				$output .= $result;
-				if($debug)
-					echo $result;	
-					
-				//can only know for sure if it is a play message update by user if the last update was 0 and this one is 1
-				if($lastUpdate->play_message == 0 && $shouldPlayMessage == 1) 
-				{ 	
-					$playMessageUpdateByUser = 1;
-				}
-				else //still need to determine if update occurred
-					$playMessageUpdateByUser = null;
-					
-				$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
-				$output .= $result;
-				if($debug)
-					echo $result;	
-					
-				if(!$lastSaidUpdate)
+			}
+			
+			$result = '<br/>emotionUpdate = '.$emotionUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;	
+				
+			//can only know for sure if it is a play message update by user if specified directly
+			if($playMessagesUpdateFlagged || $shouldPlayMessage) 
+			{ 	
+				$playMessageUpdateByUser = 1;
+			}
+			else //still need to determine if update occurred
+				$playMessageUpdateByUser = 0;
+				
+			$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
+			$output .= $result;
+			if($debug)
+				echo $result;	
+				
+			//only if there is a current association with what was said
+			if($lastSaidAssoc)
+			{
+				if($lastSaidUpdate && $lastSaidUpdate->last_said_id != $lastSaidAssoc->id)
 				{
-					//we know the first update would have been saying something
 					$saidUpdate = 1;
 				}
-				else if($lastSaidAssoc && $lastSaidUpdate->last_said_id != $lastSaidAssoc->id)
+				else
 				{
-					$saidUpdate = 1;
+					$saidUpdate = $saidUpdateFlagged;
 				}
-				else //can't determine if an update occurred
-				{
-					$saidUpdate = 0;
-				}
-				
-				$result = '<br/>saidUpdate = '.$saidUpdate;
-				$output .= $result;
-				if($debug)
-					echo $result;
-				
+			}
+			else
+				$saidUpdate = 0;
+			
+			$result = '<br/>saidUpdate = '.$saidUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
+			
+			//only if there is a current association with what message was said
+			if($lastMessageSaidAssoc)
+			{
 				if($lastMessageSaid == 0) //no update
 				{
 					$messageSaidUpdate = 0;
@@ -439,115 +485,22 @@ class Companion_model extends CI_Model {
 				{
 					$messageSaidUpdate = 1;
 				} //if the last message state is changing
-				else if($lastMessageSaidAssoc && $lastMessageSaidUpdate->last_message_said_id != $lastMessageSaidAssoc->id)
+				else if($lastMessageSaidUpdate->last_message_said_id != $lastMessageSaidAssoc->id)
 				{
 					$messageSaidUpdate = 1;
 				}
-				else //still need to determine if update occurred
+				else
 				{
-					$messageSaidUpdate = null;
+					$messageSaidUpdate = $messageSaidUpdateFlagged;
 				}
-				
-				$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
-				$output .= $result;
-				if($debug)
-					echo $result;
-				
-				//if the other two states are known not to have been caused by user interaction then
-				//we can assume that was caused by the other
-				if($lowBatteryUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $playMessageUpdateByUser === 0 && $chargeUpdate === null)
-				{
-					$result = '<br/>chargeUpdate is unknown, but the rest are not caused by user interaction.';
-					$output .= $result;
-					if($debug)
-						echo $result;
-						
-					$chargeUpdate = 1;
-					
-					$result = '<br/>chargeUpdate = '.$chargeUpdate;
-					$output .= $result;
-					if($debug)
-						echo $result;
-				}
-				
-				if($chargeUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $playMessageUpdateByUser === 0 && $lowBatteryUpdate === null)
-				{
-					$result = '<br/>lowBatteryUpdate is unknown, but the rest are not caused by user interaction.';
-					$output .= $result;
-					if($debug)
-						echo $result;
-						
-					$lowBatteryUpdate = 1;
-					
-					$result = '<br/>lowBatteryUpdate = '.$lowBatteryUpdate;
-					$output .= $result;
-					if($debug)
-						echo $result;
-				}
-				
-				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $messageSaidUpdate === 0 && $playMessageUpdateByUser === 0 && $emotionUpdate === null)
-				{
-					$result = '<br/>emotionUpdate is unknown, but the rest are not caused by user interaction.';
-					$output .= $result;
-					if($debug)
-						echo $result;
-						
-					$emotionUpdate = 1;
-					
-					$result = '<br/>emotionUpdate = '.$emotionUpdate;
-					$output .= $result;
-					if($debug)
-						echo $result;
-				}
-					
-				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $emotionUpdate === 0 && $playMessageUpdateByUser === 0 && $messageSaidUpdate === null)
-				{
-					$result = '<br/>messageSaidUpdate is unknown, but the rest are not caused by user interaction.';
-					$output .= $result;
-					if($debug)
-						echo $result;
-						
-					$messageSaidUpdate = 1;
-					
-					$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
-					$output .= $result;
-					if($debug)
-						echo $result;
-				}
-					
-				if($lowBatteryUpdate === 0 && $chargeUpdate === 0 && $emotionUpdate === 0 && $messageSaidUpdate === 0 && $playMessageUpdateByUser === null)
-				{
-					$result = '<br/>playMessageUpdateByUser is unknown, but the rest are not caused by user interaction.';
-					$output .= $result;
-					if($debug)
-						echo $result;
-						
-					$playMessageUpdateByUser = 1;
-					
-					$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
-					$output .= $result;
-					if($debug)
-						echo $result;
-				}
-				
-				//user interaction we can't say for sure and necessary to not say for sure for reporting & analytics
-				if($emotionUpdate === null)
-					$emotionUpdate = 0;
-					
-				//user interaction we can't say for sure and necessary to not say for sure for reporting & analytics
-				if($messageSaidUpdate === null)
-					$messageSaidUpdate = 0;
-				
-				//user interaction we can't say for sure and necessary to not say for sure for reporting & analytics
-				if($playMessageUpdateByUser === null)
-					$playMessageUpdateByUser = 0;
-				
-				if($lowBatteryUpdate === null)	
-					$lowBatteryUpdate = 0;
-				
-				if($chargeUpdate === null)	
-					$chargeUpdate = 0;
 			}
+			else
+				$messageSaidUpdate = 0;
+			
+			$result = '<br/>messageSaidUpdate = '.$messageSaidUpdate;
+			$output .= $result;
+			if($debug)
+				echo $result;
 		}
 		
 		//update emergency status
@@ -581,12 +534,12 @@ class Companion_model extends CI_Model {
 		   'emotional_state' => $emotionState,
 		   'emotion_update' => $emotionUpdate,
 		   'emergency_update' => $newEmergency,
-		   'play_message' => $shouldPlayMessage,
+		   'play_message' => $playMessageUpdateByUser,
 		   'play_message_update' => $playMessageUpdate,
 		   'play_message_update_by_user' => $playMessageUpdateByUser,
 		   'last_said_id' => $lastSaidAssoc ? $lastSaidAssoc->id : NULL,
 		   'last_said_update' => $saidUpdate,
-		   'last_message_said_id' => $lastMessageSaidAssoc ? $lastMessageSaidAssoc->id : NULL,
+		   'last_message_said_id' => $lastMessageSaid != 0 && $lastMessageSaidAssoc ? $lastMessageSaidAssoc->id : NULL,
 		   'last_message_said_update' => $messageSaidUpdate
 		);
 		
@@ -611,7 +564,7 @@ class Companion_model extends CI_Model {
     	}
     		
     	//only return a pending message if currently asking for one
-    	if($shouldPlayMessage)
+    	if($playMessageUpdateByUser)
     		$pendingMessage = $this->get_pending_message_association();
     	else
     		$pendingMessage = null;
@@ -622,9 +575,9 @@ class Companion_model extends CI_Model {
 			echo $result;
     		
     	//only try to update the companion message with this companion update if there was a message said update that has a message association
-    	if($lastMessageSaidAssoc && $messageSaidUpdate)
+    	if($messageSaidUpdate)
     	{
-    		$companionMessageUpdate = $this->update_companion_message_for_companion_update($companionUpdateId,$lastMessageSaidAssoc->id);
+    		$companionMessageUpdate = $this->update_companion_message_for_companion_update($companionUpdateId,$lastMessageSaidAssoc->companion_says_id);
     		
     		$result = '<br/>companionMessageUpdate = '.json_encode($companionMessageUpdate);
 			$output .= $result;
@@ -964,18 +917,10 @@ class Companion_model extends CI_Model {
     **/
     protected function update_companion_message_for_companion_update($companionUpdateId, $companionSaysId)
     {
-    	$this->db->select('*');
-    	$this->db->order_by("id", "asc");
-    	$this->db->limit(1);
-    	$this->db->where('companion_says_id', $companionSaysId);
-    	$this->db->where('is_pending', 0);
-    	$this->db->where('companion_updates_id', 'NULL');
-    	$query = $this->db->get('companion_messages');
-    	$result = $query->result();
+    	$message = $this->check_for_companion_message_for_companion_says_id($companionSaysId);
     	
-    	if($result)
+    	if($message)
     	{
-    		$message = $result[0];
     		$data = array(
 				'companion_says_id' => $companionSaysId
 			);
@@ -989,6 +934,23 @@ class Companion_model extends CI_Model {
 			else
 				return false;
     	}
+    	
+    	return $result;
+    }
+    
+    protected function check_for_companion_message_for_companion_says_id($companionSaysId)
+    {
+    	$this->db->select('*');
+    	$this->db->order_by("id", "asc");
+    	$this->db->limit(1);
+    	$this->db->where('companion_says_id', $companionSaysId);
+    	$this->db->where('is_pending', 0);
+    	$this->db->where('companion_updates_id', 'NULL');
+    	$query = $this->db->get('companion_messages');
+    	$result = $query->result();
+    	
+    	if($result)
+    		return $result[0];
     	
     	return $result;
     }

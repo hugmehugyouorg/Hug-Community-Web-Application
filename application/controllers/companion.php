@@ -66,7 +66,7 @@ class Companion extends MY_Controller {
 						}
 						else {
 							//throw new Exception($this->ion_auth->errors());
-							log_message('error', "id: ".$id.", Error: ".$this->ion_auth->errors());
+							log_message('error', "id: ".$id.", Error: EMERGENCY ALERT RESPONSE - ".$this->ion_auth->errors());
 						}
 					}
 				}
@@ -81,18 +81,18 @@ class Companion extends MY_Controller {
  		
  		if($error)
  		{
- 			//log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output.', pendingMessage: '.$pendingMessage);
- 			echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output.', pendingMessage: '.$pendingMessage;
- 			//header('HTTP/1.1 444 No Response');
+ 			log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output.', pendingMessage: '.$pendingMessage);
+ 			//echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output.', pendingMessage: '.$pendingMessage;
+ 			header('HTTP/1.1 444 No Response');
  		}
  		else
  		{
- 			//log_message('debug', "id: ".$id.", output: ".$output.', pendingMessage: '.$pendingMessage);
- 			echo 'DEBUG... id: '.$id.', output: '.$output.', pendingMessage: '.$pendingMessage;
- 			/*if($pendingMessage !== false)
+ 			log_message('debug', "id: ".$id.", output: ".$output.', pendingMessage: '.$pendingMessage);
+ 			//echo 'DEBUG... id: '.$id.', output: '.$output.', pendingMessage: '.$pendingMessage;
+ 			if($pendingMessage !== false)
  				header('HTTP/1.1 207 '.$pendingMessage);
  			else
- 				header('HTTP/1.1 444 No Response');*/
+ 				header('HTTP/1.1 444 No Response');
  		}
  		
  		die();
