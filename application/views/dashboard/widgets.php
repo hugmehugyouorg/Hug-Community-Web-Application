@@ -176,24 +176,69 @@
 			$companion = $groupToCompanion[$group->id];
 			
 			echo '<h2>'.$group->name.'</h2>';
-			if(array_key_exists($companion->id, $companionToEmotionUpdates))
-			{
-				$updates = $companionToEmotionUpdates[$companion->id];
-				
-				$companionUpdatesFound = false;
-				foreach ($updates as $update) 
-				{ 
-					if(!$companionUpdatesFound)
-					{
-						$companionUpdatesFound = true;
-						?>
+			?>
+				<div id="chart-<?php echo $companion->id; ?>"></div>
+				<script type="text/javascript" >
+					var emotions = [];
+					var messages = [];
+					<?php
+						$emotionUpdates = array_key_exists($companion->id, $companionToEmotionUpdates);
+						$messageUpdates = array_key_exists($companion->id, $companionToMessagesSaidUpdates);
+						if($emotionUpdates)
+						{
+							$updates = $companionToEmotionUpdates[$companion->id];
+							
+							foreach ($updates as $update) 
+							{ 
+								$usersTimezone = new DateTimeZone('America/Chicago');
+								$l10nDate = new DateTime($update->created_at);
+								$l10nDate->setTimeZone($usersTimezone);
+								$timestamp = $l10nDate->format('Y-m-d H:i:s');
+								?>
+								emotions.push({x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
+											switch($update->emotional_state)
+											{
+												case 3: echo 'name: "Serious", y: 0'; break;
+												case 2: echo 'name: "Unhappy", y: 1'; break;
+												case 1: echo 'name: "Happy", y: 2'; break;
+											}?>});
+							<?php
+							}
+						}
 						
-						<div id="chart-<?php echo $companion->id; ?>"></div>
-						<script type="text/javascript" >
+						if($messageUpdates)
+						{
+							$updates = $companionToMessagesSaidUpdates[$companion->id];
+							
+							foreach ($updates as $update) 
+							{ 
+								$usersTimezone = new DateTimeZone('America/Chicago');
+								$l10nDate = new DateTime($update->created_at);
+								$l10nDate->setTimeZone($usersTimezone);
+								$timestamp = $l10nDate->format('Y-m-d H:i:s');
+								
+								$usersname = $update->last_name.', '.$update->first_name;
+								$saysText = implode('<br/><i>', explode('<br/>', wordwrap($update->text,39,'<br/>')));
+								$middleText = '<br/>-------------------------------<br/><b>'.$usersname.'<\/b><br/>-------------------------------<br/><i>'.$saysText.'<\/i>", ';
+								?>
+								messages.push({x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
+											switch($update->emotional_state)
+											{
+												case 3: echo 'name: "Serious'.$middleText.'y: 0'; break;
+												case 2: echo 'name: "Unhappy'.$middleText.'y: 1'; break;
+												case 1: echo 'name: "Happy'.$middleText.'y: 2'; break;
+											}?>});
+							<?php
+							}
+						}
+						
+						if($emotionUpdates || $messageUpdates)
+						{
+						?>
 							$(function () {
 								$('#chart-<?php echo $companion->id; ?>').highcharts({
 									chart: {
-										type: 'areaspline',
+										type: 'spline',
 										zoomType: 'x',
 										spacingRight: 20
 									},
@@ -215,7 +260,7 @@
 											hour: '%I:%M %P'
 										},
 										title: {
-											text: 'Time'
+											text: null
 										}
 									},
 									yAxis: {
@@ -231,48 +276,18 @@
 										}
 									},
 									legend: {
-										enabled: false
+										//enabled: false
 									},
 									credits: {
 										  enabled: false
 									},
-									series: [{
-										name: 'Emotion',
-										data: [<?php
-			   		}
-			   		$usersTimezone = new DateTimeZone('America/Chicago');
-					$l10nDate = new DateTime($update->created_at);
-					$l10nDate->setTimeZone($usersTimezone);
-					$timestamp = $l10nDate->format('Y-m-d H:i:s');
-			   		?>
-			   									{x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
-													switch($update->emotional_state)
-													{
-														case 3: echo 'name: "Serious", y: 0'; break;
-														case 2: echo 'name: "Unhappy", y: 1'; break;
-														case 1: echo 'name: "Happy", y: 2'; break;
-													}
-												?>},<?php
-		  		}
-		  		if(!$companionUpdatesFound)
-		  		{
-		  			echo 'No updates.';
-		  		}
-		  		else
-		  		{
-		  			?>
-										]
-									}]
+									series: [{name: 'Emotion', data: emotions}, {name: 'Message', data: messages}]
 								});
 							});
-						</script>
-					<?php
-		  		}
-		  	}
-		  	else
-		  	{
-		  		echo 'No updates.';
-		  	}
+						</script><?php
+					} else {
+							echo '</script>No Updates.';
+					}
 		}
 	}
 	echo '</div>';

@@ -597,7 +597,9 @@ class Companion_model extends CI_Model {
 			
 		$this->db->insert('companion_updates',$data);
 		
-		$result = '<br/>insert id: '.$this->db->insert_id().'<br/>affected rows: '.$this->db->affected_rows().'<br/>db error: '.$this->db->_error_message();
+		$companionUpdateId = $this->db->insert_id();
+		
+		$result = '<br/>insert id: '.$companionUpdateId.'<br/>affected rows: '.$this->db->affected_rows().'<br/>db error: '.$this->db->_error_message();
 		$output .= $result;
 		if($debug)
 			echo $result;
@@ -618,6 +620,17 @@ class Companion_model extends CI_Model {
 		$output .= $result;
 		if($debug)
 			echo $result;
+    		
+    	//only try to update the companion message with this companion update if there was a message said update that has a message association
+    	if($lastMessageSaidAssoc && $messageSaidUpdate)
+    	{
+    		$companionMessageUpdate = $this->update_companion_message_for_companion_update($companionUpdateId,$lastMessageSaidAssoc->id);
+    		
+    		$result = '<br/>companionMessageUpdate = '.json_encode($companionMessageUpdate);
+			$output .= $result;
+			if($debug)
+				echo $result;
+    	}
     		
     	return array('output' => $output, 'newEmergency' => ($newEmergency < 1 ? false : true), 'pendingMessage' => ($pendingMessage ? $pendingMessage->audio_num : false));
 	}
@@ -794,6 +807,19 @@ class Companion_model extends CI_Model {
     	return $result;
     }
     
+    public function get_message_said_updates_by_companion_id($id)
+    {
+    	/*$this->db->select('*');
+    	$this->db->where('companion_id', $id);
+    	$this->db->where('last_message_said_update', 1);
+    	$this->db->order_by("created_at", "asc");
+    	$query = $this->db->get('companion_updates');
+    	return $query->result();*/
+    	
+    	$query = $this->db->query('SELECT companion_updates.*, companion_messages.user_id, companion_messages.companion_says_id, users.first_name, users.last_name, companion_says.text FROM companion_updates, companion_messages, users, companion_says WHERE companion_updates.id = companion_messages.companion_updates_id AND users.id = companion_messages.user_id AND companion_messages.companion_says_id = companion_says.id');
+		return $query->result();
+    }
+    
     public function get_latest_update_by_companion_id($id)
     {
     	$this->db->select('*');
@@ -880,11 +906,12 @@ class Companion_model extends CI_Model {
     	return $result;
     }
     
-    public function set_pending_message($id, $companionSaysId)
+    public function set_pending_message($id, $companionSaysId, $userId)
     {
     	$data = array(
-		   'companion_id' => $id,
-		   'companion_says_id' => $companionSaysId
+    		'user_id' => $userId,
+		   	'companion_id' => $id,
+		   	'companion_says_id' => $companionSaysId
 		);
     	$this->db->insert('companion_messages', $data);
     	
@@ -918,6 +945,49 @@ class Companion_model extends CI_Model {
 			}
 			else
 				return null;
+    	}
+    	
+    	return $result;
+    }
+    
+    /**
+    *
+    * The companion message record that is updated is the one with the following criteria:
+    * 
+    *  1.  FIFO: The earliest messages in the queue (by id)
+    *  2.  That matches the $companionSaysId
+    *  3.  That is not pending as it has already has been sent (is_pending is 0), and
+    *  4.  That does not already have a companion update associated yet (companion_updates_id is NULL)
+    *
+    *  TODO:  Make this a transaction (this will happen when the function that calls this is a made into a transaction
+    *
+    **/
+    protected function update_companion_message_for_companion_update($companionUpdateId, $companionSaysId)
+    {
+    	$this->db->select('*');
+    	$this->db->order_by("id", "asc");
+    	$this->db->limit(1);
+    	$this->db->where('companion_says_id', $companionSaysId);
+    	$this->db->where('is_pending', 0);
+    	$this->db->where('companion_updates_id', 'NULL');
+    	$query = $this->db->get('companion_messages');
+    	$result = $query->result();
+    	
+    	if($result)
+    	{
+    		$message = $result[0];
+    		$data = array(
+				'companion_says_id' => $companionSaysId
+			);
+			$this->db->where('id', $message->id);
+			$updateResult = $this->db->update('companion_messages', $data);
+			
+			if($updateResult)
+			{
+				return true;
+			}
+			else
+				return false;
     	}
     	
     	return $result;

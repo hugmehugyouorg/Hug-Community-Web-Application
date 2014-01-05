@@ -29,6 +29,7 @@ class Dashboard extends MY_Controller {
 		$companionToLastChargingUpdate = array();
 		$companionToLastPlayMessageOnUserUpdate = array();
 		$companionToLastSaid = array();
+		$companionToMessagesSaidUpdates = array();
 		$companionToLastUpdateWithEmotion = array();
 		$companionToLastEmergencyUpdate = array();
 		$hasAlerts = false;
@@ -116,6 +117,12 @@ class Dashboard extends MY_Controller {
 						}
 					}
 					
+					$messagesSaidUpdates = $this->Companion_model->get_message_said_updates_by_companion_id($companion->id);
+					if($messagesSaidUpdates)
+					{
+						$companionToMessagesSaidUpdates[$companion->id] = $messagesSaidUpdates;
+					}
+					
 					$lastUpdateWithEmotion = $this->Companion_model->get_latest_emotion_update_by_companion_id($companion->id);
 					if($lastUpdateWithEmotion)
 					{
@@ -150,6 +157,7 @@ class Dashboard extends MY_Controller {
 		$this->data['companionToLowBattery'] = $companionToLowBattery;
 		$this->data['companionToLastPlayMessageOnUserUpdate'] = $companionToLastPlayMessageOnUserUpdate;
 		$this->data['companionToLastSaid'] = $companionToLastSaid;
+		$this->data['companionToMessagesSaidUpdates'] = $companionToMessagesSaidUpdates;
 		$this->data['companionToLastUpdateWithEmotion'] = $companionToLastUpdateWithEmotion;
 		$this->data['companionToLastEmergencyUpdate'] = $companionToLastEmergencyUpdate;
 		$this->data['hasAlerts'] = $hasAlerts;
@@ -276,7 +284,7 @@ class Dashboard extends MY_Controller {
 				}
 				else
 				{
-					$result = $this->Companion_model->set_pending_message($companionId, $audioId);
+					$result = $this->Companion_model->set_pending_message($companionId, $audioId, $this->ion_auth->user()->row()->id);
 					
 					if($result)
 					{
