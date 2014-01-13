@@ -54,7 +54,7 @@ class Companion_model extends CI_Model {
 			bits: 00010100
 			bits: 00000000
 			
-			bits length: 36
+			bits length: 38
 			bytes to write: 5
 			bytes written: 5
 	*/
@@ -94,14 +94,6 @@ class Companion_model extends CI_Model {
 		**/
 			
 		$current = 0;
-		
-		$padding = strrev(substr($data,$current,2));
-		$current+=2;
-		
-		$result = '<br/>padding = '.$padding;
-		$output .= $result;
-		if($debug)
-			echo $result;
 		
 		$updateFlags = strrev(substr($data,$current,6));
 		$current+=6;
@@ -167,13 +159,21 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 	
+		$padding = strrev(substr($data,$current,2));
+		$current+=2;
+		
+		$result = '<br/>padding = '.$padding;
+		$output .= $result;
+		if($debug)
+			echo $result;
+	
 		/**
 		*
 		* CONVERT BINARY STRINGS TO PHP VALUES WE CAN OPERATE ON
 		*
 		**/
 	
-		if($padding != '0000')
+		if($padding != '00')
 			throw new Exception($id.": ".$padding." is not zero padded which is not possible");
 	
 		if($updateFlags == '000000')
@@ -435,6 +435,8 @@ class Companion_model extends CI_Model {
 					$emotionUpdate = $emotionUpdateFlagged;
 				}
 			}
+			else
+				$emotionUpdate = 0;
 			
 			$result = '<br/>emotionUpdate = '.$emotionUpdate;
 			$output .= $result;
