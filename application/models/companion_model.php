@@ -584,7 +584,7 @@ class Companion_model extends CI_Model {
 			if($debug)
 				echo $result;
 				
-    		$companionMessageUpdate = $this->update_companion_message_for_companion_update($lastMessageSaidAssoc->companion_says_id);
+    		$companionMessageUpdate = $this->update_companion_message_for_companion_update($companionUpdateId, $lastMessageSaidAssoc->companion_says_id);
     		
     		$result = '<br/>companionMessageUpdate = '.json_encode($companionMessageUpdate);
 			$output .= $result;
@@ -922,14 +922,14 @@ class Companion_model extends CI_Model {
     *  TODO:  Make this a transaction (this will happen when the function that calls this is a made into a transaction
     *
     **/
-    protected function update_companion_message_for_companion_update($companionSaysId)
+    protected function update_companion_message_for_companion_update($companionUpdateId, $companionSaysId)
     {
     	$message = $this->check_for_companion_message_for_companion_says_id($companionSaysId);
     	
     	if($message)
     	{
     		$data = array(
-				'companion_says_id' => $message->companion_says_id
+				'companion_updates_id' => $companionUpdateId
 			);
 			$this->db->where('id', $message->id);
 			$updateResult = $this->db->update('companion_messages', $data);
