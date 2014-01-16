@@ -579,7 +579,12 @@ class Companion_model extends CI_Model {
     	//only try to update the companion message with this companion update if there was a message said update that has a message association
     	if($messageSaidUpdate)
     	{
-    		$companionMessageUpdate = $this->update_companion_message_for_companion_update($companionUpdateId,$lastMessageSaidAssoc->companion_says_id);
+    		$result = '<br/>lastMessageSaidAssoc->companion_says_id = '.$lastMessageSaidAssoc->companion_says_id;
+			$output .= $result;
+			if($debug)
+				echo $result;
+				
+    		$companionMessageUpdate = $this->update_companion_message_for_companion_update($lastMessageSaidAssoc->companion_says_id);
     		
     		$result = '<br/>companionMessageUpdate = '.json_encode($companionMessageUpdate);
 			$output .= $result;
