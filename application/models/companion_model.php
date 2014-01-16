@@ -917,14 +917,14 @@ class Companion_model extends CI_Model {
     *  TODO:  Make this a transaction (this will happen when the function that calls this is a made into a transaction
     *
     **/
-    protected function update_companion_message_for_companion_update($companionUpdateId, $companionSaysId)
+    protected function update_companion_message_for_companion_update($companionSaysId)
     {
     	$message = $this->check_for_companion_message_for_companion_says_id($companionSaysId);
     	
     	if($message)
     	{
     		$data = array(
-				'companion_says_id' => $companionSaysId
+				'companion_says_id' => $message->companion_says_id
 			);
 			$this->db->where('id', $message->id);
 			$updateResult = $this->db->update('companion_messages', $data);
@@ -937,7 +937,7 @@ class Companion_model extends CI_Model {
 				return false;
     	}
     	
-    	return $result;
+    	return $message;
     }
     
     protected function check_for_companion_message_for_companion_says_id($companionSaysId)
@@ -947,7 +947,7 @@ class Companion_model extends CI_Model {
     	$this->db->limit(1);
     	$this->db->where('companion_says_id', $companionSaysId);
     	$this->db->where('is_pending', 0);
-    	$this->db->where('companion_updates_id', 'NULL');
+    	$this->db->where('companion_updates_id', NULL);
     	$query = $this->db->get('companion_messages');
     	$result = $query->result();
     	
