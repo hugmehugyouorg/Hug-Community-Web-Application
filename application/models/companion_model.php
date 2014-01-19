@@ -404,7 +404,7 @@ class Companion_model extends CI_Model {
 			
 			if($isCharging) //if charging then not a low battery
 				$lowBatteryUpdate = 0;
-			else if($voltage > 3.0) //if not above the threshold then not a low battery
+			else if($voltage >= 3.5) //if not above the threshold then not a low battery
 				$lowBatteryUpdate = 0;
 			else if(!$lastChargeUpdate) //there has never been a charge update before, so update is true
 			{
