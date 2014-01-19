@@ -71,26 +71,22 @@ class Dashboard extends MY_Controller {
 						$companionToLastChargingUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithCharging->created_at);
 					}*/
 					
+					//this is used to show if currently using battery or recharging along with the voltage measurement
 					$companionToLastChargingUpdate[$companion->id] = $companionToLastUpdate[$companion->id];
 					
+					//only check low battery if currently not charging
 					if(!$lastUpdate->is_charging)
 					{
 						$lastUpdateWithLowBattery = $this->Companion_model->get_latest_low_battery_update_by_companion_id($companion->id);
-						if($lastUpdateWithLowBattery)
+						$lastUpdateWithCharging = $this->Companion_model->get_latest_charging_update_by_companion_id($companion->id);
+						
+						//if a low battery update and no last charging update or there hasn't been a charge update since the last low battery update
+						if($lastUpdateWithLowBattery && !$lastUpdateWithCharging || $lastUpdateWithLowBattery->created_at > $lastUpdateWithCharging->created_at)
 						{
 							$companionToLowBattery[$companion->id]['update'] = $lastUpdateWithLowBattery;
 							$companionToLowBattery[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithLowBattery->created_at);
+							$hasAlerts = true;
 						}
-						else if(!$lastUpdateWithCharging->is_charging)
-						{
-							$companionToLowBattery[$companion->id] = $companionToLastChargingUpdate[$companion->id];
-						}
-						else
-						{
-							$companionToLowBattery[$companion->id] = $companionToLastUpdate[$companion->id];
-						}
-						
-						$hasAlerts = true;
 					}
 					
 					$lastUpdateWithPlayMessageUser = $this->Companion_model->get_latest_play_message_update_by_user_by_companion_id($companion->id);
