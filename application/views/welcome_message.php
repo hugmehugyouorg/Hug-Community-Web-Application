@@ -1,14 +1,18 @@
 <div class="container-fluid">
 	<div class="row-fluid">
-		<h1>Welcome to the Hug Community!</h1>
-		<p class="lead muted">A project of <a href="http://www.co.carver.mn.us/departments/CSS/" target="_blank">Carver County Community Social Services</a>.
-		<br/>In partnership with the <a href="http://www.hugmehugyou.org" target="_blank">Hug Me Hug YOU! Initiative</a>.</p>
+		<div class="pull-left">
+			<h1>Welcome to the Hug Community!</h1>
+			<p class="lead muted">A project of <a href="http://www.co.carver.mn.us/departments/CSS/" target="_blank">Carver County Community Social Services</a>.
+			<br/>In partnership with the <a href="http://www.hugmehugyou.org" target="_blank">Hug Me Hug YOU! Initiative</a>.</p>
+		
+			<p class="lead">
+				<a href="http://www.co.carver.mn.us/departments/CSS/" target="_blank"><img src="/assets/img/carver_county_logo.jpg"/></a>
+				<a href="http://www.hugmehugyou.org" target="_blank"><img class="hugmehugyou" src="//www.hugmehugyou.org/img/logo.png"></a>
+			</p>
 		</div>
-	<div class="row-fluid">
-		<p class="lead">
-			<a href="http://www.co.carver.mn.us/departments/CSS/" target="_blank"><img src="/assets/img/carver_county_logo.jpg"/></a>
-			<a href="http://www.hugmehugyou.org" target="_blank"><img class="hugmehugyou" src="//www.hugmehugyou.org/img/logo.png"></a>
-		</p>
+		<div class="product pull-right">
+			<img src="/assets/img/product.jpg"/>
+		</div>
 	</div>
 </div>
 

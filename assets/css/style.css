@@ -36,6 +36,10 @@ a {
 	max-height:56px;
 }
 
+.product {
+	width: 325px;
+}
+
 #main {
 	padding-bottom: 91px;
 }
@@ -158,6 +162,15 @@ a {
 
 .send-message-steps p.text-warning {
 	font-size:1.15em;
+}
+
+@media (max-width: 1199px) {
+	.product {
+		float:left;
+		margin-top:-25px;
+		margin-bottom:-25px;
+		width:300px;
+	}
 }
 
 @media (max-width: 979px) {
