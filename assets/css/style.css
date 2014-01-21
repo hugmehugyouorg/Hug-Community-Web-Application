@@ -28,16 +28,19 @@ a {
 	font-weight: normal;
 }
 
+.product {
+	max-width: 425px;
+	margin-right: 12px;
+	margin-bottom: -17px;
+	margin-top: 10px;
+}
+
 .brand img {
 	max-height:45px;
 }
 
 .brand img, img.hugmehugyou {
 	max-height:56px;
-}
-
-.product {
-	width: 325px;
 }
 
 #main {
@@ -167,9 +170,7 @@ a {
 @media (max-width: 1199px) {
 	.product {
 		float:left;
-		margin-top:-25px;
-		margin-bottom:-25px;
-		width:300px;
+		margin: 0;
 	}
 }
 
