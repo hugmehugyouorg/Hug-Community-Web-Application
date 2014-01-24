@@ -39,7 +39,7 @@
 				<cite title="Source Title">Dan Koziolek, Child and Family Manager at Carver County Community Social Services</cite>
 			</blockquote>
 			<div class="videoWrapper">
-				<iframe src='//player.vimeo.com/video/84925183?title=0&amp;byline=0&amp;portrait=0' frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+				<iframe src='https://player.vimeo.com/video/84925183?title=0&amp;byline=0&amp;portrait=0' frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 			</div>
 		</div>
 	</div>
