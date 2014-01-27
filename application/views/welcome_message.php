@@ -19,7 +19,7 @@
 <div class="container-fluid">
 	<h2>The Project</h2>
 	<div class="row-fluid">
-		<p class="span4">
+		<p class="span12">
 			Abused children and children in foster care interact with a plush toy-like therapeutic companion that sends and receives messages. A support community or safety network made up of family, friends, and social workers interact with a web or mobile interface to invite and register community members, receive updates on the child's status, preview and send messages to the child, and view analytics to better understand and work with both the child and the community.
 		</p>
 	</div>
