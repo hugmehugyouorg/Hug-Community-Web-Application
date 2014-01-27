@@ -1,6 +1,6 @@
 </div><!-- /Container -->
 
-<?php if($homeLink == 'dashboard'){ ?>
+<?php if($homeLink == 'dashboard' || $signInPage == 'true'){ ?>
 	<div class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
 			<div class="container">
