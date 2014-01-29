@@ -41,40 +41,41 @@ class Group extends MY_Controller {
  				$this->data['superUsers'] = $us[0];
 				$this->data['users'] = $us[1];
 		
-				$companion = null;
-		
-				//validate form input
 				if($isGroupEditable) {
 					$this->form_validation->set_rules('group_name', 'Child\'s Name/Nickname', 'required|xss_clean');
+				
+					$companion = null;
+					$companion_update = true;
+					$this->load->model('Companion_model');
+					$companion = $this->Companion_model->get_companion_by_group_id($id);
+					if($companion)
+						$this->form_validation->set_rules('companion_name', 'Safety Sam\'s Nickname', 'required|xss_clean');	
 				}
 				
-				$companion_update = true;
-				$this->load->model('Companion_model');
-				$companion = $this->Companion_model->get_companion_by_group_id($id);
-				if($companion)
-					$this->form_validation->set_rules('companion_name', 'Safety Sam\'s Nickname', 'required|xss_clean');	
-					
 				$this->form_validation->set_rules('group_description', 'Team Description', 'required|xss_clean');
 		
 				if (isset($_POST) && !empty($_POST))
 				{
 					if ($this->form_validation->run() === TRUE)
 					{
-						if($isGroupEditable)
-							$group_update = $this->ion_auth->update_group($id, $_POST['group_name'], $_POST['group_description']);
-						else
+						if(!$isGroupEditable)
+						{
 							$group_update = $this->ion_auth->update_group($id, FALSE, $_POST['group_description']);
-		
+						}
+						else
+						{
+							$group_update = $this->ion_auth->update_group($id, $_POST['group_name'], $_POST['group_description']);
+							$companion_update = $this->Companion_model->change_name($companion->id, $_POST['companion_name']);
+						
+							if(!$companion_update) {
+								$this->data['message'] = $this->lang->line('group_change_companion_name_failed');
+							}
+						}
+						
 						if(!$group_update)
 							$this->session->set_flashdata('message', $this->ion_auth->errors());
 						
-						$companion_update = $this->Companion_model->change_name($companion->id, $_POST['companion_name']);
-						
-						if(!$companion_update) {
-							$this->data['message'] = $this->lang->line('group_change_companion_name_failed');
-						}
-						
-						if($companion_update && $group_update) {
+						if($group_update && (!$isGroupEditable || $companion_update)) {
 							$this->session->set_flashdata('message', $this->lang->line('group_update_successful'));
 							redirect('group/'.$id.'#basic', 'refresh');
 						}
@@ -82,7 +83,7 @@ class Group extends MY_Controller {
 				}
 				
 				//set the flash data error message if there is one
-				if(!$companion_update)
+				if($isGroupEditable && !$companion_update)
 					$this->data['message'] .= '<br/>';
 				else
 					$this->data['message'] = '';
@@ -101,7 +102,7 @@ class Group extends MY_Controller {
 				if(!$isGroupEditable)
 					$this->data['group_name']['readonly'] = 'readonly';
 				
-				if($companion) {
+				if($isGroupEditable && $companion) {
 					$this->data['companion_name'] = array(
 						'name'  => 'companion_name',
 						'id'    => 'companion_name',
@@ -120,7 +121,10 @@ class Group extends MY_Controller {
 				$this->data['is_group_editable'] = $isGroupEditable;
 				$this->data['group_id'] = $id;
 		
-				$this->_render_page('group/edit', $this->data);
+				if($isGroupEditable)
+					$this->_render_page('group/edit', $this->data);
+				else
+					$this->_render_page('group/edit_super_groups', $this->data);
 			}
 			else {
 				redirect('dashboard', 'refresh');
@@ -464,21 +468,19 @@ class Group extends MY_Controller {
 			$us = $this->ion_auth->getUsersAndSuperUsers($id, true);
 			
 			$groupLeaders = $us[0];
-			$groupMembers = $us[1];
-			
 			$this->data['groupLeaders'] = $groupLeaders;
 			$newLeaders = $this->input->post('leaders');
 			if(!$newLeaders)
 				$newLeaders = array();
 			$this->data['newLeaders'] = $newLeaders;
+			$this->form_validation->set_rules('leaders', 'Add Group Leaders', 'xss_clean');
 			
+			$groupMembers = $us[1];
 			$this->data['groupMembers'] = $groupMembers;
 			$newMembers = $this->input->post('members');
 			if(!$newMembers)
 				$newMembers = array();
 			$this->data['newMembers'] = $newMembers;
-			
-			$this->form_validation->set_rules('leaders', 'Add Group Leaders', 'xss_clean');
 			$this->form_validation->set_rules('members', 'Add Group Members', 'xss_clean');
 			
 			if ($this->form_validation->run() == true)
@@ -506,10 +508,15 @@ class Group extends MY_Controller {
 				//set the flash data error message if there is one
 				$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
 				
-				$this->data['is_admin'] = $isAdmin;
 				$this->data['id'] = $id;
 				
-				$this->_render_page('group/add_users', $this->data);
+				if(!$isGroupEditable)
+					$this->_render_page('group/add_super_users', $this->data);
+				else
+				{
+					$this->data['is_admin'] = $isAdmin;
+					$this->_render_page('group/add_users', $this->data);
+				}
 			}
 		}
 		else {

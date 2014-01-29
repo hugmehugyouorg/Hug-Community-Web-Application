@@ -71,7 +71,7 @@
 								<td><?php echo $user->phone;?></td>
 								<?php if($is_admin) { ?>
 									<td>
-										<a href="#remove-group-user-modal-<?php echo $group_id;?>-<?php echo $user->id;?>" title="Remove User from the Team" role="button" data-toggle="modal">Remove</a>
+										<a href="#remove-group-user-modal-<?php echo $group_id;?>-<?php echo $user->id;?>" title="Remove User from the Safety Team" role="button" data-toggle="modal">Remove</a>
 										<!-- Modal -->
 										<div id="remove-group-user-modal-<?php echo $group_id;?>-<?php echo $user->id;?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="remove-group-user-modal-label-<?php echo $group_id;?>-<?php echo $user->id;?>" aria-hidden="true">
 										  <div class="modal-header">

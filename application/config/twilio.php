@@ -18,17 +18,17 @@
 	/**
 	 * Mode ("sandbox" or "prod")
 	 **/
-	$config['mode']   = 'prod';
+	$config['mode']   = isset($_SERVER['CI_TWILIO_MODE']) ? $_SERVER['CI_TWILIO_MODE'] : 'prod';
 
 	/**
 	 * Account SID
 	 **/
-	$config['account_sid']   = 'ACd0568e39511a8b0bb11a33616434618f';
+	$config['account_sid']   = isset($_SERVER['CI_TWILIO_ACCOUNT_SID']) ? $_SERVER['CI_TWILIO_ACCOUNT_SID'] : 'ACd0568e39511a8b0bb11a33616434618f';
 
 	/**
 	 * Auth Token
 	 **/
-	$config['auth_token']    = 'f57fb65ac93e2b7fb1eeec55ad515b84';
+	$config['auth_token']    = isset($_SERVER['CI_TWILIO_AUTH_TOKEN']) ? $_SERVER['CI_TWILIO_AUTH_TOKEN'] : 'f57fb65ac93e2b7fb1eeec55ad515b84';
 
 	/**
 	 * API Version
@@ -38,7 +38,7 @@
 	/**
 	 * Twilio Phone Number
 	 **/
-	$config['number']        = '+16122042467';
+	$config['number']        = isset($_SERVER['CI_TWILIO_NUMBER']) ? $_SERVER['CI_TWILIO_NUMBER'] : '+16122042467';
 
 
 /* End of file twilio.php */
