@@ -38,7 +38,7 @@
 				<p class="muted">Invite new members or add existing ones.</p>
 				
 				<p><a href="<?php echo site_url('group/invite/'.$group_id);?>">Invite a New Team Leader</a></p>
-				<p><a href="<?php echo site_url('group/add/'.$group_id);?>">Add an Existing Team Leader</a></p>
+				<p><a href="<?php echo site_url('group/add/'.$group_id);?>">Add an Existing Team Leader or Community Member</a></p>
 			</fieldset>
 		</div>
 		<div class="tab-pane" id="leaders">
