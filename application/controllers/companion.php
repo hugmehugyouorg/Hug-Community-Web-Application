@@ -126,8 +126,11 @@ class Companion extends MY_Controller {
         $i=0; 
         while($i<$n) 
         {       
-            $a =substr($hexstr,$i,2);           
-            $c = pack("H*",$a); 
+            $a =substr($hexstr,$i,2);     
+            if($a != '00')
+            	$c = pack("H*",$a); 
+            else
+            	$c = '0';
             if ($i==0){$sbin=$c;} 
             else {$sbin.=$c;} 
             $i+=2; 
