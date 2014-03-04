@@ -26,7 +26,7 @@ class Companion extends MY_Controller {
 			
 				log_message('info', "raw data: ".$data);
 				
-				$hexData = $this->hex2bin($data);
+				$hexData = $this->hextobin($data);
 				
 				log_message('info', "hex data: ".$hexData);
 				
