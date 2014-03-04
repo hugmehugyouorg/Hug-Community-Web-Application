@@ -30,7 +30,7 @@ class Companion extends MY_Controller {
 				$data = base_convert($data, 16, 2);
 				
 				//0 at front is ignored
-				if( substr($data,$i,2) == '00' )
+				if( substr($data,0,2) == '00' )
 					$data = '0'.$data;
 				
 				log_message('info', "convert hex to binary string: ".$data);
