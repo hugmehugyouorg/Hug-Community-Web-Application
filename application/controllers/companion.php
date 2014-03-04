@@ -30,6 +30,8 @@ class Companion extends MY_Controller {
 				$chunksLen =  count($chunks);
 				for( $i=0; $i < $chunksLen; $i++ ) {
 					$chunks[$i] = pack("h*",$chunks[$i]);
+					//convert hex string to binary string (ASCII)
+					$chunks[$i] = base_convert($chunks[$i], 16, 2);
 				}
 				$data = implode("",$chunks);
 				
