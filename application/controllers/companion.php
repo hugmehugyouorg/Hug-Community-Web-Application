@@ -35,7 +35,7 @@ class Companion extends MY_Controller {
 					$binStr = decbin($charAsNum);
 					//echo $blah . '<br/>';
 					//$binStr = strrev($binStr);
-					$binStr = $binStr . substr("00000000",0,8 - strlen($binStr));
+					//$binStr = $binStr . substr("00000000",0,8 - strlen($binStr));
 					//$binStr = base_convert(chr($blah), 10, 2);
 					//$charValue = unpack('H*', substr($value,$i,1));
 					//$binStr = base_convert($charValue[1], 16, 2);
