@@ -31,6 +31,7 @@ class Companion extends MY_Controller {
 				$valueLen = strlen($value);
 				for( $i=0; $i < $valueLen; $i++ ) {
 					$blah = ord(substr($value,$i,1));
+					echo $blah . '<br/>';
 					$blah = $blah & 128 >> 7 + $blah & 64 >> 5 + $blah & 32 >> 3 + $blah & 16 >> 1 + $blah & 8 << 1 + $blah & 4 << 3 + $blah & 2 << 5 + $blah & 1 << 7;
 					echo $blah . '<br/>';
 					$blah = decbin($blah);
