@@ -17,7 +17,7 @@ class Companion extends MY_Controller {
 		$data = $this->input->get('d', TRUE);
 		
 		//data is 10 hex digits length (could be multiple)
-		if( $id === FALSE || $data === FALSE || ctype_digit($id) === FALSE || ctype_xdigit($data) === FALSE || strlen($data) % 10 != 0 ) {
+		if( $id === FALSE || $data === FALSE || ctype_digit($id) === FALSE || ctype_xdigit($data) === FALSE /*|| strlen($data) % 10 != 0*/ ) {
 			$error = 'either the id is not specified or is not a digit or the data is not specified or is not a hex digit or is not the correct length.';
 		}
 		else {
