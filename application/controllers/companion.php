@@ -28,8 +28,7 @@ class Companion extends MY_Controller {
 				
 				$value = hex2bin($data);
 				var_dump($value);
-				//echo $value + '<br>';
-				//echo base_convert($value, 16, 2);
+				echo base_convert($data, 16, 2);
 				die();
 				
 				$zero = substr($data,0,2) == '00';
