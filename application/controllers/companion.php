@@ -27,7 +27,7 @@ class Companion extends MY_Controller {
 				log_message('info', "raw data: ".$data);
 				
 				$value = unpack('H*', $data);
-				var_dump(base_convert($value[1], 16, 2));
+				var_dump(base_convert($value, 16, 2));
 				die();
 				
 				$zero = substr($data,0,2) == '00';
