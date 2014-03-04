@@ -21,7 +21,7 @@ class Companion_model extends CI_Model {
 		9 -> Last Message Said (Community initiated) ... if value is 0 then nothing said yet, represent id's in the database
 	
 		Total # of bits = 38 bits
-		
+				  00010000111001001001111000101000000000 00                  000100 001 1100100 1 00 1 111000101 000000000
 		EXAMPLE:  00000000100111011110010001010000000000, SPLITS LIKE THIS:  000001 001 0011101 1 11 0 010001010 000000000
 		
 			Update Flags Update Flags (32 = said update, 16 = message said update, 8 = battery update, 4 = emotion update, 2 = play messages update, 1 = ready to play update... flags can be combined obviously)

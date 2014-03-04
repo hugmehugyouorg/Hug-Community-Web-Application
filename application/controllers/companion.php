@@ -7,6 +7,7 @@ class Companion extends MY_Controller {
 		parent::__construct();
 	}
 	
+	//examples:  GET /?i=1&d=00C303080, GET /?i=1&d=24C3C3070049EEE00100, etc.
 	public function index()
 	{
 		$error = false;
@@ -15,56 +16,64 @@ class Companion extends MY_Controller {
 		$id = $this->input->get('i', TRUE);
 		$data = $this->input->get('d', TRUE);
 		
-		if( $id === FALSE || $data === FALSE || ctype_alnum($id) === FALSE ) {
-			$error = 'either the id is not specified or is not alphanumeric, or the data is not specified.';
+		//data is 10 hex digits length (could be multiple)
+		if( $id === FALSE || $data === FALSE || ctype_digit($id) === FALSE || ctype_xdigit($data) === FALSE || strlen($data) % 10 != 0 ) {
+			$error = 'either the id is not specified or is not a digit or the data is not specified or is not a hex digit or is not the correct length.';
 		}
 		else {
-			//make sure it's a hex string, warning thrown if not so handle by calling
-			//a handler that throws an error instead
-			set_error_handler(array($this, "hexToBinHandler"), E_WARNING);
+			
 			try {
 			
+				//echo "raw data: ".$data."<br/>";
 				log_message('info', "raw data: ".$data);
 				
-				$hexData = hex2bin($data);
+				$chunks = str_split($data,2);
+				$chunksLen = count($chunks);
+				for( $i=0; $i < $chunksLen; $i++ ) {
 				
-				log_message('info', "hex data: ".$hexData);
-				
-				if(!$hexData)
-					throw new Exception($data." could not be converted to binary data using hex2bin()");
-				else {
-				
-					//convert hex string to binary string (ASCII)
-					$data = base_convert($data, 16, 2);
+					//echo "before convert hex to binary string: ".$chunks[$i]."<br/>";
+					log_message('info', "before convert hex to binary string: ".$chunks[$i]);
 					
-					log_message('info', "convert hex to binary string: ".$data);
+					$chunks[$i] = base_convert($chunks[$i], 16, 2);
 					
-					//should be a sequence of bytes, so if not divisble by 8
-					//then we need to pad in front cause that's the one losing info
-					$dataLen = strlen($data);
+					//echo "after convert hex to binary string: ".$chunks[$i]."<br/>";
+					log_message('info', "after convert hex to binary string: ".$chunks[$i]);
+					
+					$dataLen = strlen($chunks[$i]);
 					$dataReminder = $dataLen % 8;
-					$data = $dataReminder != 0 ? str_repeat('0', 8 - $dataReminder) . $data : $data;
+					$chunks[$i] = $dataReminder != 0 ? str_repeat('0', 8 - $dataReminder) . $chunks[$i] : $chunks[$i];
 					
-					log_message('info', "data padded with zeros: ".$data);
+					//echo "binary string padded with zeros: ".$chunks[$i]."<br/>";
+					log_message('info', "binary string padded with zeros: ".$chunks[$i]);
 					
-					//now chunk them bytes and reverse each cause data came in MSB first
-					//but we need LSB first before putting them back as a binary string
-					//to return
-					$chunks = str_split($data,8);
-					$chunksLen =  count($chunks);
-					for( $i=0; $i < $chunksLen; $i++ ) {
-							$chunks[$i] = strrev($chunks[$i]);
-					}
-					$data = implode("",$chunks);
+					$chunks[$i] = strrev($chunks[$i]);
 					
-					log_message('info', "data as LSB: ".$data);
+					//echo "binary string in LSB: ".$chunks[$i]."<br/>";
+					log_message('info', "binary string in LSB: ".$chunks[$i]);
+				}
+				$data = implode("",$chunks);
+				
+				//echo "data in LSB: ".$data."<br/>";
+				log_message('info', "data in LSB: ".$data);
 					
-					$this->load->model('Companion_model');
-					$data = $this->Companion_model->updateCompanionState($id, $data, false);
+				$this->load->model('Companion_model');
+				
+				//update model one chunk at a time
+				$chunks = str_split($data,40);
+				$chunksLen =  count($chunks);
+				for( $j=0; $j < $chunksLen; $j++ ) {
+				
+					//echo "data in LSB: "."binary chunk ".$j.": ".$chunks[$j]."<br/>";
+					log_message('info', "binary chunk ".$j.": ".$chunks[$j]);
+				
+					$data = $this->Companion_model->updateCompanionState($id, $chunks[$j], false);
 					
-					$output = $data['output'];
+					$output .= $data['output'];
 					$newEmergency = $data['newEmergency'];
-					$pendingMessage = $data['pendingMessage'];
+					
+					//only set the pending message if there is a new message
+					if($data['pendingMessage'] !== false)
+						$pendingMessage = $data['pendingMessage'];
 					
 					//$newEmergency = 0;
 					
@@ -82,12 +91,14 @@ class Companion extends MY_Controller {
 							log_message('error', "id: ".$id.", Error: EMERGENCY ALERT RESPONSE - ".$this->ion_auth->errors());
 						}
 					}
+				
 				}
+				
 			}
 			catch(Exception $e) {
 				$error = $e->getMessage();
 			}
-			restore_error_handler();
+			
  		}
  		
  		ob_clean();
@@ -100,7 +111,7 @@ class Companion extends MY_Controller {
  		}
  		else
  		{
- 			log_message('debug', "id: ".$id.", output: ".$output.', pendingMessage: '.$pendingMessage);
+ 			//log_message('debug', "id: ".$id.", output: ".$output.', pendingMessage: '.$pendingMessage);
  			//echo 'DEBUG... id: '.$id.', output: '.$output.', pendingMessage: '.$pendingMessage;
  			if($pendingMessage !== false)
  				header('HTTP/1.1 207 '.$pendingMessage);
@@ -109,10 +120,6 @@ class Companion extends MY_Controller {
  		}
  		
  		die();
-	}
-	
-	public function hexToBinHandler($errno, $errstr) {
-		throw new Exception();
 	}
 	
 }
