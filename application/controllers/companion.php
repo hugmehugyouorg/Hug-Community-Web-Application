@@ -26,12 +26,12 @@ class Companion extends MY_Controller {
 			
 				log_message('info', "raw data: ".$data);
 				
-				$hexData = $this->hextobin($data);
-				
-				log_message('info', "hex data: ".$hexData);
-				
 				//convert hex string to binary string (ASCII)
 				$data = base_convert($data, 16, 2);
+				
+				//0 at front is ignored
+				if( substr($hexstr,$i,2) == '00' )
+					$data = '0'.$data;
 				
 				log_message('info', "convert hex to binary string: ".$data);
 				
@@ -118,25 +118,6 @@ class Companion extends MY_Controller {
  		
  		die();
 	}
-	
-	private function hextobin($hexstr) 
-    { 
-        $n = strlen($hexstr); 
-        $sbin="";   
-        $i=0; 
-        while($i<$n) 
-        {       
-            $a =substr($hexstr,$i,2);     
-            if($a != '00')
-            	$c = pack("H*",$a); 
-            else
-            	$c = '0';
-            if ($i==0){$sbin=$c;} 
-            else {$sbin.=$c;} 
-            $i+=2; 
-        } 
-        return $sbin; 
-    }
 	
 }
 
