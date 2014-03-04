@@ -30,8 +30,12 @@ class Companion extends MY_Controller {
 				var_dump($value);
 				$valueLen = strlen($value);
 				for( $i=0; $i < $valueLen; $i++ ) {
-					$charValue = unpack('h*', substr($value,$i,1));
-					echo base_convert($charValue[1], 16, 2) . ' ';
+					$charValue = unpack('H*', substr($value,$i,1));
+					$binStr = base_convert($charValue[1], 16, 2);
+					echo $binStr . ' ';
+					//$binStrLen = strlen($binStr);
+					//$remainder = $binStrLen % 8;
+					//$binStrPadded = $remainder != 0 ? str_repeat('0', 8 - $dataReminder) . $binStr : $binStr;
 				}
 				//echo base_convert($data, 16, 2);
 				die();
