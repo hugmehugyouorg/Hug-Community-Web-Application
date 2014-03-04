@@ -28,11 +28,8 @@ class Companion extends MY_Controller {
 				
 				$value = hex2bin($data);
 				var_dump($value);
-				$valueLen = strlen($value);
-				for( $i=0; $i < $valueLen; $i++ ) {
-					$s = substr($value,$i,1);
-					echo base_convert($s, 2, 2) . ' ';
-				}
+				$value = unpack('H*', $value);
+				echo base_convert($value[1], 16, 2);
 				//echo base_convert($data, 16, 2);
 				die();
 				
