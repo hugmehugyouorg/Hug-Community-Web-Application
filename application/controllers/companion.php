@@ -30,7 +30,7 @@ class Companion extends MY_Controller {
 				var_dump($value);
 				$valueLen = strlen($value);
 				for( $i=0; $i < $valueLen; $i++ ) {
-					$charValue = unpack('H*', substr($value,$i,1));
+					$charValue = unpack('h*', substr($value,$i,1));
 					echo base_convert($charValue[1], 16, 2) . ' ';
 				}
 				//echo base_convert($data, 16, 2);
