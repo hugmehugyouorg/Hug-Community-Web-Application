@@ -59,7 +59,7 @@ class Companion extends MY_Controller {
 				$this->load->model('Companion_model');
 				
 				//update model one chunk at a time
-				$chunks = str_split($data,40);
+				$chunks = str_split($data,38);
 				$chunksLen =  count($chunks);
 				for( $j=0; $j < $chunksLen; $j++ ) {
 				
