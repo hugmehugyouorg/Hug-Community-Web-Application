@@ -23,18 +23,29 @@ class Companion extends MY_Controller {
 			//a handler that throws an error instead
 			set_error_handler(array($this, "hexToBinHandler"), E_WARNING);
 			try {
+			
+				log_message('info', "raw data: ".$data);
+				
 				$hexData = hex2bin($data);
+				
+				log_message('info', "hex data: ".$hexData);
+				
 				if(!$hexData)
 					throw new Exception($data." could not be converted to binary data using hex2bin()");
 				else {
+				
 					//convert hex string to binary string (ASCII)
 					$data = base_convert($data, 16, 2);
+					
+					log_message('info', "convert hex to binary string: ".$data);
 					
 					//should be a sequence of bytes, so if not divisble by 8
 					//then we need to pad in front cause that's the one losing info
 					$dataLen = strlen($data);
 					$dataReminder = $dataLen % 8;
 					$data = $dataReminder != 0 ? str_repeat('0', 8 - $dataReminder) . $data : $data;
+					
+					log_message('info', "data padded with zeros: ".$data);
 					
 					//now chunk them bytes and reverse each cause data came in MSB first
 					//but we need LSB first before putting them back as a binary string
@@ -45,6 +56,8 @@ class Companion extends MY_Controller {
 							$chunks[$i] = strrev($chunks[$i]);
 					}
 					$data = implode("",$chunks);
+					
+					log_message('info', "data as LSB: ".$data);
 					
 					$this->load->model('Companion_model');
 					$data = $this->Companion_model->updateCompanionState($id, $data, false);
