@@ -65,7 +65,7 @@ class Companion extends MY_Controller {
 				
 					log_message('info', "binary chunk ".$j.": ".$chunks[$j]);
 				
-					$data = $this->Companion_model->updateCompanionState($id, $chunks[$j], false);
+					$data = $this->Companion_model->updateCompanionState($id, $chunks[$j].'00', false);
 					
 					$output .= $data['output'];
 					$newEmergency = $data['newEmergency'];

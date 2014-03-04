@@ -74,9 +74,9 @@ class Companion_model extends CI_Model {
 			throw new Exception($id.": ".$data." is not a string");
 			
 		$dataLength = strlen($data);
-		if($dataLength < 38)
+		if($dataLength < 40)
 			throw new Exception($id.": ".$data." has a length ".$dataLength.", which is less than 40");
-		if($dataLength > 38)
+		if($dataLength > 40)
 			throw new Exception($id.": ".$data." has a length ".$dataLength.", which is greater than 40");
 		
 		if(strspn($data,'01') != $dataLength)
@@ -159,11 +159,22 @@ class Companion_model extends CI_Model {
 		if($debug)
 			echo $result;
 	
+		$padding = strrev(substr($data,$current,2));
+		$current+=2;
+		
+		$result = '<br/>padding = '.$padding;
+		$output .= $result;
+		if($debug)
+			echo $result;
+	
 		/**
 		*
 		* CONVERT BINARY STRINGS TO PHP VALUES WE CAN OPERATE ON
 		*
 		**/
+	
+		if($padding != '00')
+			throw new Exception($id.": ".$padding." is not zero padded which is not possible");
 	
 		if($updateFlags == '000000')
 			throw new Exception($id.": ".$updateFlags." specifies no update which is not possible");
