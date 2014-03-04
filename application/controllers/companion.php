@@ -26,6 +26,10 @@ class Companion extends MY_Controller {
 			
 				log_message('info', "raw data: ".$data);
 				
+				$value = unpack('H*', $data);
+				var_dump(base_convert($value[1], 16, 2));
+				die();
+				
 				$zero = substr($data,0,2) == '00';
 				
 				//convert hex string to binary string (ASCII)
@@ -59,13 +63,13 @@ class Companion extends MY_Controller {
 				$this->load->model('Companion_model');
 				
 				//update model one chunk at a time
-				$chunks = str_split($data,38);
+				$chunks = str_split($data,40);
 				$chunksLen =  count($chunks);
 				for( $j=0; $j < $chunksLen; $j++ ) {
 				
 					log_message('info', "binary chunk ".$j.": ".$chunks[$j]);
 				
-					$data = $this->Companion_model->updateCompanionState($id, $chunks[$j].'00', false);
+					$data = $this->Companion_model->updateCompanionState($id, $chunks[$j], false);
 					
 					$output .= $data['output'];
 					$newEmergency = $data['newEmergency'];
