@@ -26,11 +26,13 @@ class Companion extends MY_Controller {
 			
 				log_message('info', "raw data: ".$data);
 				
+				$zero = substr($data,0,2) == '00';
+				
 				//convert hex string to binary string (ASCII)
 				$data = base_convert($data, 16, 2);
 				
 				//0 at front is ignored
-				if( substr($data,0,2) == '00' )
+				if( $zero )
 					$data = '0'.$data;
 				
 				log_message('info', "convert hex to binary string: ".$data);
