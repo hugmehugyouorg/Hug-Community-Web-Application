@@ -26,17 +26,34 @@ class Companion extends MY_Controller {
 			
 				log_message('info', "raw data: ".$data);
 				
-				$chunks = str_split($data,2);
+				$hexData = $this->hex2bin($data);
+				
+				log_message('info', "hex data: ".$hexData);
+				
+				//convert hex string to binary string (ASCII)
+				$data = base_convert($data, 16, 2);
+				
+				log_message('info', "convert hex to binary string: ".$data);
+				
+				//should be a sequence of bytes, so if not divisble by 8
+				//then we need to pad in front cause that's the one losing info
+				$dataLen = strlen($data);
+				$dataReminder = $dataLen % 8;
+				$data = $dataReminder != 0 ? str_repeat('0', 8 - $dataReminder) . $data : $data;
+				
+				log_message('info', "data padded with zeros: ".$data);
+				
+				//now chunk them bytes and reverse each cause data came in MSB first
+				//but we need LSB first before putting them back as a binary string
+				//to return
+				$chunks = str_split($data,8);
 				$chunksLen =  count($chunks);
 				for( $i=0; $i < $chunksLen; $i++ ) {
-					$chunks[$i] = pack("h*",$chunks[$i]);
-					//convert hex string to binary string (ASCII)
-					$chunks[$i] = base_convert($chunks[$i], 16, 2);
+						$chunks[$i] = strrev($chunks[$i]);
 				}
 				$data = implode("",$chunks);
 				
-				log_message('info', "binary ASCII data: ".$data);
-				
+				log_message('info', "data as LSB: ".$data);
 				$this->load->model('Companion_model');
 				
 				//update model one chunk at a time
@@ -101,6 +118,22 @@ class Companion extends MY_Controller {
  		
  		die();
 	}
+	
+	private function hextobin($hexstr) 
+    { 
+        $n = strlen($hexstr); 
+        $sbin="";   
+        $i=0; 
+        while($i<$n) 
+        {       
+            $a =substr($hexstr,$i,2);           
+            $c = pack("H*",$a); 
+            if ($i==0){$sbin=$c;} 
+            else {$sbin.=$c;} 
+            $i+=2; 
+        } 
+        return $sbin; 
+    }
 	
 }
 
