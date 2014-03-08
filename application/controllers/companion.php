@@ -16,8 +16,8 @@ class Companion extends MY_Controller {
 		$id = $this->input->get('i', TRUE);
 		$data = $this->input->get('d', TRUE);
 		
-		//data is 10 hex digits length (could be multiple)
-		if( $id === FALSE || $data === FALSE || ctype_digit($id) === FALSE || ctype_xdigit($data) === FALSE || strlen($data) % 10 != 0 ) {
+		//data is at least 10 hex digits length (could be more if multiple data updates)
+		if( $id === FALSE || $data === FALSE || ctype_digit($id) === FALSE || ctype_xdigit($data) === FALSE || strlen($data) < 10 ) {
 			$error = 'either the id is not specified or is not a digit or the data is not specified or is not a hex digit or is not the correct length.';
 		}
 		else {
@@ -59,10 +59,13 @@ class Companion extends MY_Controller {
 				$this->load->model('Companion_model');
 				
 				//update model one chunk at a time
-				$chunks = str_split($data,40);
+				$chunks = str_split($data,38);
 				$chunksLen =  count($chunks);
 				for( $j=0; $j < $chunksLen; $j++ ) {
 				
+					if( strlen($chunks[$j]) < 38 )
+						break;
+						
 					//echo "data in LSB: "."binary chunk ".$j.": ".$chunks[$j]."<br/>";
 					log_message('info', "binary chunk ".$j.": ".$chunks[$j]);
 				
@@ -111,7 +114,7 @@ class Companion extends MY_Controller {
  		}
  		else
  		{
- 			//log_message('debug', "id: ".$id.", output: ".$output.', pendingMessage: '.$pendingMessage);
+ 			log_message('debug', "id: ".$id.", output: ".$output.', pendingMessage: '.$pendingMessage);
  			//echo 'DEBUG... id: '.$id.', output: '.$output.', pendingMessage: '.$pendingMessage;
  			if($pendingMessage !== false)
  				header('HTTP/1.1 207 '.$pendingMessage);
