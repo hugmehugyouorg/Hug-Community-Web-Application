@@ -165,9 +165,6 @@ class Companion_model extends CI_Model {
 		*
 		**/
 	
-		if($updateFlags == '000000')
-			throw new Exception($id.": ".$updateFlags." specifies a checkin but no update, which is not currently handled");
-	
 		$updateFlags = bindec($updateFlags);
 		$saidUpdateFlagged = ($updateFlags & 32) >> 5;
 		$messageSaidUpdateFlagged = ($updateFlags & 16) >> 4;

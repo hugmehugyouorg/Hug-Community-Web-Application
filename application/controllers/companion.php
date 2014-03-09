@@ -2,6 +2,8 @@
 
 class Companion extends MY_Controller {
 
+	private $debug = false;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -13,6 +15,7 @@ class Companion extends MY_Controller {
 		$error = false;
 		$output = '';
 		$pendingMessage = false;
+		$newEmergency = false;
 		$id = $this->input->get('i', TRUE);
 		$data = $this->input->get('d', TRUE);
 		
@@ -24,36 +27,42 @@ class Companion extends MY_Controller {
 			
 			try {
 			
-				//echo "raw data: ".$data."<br/>";
+				if($this->debug)
+					echo "raw data: ".$data."<br/>";
 				log_message('info', "raw data: ".$data);
 				
 				$chunks = str_split($data,2);
 				$chunksLen = count($chunks);
 				for( $i=0; $i < $chunksLen; $i++ ) {
 				
-					//echo "before convert hex to binary string: ".$chunks[$i]."<br/>";
+					if($this->debug)
+						echo "before convert hex to binary string: ".$chunks[$i]."<br/>";
 					log_message('info', "before convert hex to binary string: ".$chunks[$i]);
 					
 					$chunks[$i] = base_convert($chunks[$i], 16, 2);
 					
-					//echo "after convert hex to binary string: ".$chunks[$i]."<br/>";
+					if($this->debug)
+						echo "after convert hex to binary string: ".$chunks[$i]."<br/>";
 					log_message('info', "after convert hex to binary string: ".$chunks[$i]);
 					
 					$dataLen = strlen($chunks[$i]);
 					$dataReminder = $dataLen % 8;
 					$chunks[$i] = $dataReminder != 0 ? str_repeat('0', 8 - $dataReminder) . $chunks[$i] : $chunks[$i];
 					
-					//echo "binary string padded with zeros: ".$chunks[$i]."<br/>";
+					if($this->debug)
+						echo "binary string padded with zeros: ".$chunks[$i]."<br/>";
 					log_message('info', "binary string padded with zeros: ".$chunks[$i]);
 					
 					$chunks[$i] = strrev($chunks[$i]);
 					
-					//echo "binary string in LSB: ".$chunks[$i]."<br/>";
+					if($this->debug)
+						echo "binary string in LSB: ".$chunks[$i]."<br/>";
 					log_message('info', "binary string in LSB: ".$chunks[$i]);
 				}
 				$data = implode("",$chunks);
 				
-				//echo "data in LSB: ".$data."<br/>";
+				if($this->debug)
+					echo "data in LSB: ".$data."<br/>";
 				log_message('info', "data in LSB: ".$data);
 					
 				$this->load->model('Companion_model');
@@ -66,10 +75,11 @@ class Companion extends MY_Controller {
 					if( strlen($chunks[$j]) < 38 )
 						break;
 						
-					//echo "data in LSB: "."binary chunk ".$j.": ".$chunks[$j]."<br/>";
+					if($this->debug)
+						echo "data in LSB: "."binary chunk ".$j.": ".$chunks[$j]."<br/>";
 					log_message('info', "binary chunk ".$j.": ".$chunks[$j]);
 				
-					$data = $this->Companion_model->updateCompanionState($id, $chunks[$j], false);
+					$data = $this->Companion_model->updateCompanionState($id, $chunks[$j], $this->debug);
 					
 					$output .= $data['output'];
 					$newEmergency = $data['newEmergency'];
@@ -77,24 +87,6 @@ class Companion extends MY_Controller {
 					//only set the pending message if there is a new message
 					if($data['pendingMessage'] !== false)
 						$pendingMessage = $data['pendingMessage'];
-					
-					//$newEmergency = 0;
-					
-					//send out an emergency alert
-					if($newEmergency)
-					{
-						$output .= "<br/>There was a new EMERGENCY ALERT!!!";
-						$result = $this->ion_auth->emergency_alert($this->Companion_model->get_companion_by_id($id)->name, $this->Companion_model->get_group_id_by_companion_id($id));
-						if($result)
-						{
-							//$output .= "<br/>Emergency Alert successfully handled";
-						}
-						else {
-							//throw new Exception($this->ion_auth->errors());
-							log_message('error', "id: ".$id.", Error: EMERGENCY ALERT RESPONSE - ".$this->ion_auth->errors());
-						}
-					}
-				
 				}
 				
 			}
@@ -104,23 +96,43 @@ class Companion extends MY_Controller {
 			
  		}
  		
- 		ob_clean();
+ 		if(!$this->debug)
+ 			ob_clean();
  		
  		if($error)
  		{
+ 			if($this->debug)
+				echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output.', pendingMessage: '.$pendingMessage;
  			log_message('error', "id: ".$id.", Error: ".$error.", output: ".$output.', pendingMessage: '.$pendingMessage);
- 			//echo 'DEBUG... id: '.$id.', error: '.$error.' output: '.$output.', pendingMessage: '.$pendingMessage;
- 			header('HTTP/1.1 444 No Response');
  		}
  		else
  		{
+ 			if($this->debug)
+				echo 'DEBUG... id: '.$id.', output: '.$output.', pendingMessage: '.$pendingMessage;
  			log_message('debug', "id: ".$id.", output: ".$output.', pendingMessage: '.$pendingMessage);
- 			//echo 'DEBUG... id: '.$id.', output: '.$output.', pendingMessage: '.$pendingMessage;
- 			if($pendingMessage !== false)
- 				header('HTTP/1.1 207 '.$pendingMessage);
- 			else
- 				header('HTTP/1.1 444 No Response');
  		}
+ 		
+ 		//send out an emergency alert
+		if($newEmergency)
+		{
+			$output .= "<br/>There was a new EMERGENCY ALERT!!!";
+			$result = $this->ion_auth->emergency_alert($this->Companion_model->get_companion_by_id($id)->name, $this->Companion_model->get_group_id_by_companion_id($id));
+			if($result)
+			{
+				//$output .= "<br/>Emergency Alert successfully handled";
+			}
+			else {
+				//throw new Exception($this->ion_auth->errors());
+				if($this->debug)
+					echo "DEBUG... id: ".$id.", Error: EMERGENCY ALERT RESPONSE - ".$this->ion_auth->errors();
+				log_message('error', "id: ".$id.", Error: EMERGENCY ALERT RESPONSE - ".$this->ion_auth->errors());
+			}
+		}
+ 		
+ 		if($pendingMessage !== false)
+			header('HTTP/1.1 207 '.$pendingMessage);
+		else
+			header('HTTP/1.1 444 No Response');
  		
  		die();
 	}
