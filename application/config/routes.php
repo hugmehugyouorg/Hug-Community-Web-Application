@@ -41,7 +41,7 @@
 $route['default_controller'] = isset($_SERVER['CI_DEFAULT_CONTROLLER']) ? $_SERVER['CI_DEFAULT_CONTROLLER'] : "welcome";
 $route['404_override'] = '';
 $route['welcome'] = "welcome";
-$route['dns_health_check'] = "dnshealthcheck";
+$route['health_check'] = "healthcheck";
 $route['companion'] = "companion";
 $route['companion/(:any)'] = "companion/$1";
 $route['audio'] = "audio";
