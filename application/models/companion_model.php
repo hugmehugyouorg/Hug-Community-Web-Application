@@ -578,8 +578,55 @@ class Companion_model extends CI_Model {
 				echo $result;
     	}
     		
+    	//turn off curfew alert
+		$this->db->where(array('id' => $companion->id, 'curfew_alert' => 1));
+		$this->db->update('companions', array('curfew_alert' => 0));
+    	
+    	$result = '<br/>turn off curfew alert<br/>affected rows: '.$this->db->affected_rows().'<br/>db error: '.$this->db->_error_message();
+		$output .= $result;
+		if($debug)
+			echo $result;
+    	
     	return array('output' => $output, 'newEmergency' => ($newEmergency < 1 ? false : true), 'pendingMessage' => ($pendingMessage ? $pendingMessage->audio_num : false));
 	}
+    
+    public function curfew_check() {
+    	$this->db->trans_start();
+    	
+    	//grab the first distinct companion_ids that have been updated in the last 15 minutes
+    	$this->db->select('companion_id');
+    	$this->db->from('companion_updates');
+    	$this->db->where('companion_updates.created_at > timestampadd(minute, -15, now())');
+    	$this->db->group_by('companion_id');
+    	$this->db->order_by('created_at', 'DESC');
+    	$this->db->distinct();
+		
+		$result = $this->db->get();
+		
+		if(!$result)
+    		return '';
+
+		$ids = array();
+		foreach ($result->result() as $row)
+		{
+			array_push($ids, $row->companion_id);
+		}
+		
+		//update all companions who are not in that list as out past curfew
+		if(count($ids) != 0)
+			$this->db->where_not_in('id', $ids);
+		$this->db->where('curfew_alert', '0');
+		$result = $this->db->update('companions', array('curfew_alert'=>1)); 
+		
+    	$this->db->trans_complete();
+    	
+    	if ($this->db->trans_status() !== FALSE)
+		{
+			return '';
+		}
+		
+    	return $this->db->_error_message().' ...failed to update companions curfew_alert: '.implode(', ',$ids);
+    }
     
     public function get_unassigned_companions()
     {

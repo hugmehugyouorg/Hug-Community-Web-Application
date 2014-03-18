@@ -32,6 +32,7 @@ class Dashboard extends MY_Controller {
 		$companionToMessagesSaidUpdates = array();
 		$companionToLastUpdateWithEmotion = array();
 		$companionToLastEmergencyUpdate = array();
+		$companionToLastCurfewUpdate = array();
 		$hasAlerts = false;
 		
 		$this->load->model('Companion_model');
@@ -138,6 +139,12 @@ class Dashboard extends MY_Controller {
 							$companionToLastEmergencyUpdate[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithEmergency->created_at);
 						}
 					}
+					
+					if($companion->curfew_alert)
+					{
+						$hasAlerts = true;
+						$companionToLastCurfewUpdate[$companion->id] = $companionToLastUpdate[$companion->id];
+					}
 				}
 			}
 		} 
@@ -156,6 +163,7 @@ class Dashboard extends MY_Controller {
 		$this->data['companionToMessagesSaidUpdates'] = $companionToMessagesSaidUpdates;
 		$this->data['companionToLastUpdateWithEmotion'] = $companionToLastUpdateWithEmotion;
 		$this->data['companionToLastEmergencyUpdate'] = $companionToLastEmergencyUpdate;
+		$this->data['companionToLastCurfewUpdate'] = $companionToLastCurfewUpdate;
 		$this->data['hasAlerts'] = $hasAlerts;
 		
 		$this->_render_page('dashboard/widgets', $this->data);

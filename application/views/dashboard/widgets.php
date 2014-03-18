@@ -38,6 +38,14 @@
 				<?php
 			}
 			
+			if(array_key_exists($companion->id, $companionToLastCurfewUpdate))
+			{
+				$timeElapsed = $companionToLastCurfewUpdate[$companion->id]['timeElapsed'];
+				?>
+				<div class="alert"><span class="close no-link"><i class="fa fa-clock-o text-error fa-2x"></i></span><?php echo $companion->name; ?> is out past curfew.&nbsp;&nbsp;<code><?php echo $timeElapsed; ?> ago</code></div>
+				<?php
+			}
+			
 			if(array_key_exists($companion->id, $companionToLowBattery))
 			{
 				$timeElapsed = $companionToLowBattery[$companion->id]['timeElapsed'];
