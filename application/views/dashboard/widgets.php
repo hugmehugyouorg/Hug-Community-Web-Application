@@ -187,8 +187,8 @@
 			?>
 				<div id="chart-<?php echo $companion->id; ?>"></div>
 				<script type="text/javascript" >
-					var emotions = [];
-					var messages = [];
+					var emotions<?php echo $companion->id; ?> = [];
+					var messages<?php echo $companion->id; ?> = [];
 					<?php
 						$emotionUpdates = array_key_exists($companion->id, $companionToEmotionUpdates);
 						$messageUpdates = array_key_exists($companion->id, $companionToMessagesSaidUpdates);
@@ -203,7 +203,7 @@
 								$l10nDate->setTimeZone($usersTimezone);
 								$timestamp = $l10nDate->format('Y-m-d H:i:s');
 								?>
-								emotions.push({x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
+								emotions<?php echo $companion->id; ?>.push({x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
 											switch($update->emotional_state)
 											{
 												case 3: echo 'name: "Serious", y: 0'; break;
@@ -229,7 +229,7 @@
 								$saysText = implode('<br/><i>', explode('<br/>', wordwrap($update->text,39,'<br/>')));
 								$middleText = '<br/>-------------------------------<br/><b>'.$usersname.'<\/b><br/>-------------------------------<br/><i>'.$saysText.'<\/i>", ';
 								?>
-								messages.push({x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
+								messages<?php echo $companion->id; ?>.push({x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
 											switch($update->emotional_state)
 											{
 												case 3: echo 'name: "Serious'.$middleText.'y: 0'; break;
@@ -289,7 +289,7 @@
 									credits: {
 										  enabled: false
 									},
-									series: [{name: 'Emotion', data: emotions}, {name: 'Message', data: messages}]
+									series: [{name: 'Emotion', data: emotions<?php echo $companion->id; ?>}, {name: 'Message', data: messages<?php echo $companion->id; ?>}]
 								});
 							});
 						</script><?php
