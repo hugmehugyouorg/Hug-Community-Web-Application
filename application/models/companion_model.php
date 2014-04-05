@@ -324,7 +324,7 @@ class Companion_model extends CI_Model {
 			if($debug)
 				echo $result;
 				
-			$lowBatteryUpdate = !$isCharging && $voltage <= 3.0 ? 1 : 0;
+			$lowBatteryUpdate = !$isCharging && $voltage < 3.7 ? 1 : 0;
 			
 			$result = '<br/>lowBatteryUpdate = '.$lowBatteryUpdate;
 			$output .= $result;
@@ -359,6 +359,7 @@ class Companion_model extends CI_Model {
 		{
 			$lastEmotionUpdate = $this->get_latest_emotion_update_by_companion_id($companion->id);
 			$lastChargeUpdate = $this->get_latest_charging_update_by_companion_id($companion->id);
+			$lastLowBatteryUpdate = $this->get_latest_low_battery_update_by_companion_id($companion->id);
 			$lastSaidUpdate = $this->get_latest_said_update_by_companion_id($companion->id);
 			$lastMessageSaidUpdate = $this->get_latest_message_said_update_by_companion_id($companion->id);
 			
@@ -390,15 +391,21 @@ class Companion_model extends CI_Model {
 			
 			if($isCharging) //if charging then not a low battery
 				$lowBatteryUpdate = 0;
-			else if($voltage >= 3.5) //if not above the threshold then not a low battery
+			else if($voltage >= 3.7) //if not above the threshold then not a low battery
 				$lowBatteryUpdate = 0;
 			else if(!$lastChargeUpdate) //there has never been a charge update before, so update is true
 			{
 				$lowBatteryUpdate = 1;
-			}
-			else if($lastChargeUpdate->is_charging) //if the charge state is changing from charging to not then update is true
+			} 
+			else if(!$lastLowBatteryUpdate) //there has never been a low battery update before, so update is true
+			{
 				$lowBatteryUpdate = 1;
-			else //low battery yes, but the last charge update was not charging so don't want to reupdate
+			}
+			else if($lastLowBatteryUpdate->created_at < $lastChargeUpdate->created_at) //this is a new last low battery update because there hasn't been a low battery update since the last charge update
+			{
+				$lowBatteryUpdate = 1;
+			}
+			else
 				$lowBatteryUpdate = 0;
 			
 			$result = '<br/>lowBatteryUpdate = '.$lowBatteryUpdate;

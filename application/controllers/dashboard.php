@@ -82,7 +82,7 @@ class Dashboard extends MY_Controller {
 						$lastUpdateWithCharging = $this->Companion_model->get_latest_charging_update_by_companion_id($companion->id);
 						
 						//if a low battery update and no last charging update or there hasn't been a charge update since the last low battery update
-						if($lastUpdateWithLowBattery && !$lastUpdateWithCharging || $lastUpdateWithLowBattery->created_at > $lastUpdateWithCharging->created_at)
+						if($lastUpdateWithLowBattery && !$lastUpdateWithCharging || $lastUpdateWithLowBattery->created_at >= $lastUpdateWithCharging->created_at)
 						{
 							$companionToLowBattery[$companion->id]['update'] = $lastUpdateWithLowBattery;
 							$companionToLowBattery[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithLowBattery->created_at);
