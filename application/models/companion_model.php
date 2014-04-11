@@ -2,6 +2,8 @@
 
 class Companion_model extends CI_Model {
 
+	const LOW_BATTERY_THRESHOLD = 3.7;
+
     function __construct()
     {
         parent::__construct();
@@ -324,7 +326,7 @@ class Companion_model extends CI_Model {
 			if($debug)
 				echo $result;
 				
-			$lowBatteryUpdate = !$isCharging && $voltage < 3.7 ? 1 : 0;
+			$lowBatteryUpdate = !$isCharging && $voltage < Companion_model::LOW_BATTERY_THRESHOLD ? 1 : 0;
 			
 			$result = '<br/>lowBatteryUpdate = '.$lowBatteryUpdate;
 			$output .= $result;
@@ -391,7 +393,7 @@ class Companion_model extends CI_Model {
 			
 			if($isCharging) //if charging then not a low battery
 				$lowBatteryUpdate = 0;
-			else if($voltage >= 3.7) //if not above the threshold then not a low battery
+			else if($voltage >= Companion_model::LOW_BATTERY_THRESHOLD) //if not above the threshold then not a low battery
 				$lowBatteryUpdate = 0;
 			else if(!$lastChargeUpdate) //there has never been a charge update before, so update is true
 			{

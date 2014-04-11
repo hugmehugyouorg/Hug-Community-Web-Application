@@ -75,8 +75,8 @@ class Dashboard extends MY_Controller {
 					//this is used to show if currently using battery or recharging along with the voltage measurement
 					$companionToLastChargingUpdate[$companion->id] = $companionToLastUpdate[$companion->id];
 					
-					//only check low battery if currently not charging
-					if(!$lastUpdate->is_charging)
+					//only check for a low battery alert if currently not charging and the last update voltage is in the low battery range
+					if(!$lastUpdate->is_charging && $lastUpdate->voltage < Companion_model::LOW_BATTERY_THRESHOLD)
 					{
 						$lastUpdateWithLowBattery = $this->Companion_model->get_latest_low_battery_update_by_companion_id($companion->id);
 						$lastUpdateWithCharging = $this->Companion_model->get_latest_charging_update_by_companion_id($companion->id);
