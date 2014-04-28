@@ -1,0 +1,19 @@
+{
+	"folders":
+	[
+		{
+           "path": "/Users/awelters/Desktop/workspace/hugcommunity.org/Hug-Community-Web-Application"
+        }
+	],
+	"settings": {
+        "xdebug": {
+           	"path_mapping": {
+            	"/var/www/www.hugcommunity.org" : "/Users/awelters/Desktop/workspace/hugcommunity.org/Hug-Community-Web-Application"
+	         },
+	         "url": "https://www.hugcommunity.org/",
+	         "debug": true,
+         	 "super_globals": true,
+         	 "close_on_stop": true
+        }
+    }
+}

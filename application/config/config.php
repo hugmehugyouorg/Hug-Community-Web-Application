@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= '';
+$config['base_url']	= isset($_SERVER['CI_BASE_URL']) ? $_SERVER['CI_BASE_URL'] : "https://www.hugcommunity.org/";
 
 /*
 |--------------------------------------------------------------------------
