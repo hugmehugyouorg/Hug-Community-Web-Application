@@ -38,7 +38,7 @@
 		</div>
 	</div>
 </div>
-
+<!--
 <div class="container-fluid">
 	<h3>The Plan</h3>
 	<div class="row-fluid">
@@ -53,3 +53,4 @@
 		</p>
 	</div>
 </div>
+-->
