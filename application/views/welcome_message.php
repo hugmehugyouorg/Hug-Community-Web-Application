@@ -22,6 +22,12 @@
 		<p class="span12">
 			Abused children and children in foster care interact with a plush toy-like therapeutic companion that sends and receives messages. A support community or safety network made up of family, friends, and social workers interact with a web or mobile interface to invite and register community members, receive updates on the child's status, preview and send messages to the child, and view analytics to better understand and work with both the child and the community.
 		</p>
+		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+			<input type="hidden" name="cmd" value="_s-xclick">
+			<input type="hidden" name="hosted_button_id" value="23HFDMBGWH78W">
+			<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" style="border:none;margin-bottom:0;margin-top:10px;">
+			<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+		</form>
 	</div>
 </div>
 
