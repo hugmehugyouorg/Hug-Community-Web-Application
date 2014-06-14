@@ -37,12 +37,12 @@ GET STARTED
 The project is built using PHP, CodeIgniter (http://ellislab.com/codeigniter), and Ion Auth (https://github.com/benedmunds/CodeIgniter-Ion-Auth).  In addition to this repository, a development VM has been provisioned to allow you to get started contributing right away.  Follow theses instructions and you should have the project up in running in 15 mins:
 
 1.  Install Git (http://git-scm.com/)
-2.  Install VirtualBox (https://www.virtualbox.org/)
-3.  Install Vagrant v1.0.7 (http://downloads.vagrantup.com/tags/v1.0.7)
+2.  Install VirtualBox (https://www.virtualbox.org/wiki/Downloads)
+3.  Install Vagrant (https://www.vagrantup.com/downloads.html)
 4.  Run some commands to get the provisioned VM and Code Repository
 
-<pre><code>vagrant gem install vagrant-vbguest
-vagrant gem install vagrant-hostmaster
+<pre><code>vagrant plugin install vagrant-vbguest
+vagrant plugin install vagrant-hostmanager
 mkdir hugcommunity.org
 cd hugcommunity.org
 git clone https://github.com/awelters/Hug-Community-Web-Application.git
