@@ -333,5 +333,7 @@ class Dashboard extends MY_Controller {
 			$numberOfUnits = floor($time / $unit);
 			return $numberOfUnits.' '.$text.(($numberOfUnits>1)?'s':'');
 		}
+
+		return '0 seconds';
 	}
 }
