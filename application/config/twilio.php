@@ -28,7 +28,7 @@
 	/**
 	 * Auth Token
 	 **/
-	$config['auth_token']    = isset($_SERVER['CI_TWILIO_AUTH_TOKEN']) ? $_SERVER['CI_TWILIO_AUTH_TOKEN'] : 'f57fb65ac93e2b7fb1eeec55ad515b84';
+	$config['auth_token']    = isset($_SERVER['CI_TWILIO_AUTH_TOKEN']) ? $_SERVER['CI_TWILIO_AUTH_TOKEN'] : ''; //ask team if necessary
 
 	/**
 	 * API Version
