@@ -561,10 +561,10 @@ class Companion_model extends CI_Model {
     	}
     		
     	//only return a pending message if currently asking for one
-    	if($playMessageUpdateByUser)
+    	//if($playMessageUpdateByUser)
     		$pendingMessage = $this->get_pending_message_association();
-    	else
-    		$pendingMessage = null;
+    	//else
+    		//$pendingMessage = null;
     		
     	$result = '<br/>pendingMessage = '.json_encode($pendingMessage);
 		$output .= $result;
