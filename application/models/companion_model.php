@@ -334,7 +334,7 @@ class Companion_model extends CI_Model {
 				echo $result;
 			
 			//only a play message update (also by user) if play message is on (user pressed the play message button)
-			$playMessageUpdateByUser = $playMessagesUpdate;
+			$playMessageUpdateByUser = $playMessageUpdate;
 			
 			$result = '<br/>playMessageUpdateByUser = '.$playMessageUpdateByUser;
 			$output .= $result;
