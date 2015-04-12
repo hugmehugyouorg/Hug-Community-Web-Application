@@ -66,10 +66,10 @@ CREATE TABLE `users_groups` (
   CONSTRAINT `fk_users_groups_users1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-INSERT INTO `users_groups` VALUES (NULL,@awelters,@admin_group);
+INSERT INTO `users_groups` VALUES (NULL,@real_admin,@admin_group);
 SET @real_admin_admins = LAST_INSERT_ID();
 
-INSERT INTO `users_groups` VALUES (NULL,@awelters,@test_community_group);
+INSERT INTO `users_groups` VALUES (NULL,@real_admin,@real_prototype_test_community_group);
 SET @real_admin_test_community = LAST_INSERT_ID();
 
 INSERT INTO `users_groups` VALUES (NULL,@test_admin,@admin_group);
@@ -127,8 +127,7 @@ CREATE TABLE `companions_groups` (
   CONSTRAINT `fk_companions_groups_groups1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-INSERT INTO `companions_groups` VALUES (NULL,@real_prototype,@test_community_group);
-SET @real_prototype_test_community = LAST_INSERT_ID();
+INSERT INTO `companions_groups` VALUES (NULL,@real_prototype,@real_prototype_test_community_group);
 
 CREATE TABLE `companion_says_audio` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
