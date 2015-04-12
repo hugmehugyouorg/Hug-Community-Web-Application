@@ -12,6 +12,7 @@
 		{
 			if($companion->emergency_alert)
 			{
+				log_message('info', "Widget Emergency Alert: ".$companion->emergency_alert);
 				?>
 				<div class="alert alert-error">
 					<?php if($leader) { ?>

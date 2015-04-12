@@ -106,7 +106,7 @@ CREATE TABLE `companions` (
   UNIQUE KEY `uc_companions_name` (`name`)
 );
 
-INSERT INTO `companions` VALUES (NULL,'Andy\'s Sammy','Carver County\'s Safety Sam Prototype',1,0);
+INSERT INTO `companions` VALUES (NULL,'Andy\'s Sammy','Carver County\'s Safety Sam Prototype',0,0);
 SET @real_prototype = LAST_INSERT_ID();
 
 INSERT INTO `companions` VALUES (NULL,'Test Companion 1','Test Companion 1',0,0);
