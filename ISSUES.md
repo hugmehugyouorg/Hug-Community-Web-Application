@@ -1,3 +1,6 @@
+//views/widgets.php line 106, the player will not show up if there is no last said
+//but after the first time talking there should be, right???
+
 //Value is 100 for the voltage after the decimal point?????
 
 INFO  - 2015-04-12 19:19:56 --> id: 1
