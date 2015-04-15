@@ -1139,7 +1139,7 @@ class Companion_model extends CI_Model {
 		{
 			$basePath = 'assets/uploads/media/audio';
 			$filePath = $basePath.'/'.$audioNum.'.mp3';
-			$absoluteURL = base_url($filePath).'?updated_at='.$audio->updated_at;
+			$absoluteURL = base_url($filePath).'?server='.md5($this->config->item('server_ip')).'&updated_at='.$audio->updated_at;
 			
 			//make directory if does not exist
 			if (!file_exists($basePath)) {
