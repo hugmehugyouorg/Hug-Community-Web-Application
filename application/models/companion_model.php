@@ -1024,6 +1024,7 @@ class Companion_model extends CI_Model {
     				$audio->audio_url = $this->getAudioURL($audio->audio_num);
     			}
     			catch(Exception $e) {
+    				log_message('error', (string)e);
     				return null;
     			}
     			
@@ -1138,7 +1139,7 @@ class Companion_model extends CI_Model {
 		{
 			$basePath = 'assets/uploads/media/audio';
 			$filePath = $basePath.'/'.$audioNum.'.mp3';
-			$absoluteURL = base_url($filePath).'?server='.$this->config->item('server_ip').'&updated_at='.$audio->updated_at;
+			$absoluteURL = base_url($filePath).'?updated_at='.$audio->updated_at;
 			
 			//make directory if does not exist
 			if (!file_exists($basePath)) {
