@@ -18,6 +18,17 @@ $config['base_url']	= isset($_SERVER['CI_BASE_URL']) ? $_SERVER['CI_BASE_URL'] :
 
 /*
 |--------------------------------------------------------------------------
+| Server IP
+|--------------------------------------------------------------------------
+|
+| This is for allowing for doing things differently depending on the
+| server.
+|
+*/
+$config['server_ip'] = gethostbyname(gethostname());
+
+/*
+|--------------------------------------------------------------------------
 | Index File
 |--------------------------------------------------------------------------
 |
