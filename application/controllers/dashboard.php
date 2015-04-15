@@ -101,15 +101,19 @@ class Dashboard extends MY_Controller {
 					$lastUpdateWithSaid = $this->Companion_model->get_latest_said_update_by_companion_id($companion->id);
 					if($lastUpdateWithSaid)
 					{
+						log_message('info', "lastUpdateWithSaid exists - get_latest_said_update_by_companion_id: ".$companion->id);
 						$said = $this->Companion_model->get_audio('id', $lastUpdateWithSaid->last_said_id);
 						if($said)
 						{
+							log_message('info', "lastUpdateWithSaid exists - get_audio('id', lastUpdateWithSaid->last_said_id): ".$lastUpdateWithSaid->last_said_id);
 							$companionToLastSaid[$companion->id]['update'] = $lastUpdateWithSaid;
 							$companionToLastSaid[$companion->id]['timeElapsed'] = $this->humanTiming($lastUpdateWithSaid->created_at);
 							$companionToLastSaid[$companion->id]['text'] = $said->text;
 							
 							$playerData = array('audioNum' => $said->audio_num, 'audioText' => $said->text, 'audioURL' => $said->audio_url);
 							
+							log_message('info', "playerData: ".json_encode($playerData));
+
 							$companionToLastSaid[$companion->id]['player'] = $this->load->view('audio/player', $playerData, TRUE);
 						}
 					}

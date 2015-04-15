@@ -105,6 +105,7 @@
 			
 			if(array_key_exists($companion->id, $companionToLastSaid))
 			{
+				log_message('info', "companionToLastSaid: ".$companion->id);
 				$firstUpdate = $companionToLastSaid[$companion->id]['update'];
 				$timeElapsed = $companionToLastSaid[$companion->id]['timeElapsed'];
 				$text = $companionToLastSaid[$companion->id]['text'];
