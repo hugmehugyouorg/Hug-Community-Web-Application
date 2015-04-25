@@ -408,7 +408,7 @@
 						       $.ajax({ 
 						       		url: "/dashboard/poll", 
 						       		success: function(r) {
-						       			if(r === 1) {
+						       			if(r === 1 || r === "1") {
 						            		location.reload(true);
 						            	}
 						       		}, 
