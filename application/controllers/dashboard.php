@@ -376,8 +376,8 @@ class Dashboard extends MY_Controller {
 			return;
 		}
 
-		//must exist and have the same number of elements
-		if(!$oldCompanionToLastUpdate || count($oldCompanionToLastUpdate) != count($companionToLastUpdate)) {
+		//must exist
+		if(!$oldCompanionToLastUpdate) {
 			$this->output->set_output(json_encode(false));
 			return;
 		}
@@ -401,20 +401,14 @@ class Dashboard extends MY_Controller {
 				return;
 			}
  
- 			//both must not have an update for this companion
+ 			//could have received its first update
 			if( !array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) && array_key_exists($companionId, $companionToLastUpdate) )
 			{
 				$this->output->set_output(json_encode(false));
 				return;
 			}
 
-			//or both must have an update for this companion
-			if( array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) && !array_key_exists($companionId, $companionToLastUpdate) )
-			{
-				$this->output->set_output(json_encode(false));
-				return;
-			}
-
+			//if this companion has an update
 			if( array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) ) {
 				$oldLastUpdate = $oldCompanionToLastUpdate[$oldCompanionId];
 				$lastUpdate = $companionToLastUpdate[$companionId];
