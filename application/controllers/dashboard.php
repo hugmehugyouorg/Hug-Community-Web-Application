@@ -420,7 +420,7 @@ class Dashboard extends MY_Controller {
 				$lastUpdate = $companionToLastUpdate[$companionId];
 
 				//the ids must be the same (could have used created_at, but this is better)
-				if($oldLastUpdate->id != $lastUpdate->id) {
+				if($oldLastUpdate['update']->id != $lastUpdate['update']->id) {
 					$this->output->set_output(json_encode(false));
 					return;
 				}
