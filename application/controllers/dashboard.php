@@ -415,13 +415,15 @@ class Dashboard extends MY_Controller {
 				return;
 			}
 
-			$oldLastUpdate = $oldCompanionToLastUpdate[$oldCompanionId];
-			$lastUpdate = $companionToLastUpdate[$companionId];
+			if( array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) ) {
+				$oldLastUpdate = $oldCompanionToLastUpdate[$oldCompanionId];
+				$lastUpdate = $companionToLastUpdate[$companionId];
 
-			//the ids must be the same (could have used created_at, but this is better)
-			if($oldLastUpdate->id != $lastUpdate->id) {
-				$this->output->set_output(json_encode(false));
-				return;
+				//the ids must be the same (could have used created_at, but this is better)
+				if($oldLastUpdate->id != $lastUpdate->id) {
+					$this->output->set_output(json_encode(false));
+					return;
+				}
 			}
 		}
 
