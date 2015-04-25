@@ -408,6 +408,9 @@
 						       $.ajax({ 
 						       		url: "/dashboard/poll", 
 						       		success: function(r) {
+						       			console.log(r);
+						       			console.log((r ? "r exists" : "r does not exist"));
+						       			console.log((r === false ? "r is false" : "r is not false"));
 						            	if(r && r === false) {
 						            		location.reload(true);
 						            	}
