@@ -362,14 +362,6 @@ class Dashboard extends MY_Controller {
 			}
 		}
 
-		$returnData = array();
-		$returnData[] = $oldCompanions;
-		$returnData[] = $oldCompanionToLastUpdate;
-		$returnData[] = $companions;
-		$returnData[] = $companionToLastUpdate;
-		$this->output->set_output(json_encode($returnData));
-		return;
-
 		/*
 			For all companions associated with this user,
 			If the last companion_updates record's created_at field
@@ -378,15 +370,21 @@ class Dashboard extends MY_Controller {
 			Else return true as the view is clean
 		*/
 
-		//must exist and have the same number of elements
-		if(!$oldCompanions || count($oldCompanions) != count($companions)) {
-			$this->output->set_output(json_encode(false));
+		//must exist
+		if(!is_array($oldCompanions)) {
+			$this->output->set_output(json_encode("oldCompanions is not an array"));
 			return;
 		}
 
 		//must exist
-		if(!$oldCompanionToLastUpdate) {
-			$this->output->set_output(json_encode(false));
+		if(!is_array($oldCompanionToLastUpdate)) {
+			$this->output->set_output(json_encode("oldCompanionToLastUpdate is not an array"));
+			return;
+		}
+
+		//must have the same number of elements
+		if(count($oldCompanions) != count($companions)) {
+			$this->output->set_output(json_encode("oldCompanions and companions do not have the same number of elements"));
 			return;
 		}
 
@@ -399,20 +397,20 @@ class Dashboard extends MY_Controller {
 
 			//must be comparing the same companions
 			if($oldCompanionId != $companionId) {
-				$this->output->set_output(json_encode(false));
+				$this->output->set_output(json_encode("old and new companion ids do not match"));
 				return;
 			}
 
 			//the last updated timestamp must be the same
 			if($oldCompanion->updated_at != $companion->updated_at) {
-				$this->output->set_output(json_encode(false));
+				$this->output->set_output(json_encode("companion itself updated"));
 				return;
 			}
  
  			//could have received its first update
 			if( !array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) && array_key_exists($companionId, $companionToLastUpdate) )
 			{
-				$this->output->set_output(json_encode(false));
+				$this->output->set_output(json_encode("received first update"));
 				return;
 			}
 
@@ -423,7 +421,7 @@ class Dashboard extends MY_Controller {
 
 				//the ids must be the same (could have used created_at, but this is better)
 				if($oldLastUpdate['update']->id != $lastUpdate['update']->id) {
-					$this->output->set_output(json_encode(false));
+					$this->output->set_output(json_encode("received a new update from the companion"));
 					return;
 				}
 			}

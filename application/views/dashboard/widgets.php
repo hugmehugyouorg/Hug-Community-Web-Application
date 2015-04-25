@@ -409,7 +409,6 @@
 						       		url: "/dashboard/poll", 
 						       		success: function(r) {
 						            	if(!r) {
-						            		console.log('refresh');
 						            		//window.location = window.location;
 						            	}
 						       		}, 
