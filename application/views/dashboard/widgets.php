@@ -12,7 +12,6 @@
 		{
 			if($companion->emergency_alert)
 			{
-				log_message('info', "Widget Emergency Alert: ".$companion->emergency_alert);
 				?>
 				<div class="alert alert-error">
 					<?php if($leader) { ?>
@@ -105,7 +104,6 @@
 			
 			if(array_key_exists($companion->id, $companionToLastSaid))
 			{
-				log_message('info', "companionToLastSaid: ".$companion->id);
 				$firstUpdate = $companionToLastSaid[$companion->id]['update'];
 				$timeElapsed = $companionToLastSaid[$companion->id]['timeElapsed'];
 				$text = $companionToLastSaid[$companion->id]['text'];
@@ -403,6 +401,27 @@
 							});
 							$('.companion-messages-select').trigger('change', [true]);
 						}
+
+						//TODO: enhance with the use of http://www.html5rocks.com/en/tutorials/eventsource/basics/
+						(function poll() {
+						   setTimeout(function() {
+						       $.ajax({ 
+						       		url: "/dashboard/poll", 
+						       		success: function(r) {
+						            	if(!r) {
+						            		window.location = window.location;
+						            	}
+						       		}, 
+						       		error: function( jqXhr ) {
+										if( jqXhr.status == 401 )
+											window.location = '/sign_in';
+									},
+									type: "GET", 
+									cache: false, 
+									complete: poll 
+								});
+						    }, 5000);
+						})();
 					},
 				
 					error: function( jqXhr ) {

@@ -102,17 +102,18 @@ CREATE TABLE `companions` (
   `description` varchar(100) NOT NULL,
   `emergency_alert` tinyint(1) NOT NULL DEFAULT '0',
   `curfew_alert` tinyint(1) NOT NULL DEFAULT '0',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uc_companions_name` (`name`)
 );
 
-INSERT INTO `companions` VALUES (NULL,'Andy\'s Sammy','Carver County\'s Safety Sam Prototype',0,0);
+INSERT INTO `companions` VALUES (NULL,'Andy\'s Sammy','Carver County\'s Safety Sam Prototype',0,0,NOW());
 SET @real_prototype = LAST_INSERT_ID();
 
-INSERT INTO `companions` VALUES (NULL,'Test Companion 1','Test Companion 1',0,0);
+INSERT INTO `companions` VALUES (NULL,'Test Companion 1','Test Companion 1',0,0,NOW());
 SET @test1_prototype = LAST_INSERT_ID();
 
-INSERT INTO `companions` VALUES (NULL,'Test Companion 2','Test Companion 2',0,0);
+INSERT INTO `companions` VALUES (NULL,'Test Companion 2','Test Companion 2',0,0,NOW());
 SET @test2_prototype = LAST_INSERT_ID();
 
 CREATE TABLE `companions_groups` (
