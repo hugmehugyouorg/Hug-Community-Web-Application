@@ -362,6 +362,14 @@ class Dashboard extends MY_Controller {
 			}
 		}
 
+		$returnData = array();
+		$returnData[] = $oldCompanions;
+		$returnData[] = $oldCompanionToLastUpdate;
+		$returnData[] = $companions;
+		$returnData[] = $companionToLastUpdate;
+		$this->output->set_output(json_encode($returnData));
+		return;
+
 		/*
 			For all companions associated with this user,
 			If the last companion_updates record's created_at field
