@@ -329,105 +329,112 @@ class Dashboard extends MY_Controller {
 			return;
 		}
 		
-		if (!$this->ion_auth->logged_in())
-		{
-			$this->output->set_status_header('401');
-			$this->output->set_output(json_encode(null));
-			return;
-		}
+		//long poll no longer than 5 minutes
+		set_time_limit(300);
 
-		$oldCompanions = $this->session->userdata('companions');
-		$oldCompanionToLastUpdate = $this->session->userdata('companionToLastUpdate');
+		while(1) {
 
-		$isTeamLeader = $this->ion_auth->is_admin();
-		
-		$groups = $this->ion_auth->get_users_groups()->result();
-		$companions = array();
-		$companionToLastUpdate = array();
-		
-		$this->load->model('Companion_model');
-		
-		foreach( $groups as $group )
-		{
-			$companion = $this->Companion_model->get_companion_by_group_id($group->id);
-			if($companion)
+			if (!$this->ion_auth->logged_in())
 			{
-				array_push($companions, $companion);
-				$lastUpdate = $this->Companion_model->get_latest_update_by_companion_id($companion->id);
-				
-				if($lastUpdate)
+				$this->output->set_status_header('401');
+				$this->output->set_output(json_encode(null));
+				return;
+			}
+
+			$oldCompanions = $this->session->userdata('companions');
+			$oldCompanionToLastUpdate = $this->session->userdata('companionToLastUpdate');
+
+			$isTeamLeader = $this->ion_auth->is_admin();
+			
+			$groups = $this->ion_auth->get_users_groups()->result();
+			$companions = array();
+			$companionToLastUpdate = array();
+			
+			$this->load->model('Companion_model');
+			
+			foreach( $groups as $group )
+			{
+				$companion = $this->Companion_model->get_companion_by_group_id($group->id);
+				if($companion)
 				{
-					$companionToLastUpdate[$companion->id]['update'] = $lastUpdate;
+					array_push($companions, $companion);
+					$lastUpdate = $this->Companion_model->get_latest_update_by_companion_id($companion->id);
+					
+					if($lastUpdate)
+					{
+						$companionToLastUpdate[$companion->id]['update'] = $lastUpdate;
+					}
 				}
 			}
-		}
 
-		/*
-			For all companions associated with this user,
-			If the last companion_updates record's created_at field
-			Or the companions updated_at field is different then
-			The last ones then return false as view is no longer clean
-			Else return true as the view is clean
-		*/
+			/*
+				For all companions associated with this user,
+				If the last companion_updates record's created_at field
+				Or the companions updated_at field is different then
+				The last ones then return false as view is no longer clean
+				Else return true as the view is clean
+			*/
 
-		//must exist
-		if(!is_array($oldCompanions)) {
-			$this->output->set_output(json_encode(1));
-			return;
-		}
-
-		//must exist
-		if(!is_array($oldCompanionToLastUpdate)) {
-			$this->output->set_output(json_encode(1));
-			return;
-		}
-
-		//must have the same number of elements
-		if(count($oldCompanions) != count($companions)) {
-			$this->output->set_output(json_encode(1));
-			return;
-		}
-
-		$numCompanions = count($companions);
-		for( $i = 0; $i < $numCompanions; $i++ ) {
-			$oldCompanion = $oldCompanions[$i];
-			$companion = $companions[$i];
-			$oldCompanionId = $oldCompanion->id;
-			$companionId = $companion->id;
-
-			//must be comparing the same companions
-			if($oldCompanionId != $companionId) {
+			//must exist
+			if(!is_array($oldCompanions)) {
 				$this->output->set_output(json_encode(1));
 				return;
 			}
 
-			//the last updated timestamp must be the same
-			if($oldCompanion->updated_at != $companion->updated_at) {
-				$this->output->set_output(json_encode(1));
-				return;
-			}
- 
- 			//could have received its first update
-			if( !array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) && array_key_exists($companionId, $companionToLastUpdate) )
-			{
+			//must exist
+			if(!is_array($oldCompanionToLastUpdate)) {
 				$this->output->set_output(json_encode(1));
 				return;
 			}
 
-			//if this companion has an update
-			if( array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) ) {
-				$oldLastUpdate = $oldCompanionToLastUpdate[$oldCompanionId];
-				$lastUpdate = $companionToLastUpdate[$companionId];
+			//must have the same number of elements
+			if(count($oldCompanions) != count($companions)) {
+				$this->output->set_output(json_encode(1));
+				return;
+			}
 
-				//the ids must be the same (could have used created_at, but this is better)
-				if($oldLastUpdate['update']->id != $lastUpdate['update']->id) {
+			$numCompanions = count($companions);
+			for( $i = 0; $i < $numCompanions; $i++ ) {
+				$oldCompanion = $oldCompanions[$i];
+				$companion = $companions[$i];
+				$oldCompanionId = $oldCompanion->id;
+				$companionId = $companion->id;
+
+				//must be comparing the same companions
+				if($oldCompanionId != $companionId) {
 					$this->output->set_output(json_encode(1));
 					return;
 				}
-			}
-		}
 
-		$this->output->set_output(json_encode(0));
+				//the last updated timestamp must be the same
+				if($oldCompanion->updated_at != $companion->updated_at) {
+					$this->output->set_output(json_encode(1));
+					return;
+				}
+	 
+	 			//could have received its first update
+				if( !array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) && array_key_exists($companionId, $companionToLastUpdate) )
+				{
+					$this->output->set_output(json_encode(1));
+					return;
+				}
+
+				//if this companion has an update
+				if( array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) ) {
+					$oldLastUpdate = $oldCompanionToLastUpdate[$oldCompanionId];
+					$lastUpdate = $companionToLastUpdate[$companionId];
+
+					//the ids must be the same (could have used created_at, but this is better)
+					if($oldLastUpdate['update']->id != $lastUpdate['update']->id) {
+						$this->output->set_output(json_encode(1));
+						return;
+					}
+				}
+			}
+
+			//$this->output->set_output(json_encode(0));
+			usleep(1000000);
+		}
 	}
 
 	protected function humanTiming ($time)
