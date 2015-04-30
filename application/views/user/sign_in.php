@@ -17,15 +17,6 @@
 		<label for="password">Password:</label>
 		<div class="input"><?php echo form_input($password);?></div>
 	  </div>
-	
-	<? /*
-	  <div class="clearfix">
-	  	<label class="checkbox">
-		  <?php echo form_checkbox('remember', '1', FALSE, 'class="input"');?> Remember Me
-		</label>
-	  </div>
-	*/ 
-	  ?>
 	  
 	  <div class="input"><?php echo form_submit(array('class'=>'btn primary', 'value'=>'Sign In'), 'Sign In');?></div>
 	
