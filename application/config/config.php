@@ -256,14 +256,14 @@ $config['encryption_key'] = isset($_SERVER['CI_ENCRYPTION_KEY']) ? $_SERVER['CI_
 |
 */
 $config['sess_cookie_name']		= 'ci_session';
-$config['sess_expiration']		= 7200;
+$config['sess_expiration']		= 86400*365; //session IDs will change once a year
 $config['sess_expire_on_close']	= FALSE;
 $config['sess_encrypt_cookie']	= TRUE;
 $config['sess_use_database']	= TRUE;
 $config['sess_table_name']		= 'ci_sessions';
 $config['sess_match_ip']		= TRUE;
 $config['sess_match_useragent']	= TRUE;
-$config['sess_time_to_update']	= 300;
+$config['sess_time_to_update']	= $config['sess_expiration'];
 
 /*
 |--------------------------------------------------------------------------
