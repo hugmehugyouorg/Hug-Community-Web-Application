@@ -330,11 +330,11 @@ class Dashboard extends MY_Controller {
 		}
 		
 		//timeout just in case at longer than 5 minutes
-		set_time_limit(300);
+		set_time_limit(315);
 		$time = time();
 
 		//try a couple times
-		while(time() - $time < 290) {
+		while(time() - $time < 300) {
 
 			if (!$this->ion_auth->logged_in())
 			{
