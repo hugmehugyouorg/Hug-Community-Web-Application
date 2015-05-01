@@ -334,7 +334,7 @@ class Dashboard extends MY_Controller {
 		$time = time();
 
 		//try a couple times
-		while(time() - $time) < 20)) {
+		while(time() - $time < 20) {
 
 			if (!$this->ion_auth->logged_in())
 			{
