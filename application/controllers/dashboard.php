@@ -330,7 +330,7 @@ class Dashboard extends MY_Controller {
 		}
 		
 		//long poll no longer than 5 minutes
-		set_time_limit(300);
+		set_time_limit(15);
 
 		while(1) {
 
@@ -433,7 +433,9 @@ class Dashboard extends MY_Controller {
 			}
 
 			//$this->output->set_output(json_encode(0));
-			usleep(1000000);
+
+			//sleep for 5 seconds
+			usleep(5000000);
 		}
 	}
 
