@@ -329,10 +329,12 @@ class Dashboard extends MY_Controller {
 			return;
 		}
 		
-		//long poll no longer than 5 minutes
-		set_time_limit(15);
+		//timeout just in case at longer than 5 minutes
+		set_time_limit(300);
+		$time = time();
 
-		while(1) {
+		//try a couple times
+		while(time() - $time) < 20)) {
 
 			if (!$this->ion_auth->logged_in())
 			{
@@ -432,11 +434,11 @@ class Dashboard extends MY_Controller {
 				}
 			}
 
-			//$this->output->set_output(json_encode(0));
-
 			//sleep for 5 seconds
 			usleep(5000000);
 		}
+		
+		$this->output->set_output(json_encode(0));
 	}
 
 	protected function humanTiming ($time)
