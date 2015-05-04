@@ -3,6 +3,16 @@
 <script type="text/javascript" src="/assets/js/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/assets/js/jplayer/jquery.jplayer.min.js"></script>
 <?php 
+	function toLocalTime($timestamp, $usersTimezone = null) {
+		if(!$usersTimezone) {
+			$usersTimezone = new DateTimeZone('America/Chicago');
+		}
+		$l10nDate = new DateTime($timestamp);
+		$l10nDate->setTimeZone($usersTimezone);
+		$timestamp = $l10nDate->format('Y-m-d H:i:s');
+		return $timestamp;
+	}
+
 	echo '<div class="widgets row"><div class="pull-right span4">';
 	
 	if($hasAlerts)
@@ -17,7 +27,7 @@
 					<?php if($leader) { ?>
 					<a href="#clear-alert-modal-<?php echo $companion->id?>" title="Clear Alert" role="button" class="close" data-toggle="modal"><i class="fa fa-times fa-2x"></i></a>
 					<?php } ?>
-					<?php echo $companion->name; ?> reported a Serious Situation with <?php echo $companionToGroup[$companion->id]->name; if($companionToLastEmergencyUpdate[$companion->id]) { ?>&nbsp;&nbsp;<code class="humanTiming" data-time="<?php echo $companionToLastEmergencyUpdate[$companion->id]['update']->created_at?>"><?php echo $companionToLastEmergencyUpdate[$companion->id]['timeElapsed']; ?> ago</code><?php } ?>
+					<?php echo $companion->name; ?> reported a Serious Situation with <?php echo $companionToGroup[$companion->id]->name; if($companionToLastEmergencyUpdate[$companion->id]) { ?>&nbsp;&nbsp;<code class="humanTiming" data-time="<?php echo toLocalTime($companionToLastEmergencyUpdate[$companion->id]['update']->created_at); ?>"><?php echo $companionToLastEmergencyUpdate[$companion->id]['timeElapsed']; ?> ago</code><?php } ?>
 					<?php if($leader) { ?>
 						<!-- Modal -->
 						<div id="clear-alert-modal-<?php echo $companion->id?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="clear-alert-modal-label" aria-hidden="true">
@@ -43,7 +53,7 @@
 				$firstUpdate = $companionToLastCurfewUpdate[$companion->id]['update'];
 				$timeElapsed = $companionToLastCurfewUpdate[$companion->id]['timeElapsed'];
 				?>
-				<div class="alert"><span class="close no-link"><i class="fa fa-clock-o text-error fa-2x"></i></span><?php echo $companion->name; ?> is out past curfew.&nbsp;&nbsp;<code class="humanTiming" data-time="<?php echo $firstUpdate->created_at?>"><?php echo $timeElapsed; ?> ago</code></div>
+				<div class="alert"><span class="close no-link"><i class="fa fa-clock-o text-error fa-2x"></i></span><?php echo $companion->name; ?> is out past curfew.&nbsp;&nbsp;<code class="humanTiming" data-time="<?php echo toLocalTime($firstUpdate->created_at)?>"><?php echo $timeElapsed; ?> ago</code></div>
 				<?php
 			}
 			
@@ -52,7 +62,7 @@
 				$firstUpdate = $companionToLowBattery[$companion->id]['update'];
 				$timeElapsed = $companionToLowBattery[$companion->id]['timeElapsed'];
 				?>
-				<div class="alert"><span class="close no-link"><i class="fa fa-dashboard text-error fa-2x"></i></span><?php echo $companion->name; ?> has a low battery.&nbsp;&nbsp;<code class="humanTiming" data-time="<?php echo $firstUpdate->created_at?>"><?php echo $timeElapsed; ?> ago</code></div>
+				<div class="alert"><span class="close no-link"><i class="fa fa-dashboard text-error fa-2x"></i></span><?php echo $companion->name; ?> has a low battery.&nbsp;&nbsp;<code class="humanTiming" data-time="<?php echo toLocalTime($firstUpdate->created_at)?>"><?php echo $timeElapsed; ?> ago</code></div>
 				<?php
 			}
 		}
@@ -74,9 +84,9 @@
 				switch($firstUpdate->emotional_state)
 				{
 					case 0: echo '<div class="alert"><span class="close no-link"><i class="fa fa-meh-o fa-2x"></i></span>'.$group->name.' has not shared with the team yet.</div>'; break;
-					case 1: echo '<div class="alert alert-info"><span class="close no-link"><i class="fa fa-smile-o fa-2x"></i></span>'.$group->name.' shared a happy moment.&nbsp;&nbsp;<code class="humanTiming" data-time="'.$firstUpdate->created_at.'">'.$timeElapsed.' ago</code></div>'; break;
-					case 2: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o fa-2x"></i></span>'.$group->name.' shared an unhappy moment.&nbsp;&nbsp;<code class="humanTiming" data-time="'.$firstUpdate->created_at.'">'.$timeElapsed.' ago</code></div>'; break;
-					case 3: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o fa-2x"></i></span>'.$group->name.' shared a serious moment.&nbsp;&nbsp;<code class="humanTiming" data-time="'.$firstUpdate->created_at.'">'.$timeElapsed.' ago</code></div>'; break;
+					case 1: echo '<div class="alert alert-info"><span class="close no-link"><i class="fa fa-smile-o fa-2x"></i></span>'.$group->name.' shared a happy moment.&nbsp;&nbsp;<code class="humanTiming" data-time="'.toLocalTime($firstUpdate->created_at).'">'.$timeElapsed.' ago</code></div>'; break;
+					case 2: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o fa-2x"></i></span>'.$group->name.' shared an unhappy moment.&nbsp;&nbsp;<code class="humanTiming" data-time="'.toLocalTime($firstUpdate->created_at).'">'.$timeElapsed.' ago</code></div>'; break;
+					case 3: echo '<div class="alert alert-error"><span class="close no-link"><i class="fa fa-frown-o fa-2x"></i></span>'.$group->name.' shared a serious moment.&nbsp;&nbsp;<code class="humanTiming" data-time="'.toLocalTime($firstUpdate->created_at).'">'.$timeElapsed.' ago</code></div>'; break;
 				}
 			}
 			else
@@ -89,7 +99,7 @@
 				$firstUpdate = $companionToLastPlayMessageOnUserUpdate[$companion->id]['update'];
 				$timeElapsed = $companionToLastPlayMessageOnUserUpdate[$companion->id]['timeElapsed'];
 				
-				echo '<div class="alert"><span class="close no-link" style="right: -24px;"><i class="fa fa-volume-up fa-2x"></i></span>'.$group->name.' was listening to messages.&nbsp;&nbsp;<code class="humanTiming" data-time="'.$firstUpdate->created_at.'">'.$timeElapsed.' ago</code></div>';
+				echo '<div class="alert"><span class="close no-link" style="right: -24px;"><i class="fa fa-volume-up fa-2x"></i></span>'.$group->name.' was listening to messages.&nbsp;&nbsp;<code class="humanTiming" data-time="'.toLocalTime($firstUpdate->created_at).'">'.$timeElapsed.' ago</code></div>';
 			}
 		}
 	}
@@ -154,7 +164,7 @@
 					</span>
 					<?php echo $companion->name;?> had this to say, <em>"<?php echo $text; ?>"</em>
 					&nbsp;&nbsp;
-					<code class="humanTiming" data-time="<?php echo $firstUpdate->created_at?>"><?php echo $timeElapsed; ?> ago</code>
+					<code class="humanTiming" data-time="<?php echo toLocalTime($firstUpdate->created_at)?>"><?php echo $timeElapsed; ?> ago</code>
 				</div>
 				<?php
 			}
@@ -166,11 +176,11 @@
 		
 				if(!$firstUpdate->is_charging)
 				{
-					echo '<div class="alert"><span class="close no-link"><i class="fa fa-dashboard fa-2x"></i></span>'.$companion->name.' is battery powered at '.$firstUpdate->voltage.' Volts.&nbsp;&nbsp;<code class="humanTiming" data-time="'.$firstUpdate->created_at.'">'.$timeElapsed.' ago</code></div>';
+					echo '<div class="alert"><span class="close no-link"><i class="fa fa-dashboard fa-2x"></i></span>'.$companion->name.' is battery powered at '.$firstUpdate->voltage.' Volts.&nbsp;&nbsp;<code class="humanTiming" data-time="'.toLocalTime($firstUpdate->created_at).'">'.$timeElapsed.' ago</code></div>';
 				}
 				else
 				{
-					echo '<div class="alert clearfix"><span class="close no-link" style="right: -14px;"><i class="fa fa-flash fa-2x"></i></span>'.$companion->name.' is recharging at '.$firstUpdate->voltage.' Volts.&nbsp;&nbsp;<code class="humanTiming" data-time="'.$firstUpdate->created_at.'">'.$timeElapsed.' ago</code></div>';
+					echo '<div class="alert clearfix"><span class="close no-link" style="right: -14px;"><i class="fa fa-flash fa-2x"></i></span>'.$companion->name.' is recharging at '.$firstUpdate->voltage.' Volts.&nbsp;&nbsp;<code class="humanTiming" data-time="'.toLocalTime($firstUpdate->created_at).'">'.$timeElapsed.' ago</code></div>';
 				}
 			}
 		}
@@ -200,12 +210,8 @@
 							
 							foreach ($updates as $update) 
 							{ 
-								$usersTimezone = new DateTimeZone('America/Chicago');
-								$l10nDate = new DateTime($update->created_at);
-								$l10nDate->setTimeZone($usersTimezone);
-								$timestamp = $l10nDate->format('Y-m-d H:i:s');
 								?>
-								emotions<?php echo $companion->id; ?>.push({x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
+								emotions<?php echo $companion->id; ?>.push({x: new Date(<?php echo strtotime(toLocalTime($update->created_at))*1000;?>), <?php
 											switch($update->emotional_state)
 											{
 												case 3: echo 'name: "Serious", y: 0'; break;
@@ -222,16 +228,11 @@
 							
 							foreach ($updates as $update) 
 							{ 
-								$usersTimezone = new DateTimeZone('America/Chicago');
-								$l10nDate = new DateTime($update->created_at);
-								$l10nDate->setTimeZone($usersTimezone);
-								$timestamp = $l10nDate->format('Y-m-d H:i:s');
-								
 								$usersname = $update->last_name.', '.$update->first_name;
 								$saysText = implode('<br/><i>', explode('<br/>', wordwrap($update->text,39,'<br/>')));
 								$middleText = '<br/>-------------------------------<br/><b>'.$usersname.'<\/b><br/>-------------------------------<br/><i>'.$saysText.'<\/i>", ';
 								?>
-								messages<?php echo $companion->id; ?>.push({x: new Date(<?php echo strtotime($timestamp)*1000;?>), <?php
+								messages<?php echo $companion->id; ?>.push({x: new Date(<?php echo strtotime(toLocalTime($update->created_at))*1000;?>), <?php
 											switch($update->emotional_state)
 											{
 												case 3: echo 'name: "Serious'.$middleText.'y: 0'; break;

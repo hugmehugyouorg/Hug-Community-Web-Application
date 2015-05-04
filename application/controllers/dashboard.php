@@ -441,7 +441,7 @@ class Dashboard extends MY_Controller {
 		$this->output->set_output(json_encode(0));
 	}
 
-	protected function humanTiming ($time)
+	protected function humanTiming($time)
 	{
 		$time = time() - strtotime($time); // to get the time since that moment
 	
