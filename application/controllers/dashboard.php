@@ -384,18 +384,24 @@ class Dashboard extends MY_Controller {
 
 			//must exist
 			if(!is_array($oldCompanions)) {
+				$this->session->set_userdata('companions', $companions);
+				$this->session->set_userdata('companionToLastUpdate', $companionToLastUpdate);
 				$this->output->set_output(json_encode(1));
 				return;
 			}
 
 			//must exist
 			if(!is_array($oldCompanionToLastUpdate)) {
+				$this->session->set_userdata('companions', $companions);
+				$this->session->set_userdata('companionToLastUpdate', $companionToLastUpdate);
 				$this->output->set_output(json_encode(1));
 				return;
 			}
 
 			//must have the same number of elements
 			if(count($oldCompanions) != count($companions)) {
+				$this->session->set_userdata('companions', $companions);
+				$this->session->set_userdata('companionToLastUpdate', $companionToLastUpdate);
 				$this->output->set_output(json_encode(1));
 				return;
 			}
@@ -409,12 +415,16 @@ class Dashboard extends MY_Controller {
 
 				//must be comparing the same companions
 				if($oldCompanionId != $companionId) {
+					$this->session->set_userdata('companions', $companions);
+					$this->session->set_userdata('companionToLastUpdate', $companionToLastUpdate);
 					$this->output->set_output(json_encode(1));
 					return;
 				}
 
 				//the last updated timestamp must be the same
 				if($oldCompanion->updated_at != $companion->updated_at) {
+					$this->session->set_userdata('companions', $companions);
+					$this->session->set_userdata('companionToLastUpdate', $companionToLastUpdate);
 					$this->output->set_output(json_encode(1));
 					return;
 				}
@@ -422,6 +432,8 @@ class Dashboard extends MY_Controller {
 	 			//could have received its first update
 				if( !array_key_exists($oldCompanionId, $oldCompanionToLastUpdate) && array_key_exists($companionId, $companionToLastUpdate) )
 				{
+					$this->session->set_userdata('companions', $companions);
+					$this->session->set_userdata('companionToLastUpdate', $companionToLastUpdate);
 					$this->output->set_output(json_encode(1));
 					return;
 				}
@@ -433,6 +445,8 @@ class Dashboard extends MY_Controller {
 
 					//the ids must be the same (could have used created_at, but this is better)
 					if($oldLastUpdate['update']->id != $lastUpdate['update']->id) {
+						$this->session->set_userdata('companions', $companions);
+						$this->session->set_userdata('companionToLastUpdate', $companionToLastUpdate);
 						$this->output->set_output(json_encode(1));
 						return;
 					}
