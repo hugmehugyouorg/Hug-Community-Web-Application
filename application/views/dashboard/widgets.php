@@ -1,7 +1,9 @@
 <link type="text/css" href="/assets/css/jplayer.blue.monday.css" rel="stylesheet" />
 <link type="text/css" href="/assets/css/style.jplayer.override.css" rel="stylesheet" />
+<link type="text/css" href="/assets/css/toastr.min.css" rel="stylesheet" />
 <script type="text/javascript" src="/assets/js/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/assets/js/jplayer/jquery.jplayer.min.js"></script>
+<script type="text/javascript" src="/assets/js/toastr.min.js"></script>
 <?php 
 	function toLocalTime($timestamp, $usersTimezone = null) {
 		if(!$usersTimezone) {
@@ -329,134 +331,9 @@
 		echo $replyModal;
 	}
 	?>
-	<script type="text/javascript">
-			$(function () {
-				var pauseReload = false;
-				var shouldReload = false;
+	
+	<script type="text/javascript" src="/assets/js/widgets.js"></script>
 
-				function pausePollingReload() {
-					pauseReload = true;
-				}
-
-				function playPollingReload() {
-					if(!pauseReload && shouldReload) {
-						location.reload(true);
-					}
-					pauseReload = false;
-				}
-
-				//TODO: enhance with the use of http://www.html5rocks.com/en/tutorials/eventsource/basics/
-				function poll() {
-			       $poller = $.ajax({ 
-			       		url: "/dashboard/poll", 
-			       		success: function(r) {
-			       			if(r === 1 || r === "1") {
-			       				shouldReload = true;
-			       				playPollingReload();
-			            	}
-			       		}, 
-			       		error: function( jqXhr ) {
-							if( jqXhr.status == 401 )
-								window.location = '/sign_in';
-						},
-						type: "GET", 
-						cache: false, 
-						complete: poll 
-					});
-				}
-
-				$(document).on('show', '.modal', function () {
-					pausePollingReload();
-				});
-
-				$(document).on('hidden', '.modal', function () {
-					playPollingReload();
-				});
-
-				$.ajax({
-					url: "/dashboard/getMessages",
-					type: "GET",
-					cache: false,
-					success: function (r) {
-						var json = $.parseJSON(r);
-						
-						if(json)
-						{
-							var options = "";
-							$.each(json, function(index, item){
-								options += "<option value='" + item.id + "'>" + item.text + "</option>";
-							});
-							$(".companion-messages-select").html(options).selectpicker();
-							
-							$('.companion-messages-select').on('change', function(e, isTriggered) {
-								if(!this.value)
-									return;
-									
-								var selfie = $(this);
-								var ancestor = selfie.parent();
-								ancestor.find('#companion-message-audio-player').remove();
-								
-								$.ajax({
-									url: "/dashboard/getAudioPlayer",
-									type: "GET",
-									data: { id : this.value },
-									cache: false,
-									success: function (r) {
-										ancestor.append("<div id='companion-message-audio-player' class='span1 pull-right' style='margin-top:-5px;'>"+r+"</div>");
-										var player = $('#companion-message-audio-player').find('.jp-jplayer');
-										
-										if(!isTriggered)
-										{
-											player.bind($.jPlayer.event.ready, function(event) {
-												player.jPlayer("play");
-											});
-										}
-										
-										$('.btn-send-reply').unbind('click');
-										$('.btn-send-reply').bind('click', function(e) {
-											var companionId = $(this).data('companionId');
-											
-											if(player)
-												player.jPlayer("stop");
-														
-											$.ajax({
-												url: "/dashboard/sendAudioMessage",
-												type: "GET",
-												cache: false,
-												data: { audioId : selfie.val(), companionId: companionId},
-												success: function (r) {
-													if(player)
-														player.jPlayer("stop");
-													$('#send-a-message-modal-'+companionId).modal('hide');
-													$('#success-modal').modal('show');
-												},
-												error: function( jqXhr ) {
-													if( jqXhr.status == 401 )
-														window.location = '/sign_in';
-												}
-											});
-										});
-									},
-								
-									error: function( jqXhr ) {
-										if( jqXhr.status == 401 )
-											window.location = '/sign_in';
-									}
-								});
-							});
-							$('.companion-messages-select').trigger('change', [true]);
-						}
-					},
-				
-					error: function( jqXhr ) {
-						if( jqXhr.status == 401 )
-							window.location = '/sign_in';
-					}
-				});
-
-				poll();
-			});
-		</script>
 	<?php
 	echo '</div>';
 ?>
