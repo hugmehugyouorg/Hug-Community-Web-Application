@@ -331,6 +331,48 @@
 	?>
 	<script type="text/javascript">
 			$(function () {
+				var pauseReload = false;
+				var shouldReload = false;
+
+				function pausePollingReload() {
+					pauseReload = true;
+				}
+
+				function playPollingReload() {
+					if(!pauseReload && shouldReload) {
+						location.reload(true);
+					}
+					pauseReload = false;
+				}
+
+				//TODO: enhance with the use of http://www.html5rocks.com/en/tutorials/eventsource/basics/
+				function poll() {
+			       $poller = $.ajax({ 
+			       		url: "/dashboard/poll", 
+			       		success: function(r) {
+			       			if(r === 1 || r === "1") {
+			       				shouldReload = true;
+			       				playPollingReload();
+			            	}
+			       		}, 
+			       		error: function( jqXhr ) {
+							if( jqXhr.status == 401 )
+								window.location = '/sign_in';
+						},
+						type: "GET", 
+						cache: false, 
+						complete: poll 
+					});
+				}
+
+				$(document).on('show', '.modal', function () {
+					pausePollingReload();
+				});
+
+				$(document).on('hidden', '.modal', function () {
+					playPollingReload();
+				});
+
 				$.ajax({
 					url: "/dashboard/getMessages",
 					type: "GET",
@@ -404,27 +446,6 @@
 							});
 							$('.companion-messages-select').trigger('change', [true]);
 						}
-
-						//TODO: enhance with the use of http://www.html5rocks.com/en/tutorials/eventsource/basics/
-						(function poll() {
-						   setTimeout(function() {
-						       $.ajax({ 
-						       		url: "/dashboard/poll", 
-						       		success: function(r) {
-						       			if(r === 1 || r === "1") {
-						            		location.reload(true);
-						            	}
-						       		}, 
-						       		error: function( jqXhr ) {
-										if( jqXhr.status == 401 )
-											window.location = '/sign_in';
-									},
-									type: "GET", 
-									cache: false, 
-									complete: poll 
-								});
-						    }, 5000);
-						})();
 					},
 				
 					error: function( jqXhr ) {
@@ -432,6 +453,8 @@
 							window.location = '/sign_in';
 					}
 				});
+
+				poll();
 			});
 		</script>
 	<?php

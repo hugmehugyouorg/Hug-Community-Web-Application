@@ -329,12 +329,22 @@ class Dashboard extends MY_Controller {
 			return;
 		}
 		
-		//timeout just in case at longer than 5 minutes
-		set_time_limit(315);
+		if (!$this->ion_auth->logged_in())
+		{
+			$this->output->set_status_header('401');
+			$this->output->set_output(json_encode(null));
+			return;
+		}
+
+		$oldCompanions = $this->session->userdata('companions');
+		$oldCompanionToLastUpdate = $this->session->userdata('companionToLastUpdate');
+
+		//timeout just in case at longer than 30 minutes
+		set_time_limit(1815);
 		$time = time();
 
-		//try for 3 minutes
-		while(time() - $time <= 180) {
+		//try for 30 minutes
+		while(time() - $time <= 1805) {
 
 			if (!$this->ion_auth->logged_in())
 			{
@@ -343,11 +353,6 @@ class Dashboard extends MY_Controller {
 				return;
 			}
 
-			$oldCompanions = $this->session->userdata('companions');
-			$oldCompanionToLastUpdate = $this->session->userdata('companionToLastUpdate');
-
-			$isTeamLeader = $this->ion_auth->is_admin();
-			
 			$groups = $this->ion_auth->get_users_groups()->result();
 			$companions = array();
 			$companionToLastUpdate = array();
