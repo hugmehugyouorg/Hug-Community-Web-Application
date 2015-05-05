@@ -419,6 +419,7 @@ $(function () {
 	var pauseReload = 0;
 	var shouldReload = false;
 	var reloadAborted = false;
+	var needRefresh = false;
 
 	function pausePollingReload() {
 		pauseReload++;
@@ -426,7 +427,26 @@ $(function () {
 
 	function playPollingReload() {
 		if(pauseReload == 0 && shouldReload) {
-			toastr["error"]("The page will reload momentarily... click to cancel.", "Safety Team Updates!");
+			toastr["error"]("The page will reload momentarily... click to cancel.", "Safety Team Updates!",
+			{
+			  "closeButton": true,
+			  "closeHtml": '<button onclick="$(\'#toast-container .toast\').click();return false;" type="button">&times;</button>',
+			  "debug": false,
+			  "newestOnTop": false,
+			  "progressBar": true,
+			  "positionClass": "toast-bottom-center",
+			  "preventDuplicates": true,
+			  "onclick": toastCloseClick,
+			  "onHidden": toastHidden,
+			  "showDuration": "300",
+			  "hideDuration": "1000",
+			  "timeOut": "15000",
+			  "extendedTimeOut": "5000",
+			  "showEasing": "swing",
+			  "hideEasing": "linear",
+			  "showMethod": "fadeIn",
+			  "hideMethod": "fadeOut"
+			});
 		}
 		pauseReload--;
 		if(pauseReload < 0)
@@ -447,6 +467,29 @@ $(function () {
 		if(!reloadAborted) {
 			location.reload(true);
 			return;
+		}
+		
+		if(!needRefresh) {
+			needRefresh = true;
+			toastr["warning"]("Please reload the page", "You cancelled auto-refresh", {
+			  "closeButton": false,
+			  "tapToDismiss": false,
+			  "debug": false,
+			  "newestOnTop": false,
+			  "progressBar": false,
+			  "positionClass": "toast-bottom-center",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "onHidden": null,
+			  "showDuration": "3000",
+			  "hideDuration": "0",
+			  "timeOut": "0",
+			  "extendedTimeOut": "0",
+			  "showEasing": "swing",
+			  "hideEasing": "linear",
+			  "showMethod": "fadeIn",
+			  "hideMethod": "fadeOut"
+			});
 		}
 
 		reloadAborted = false;
@@ -477,26 +520,6 @@ $(function () {
 	$(document).on('show', '.modal', pausePollingReload);
 
 	$(document).on('hidden', '.modal', playPollingReload);
-
-	toastr.options = {
-	  "closeButton": true,
-	  "closeHtml": '<button onclick="$(\'#toast-container .toast\').click();return false;" type="button">&times;</button>',
-	  "debug": false,
-	  "newestOnTop": false,
-	  "progressBar": true,
-	  "positionClass": "toast-bottom-center",
-	  "preventDuplicates": true,
-	  "onclick": toastCloseClick,
-	  "onHidden": toastHidden,
-	  "showDuration": "300",
-	  "hideDuration": "1000",
-	  "timeOut": "15000",
-	  "extendedTimeOut": "5000",
-	  "showEasing": "swing",
-	  "hideEasing": "linear",
-	  "showMethod": "fadeIn",
-	  "hideMethod": "fadeOut"
-	};
 
 	poll();
 });
