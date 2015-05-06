@@ -522,9 +522,9 @@ $(function () {
 		});
 
 		$poller.always(goPoll);
-		setTimeout(function(){
+		/*setTimeout(function(){
 			$poller.abort();
-		},10000);
+		},10000);*/
 	}
 
 	$(document).on('show', '.modal', pausePollingReload);
