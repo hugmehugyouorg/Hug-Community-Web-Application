@@ -455,6 +455,7 @@ $(function () {
 	}
 
 	function goPoll() {
+		console.log('goPoll');
 		if(!shouldReload) {
 			poll();
 		}
@@ -507,6 +508,7 @@ $(function () {
 		});
 
        	$poller.done(function(r) {
+       		console.log('done');
    			if(r === 1 || r === "1") {
    				shouldReload = true;
    				playPollingReload();
@@ -514,6 +516,7 @@ $(function () {
    		});
 
    		$poller.fail(function( jqXhr ) {
+   			console.log('fail');
 			if( jqXhr.status == 401 )
 				window.location = '/sign_in';
 		});
