@@ -522,7 +522,7 @@ $(function () {
 		});
 
 		$poller.always(goPoll);
-		setTimeout(function(){
+		setInterval(function(){
 			console.dir($poller);
 		},10000);
 	}
