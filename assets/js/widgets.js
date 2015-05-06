@@ -420,6 +420,7 @@ $(function () {
 	var shouldReload = false;
 	var reloadAborted = false;
 	var needRefresh = false;
+	var $poller = null;
 
 	function pausePollingReload() {
 		pauseReload++;
@@ -518,6 +519,9 @@ $(function () {
 		});
 
 		$poller.always(goPoll);
+		setTimeout(function(){
+			$poller.abort();
+		},10000);
 	}
 
 	$(document).on('show', '.modal', pausePollingReload);
