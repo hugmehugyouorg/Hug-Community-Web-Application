@@ -504,7 +504,16 @@ $(function () {
        $poller = $.ajax({ 
        		url: "/dashboard/poll",
 			type: "GET", 
-			cache: false
+			cache: false,
+			success: function() {
+				console.log('success');
+			},
+			error: function() {
+				console.log('error');
+			},
+			complete: function() {
+				console.log('complete');
+			}
 		});
 
        	$poller.done(function(r) {
