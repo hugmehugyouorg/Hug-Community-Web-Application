@@ -500,21 +500,24 @@ $(function () {
 	//TODO: enhance with the use of http://www.html5rocks.com/en/tutorials/eventsource/basics/
 	function poll() {
        $poller = $.ajax({ 
-       		url: "/dashboard/poll", 
-       		success: function(r) {
-       			if(r === 1 || r === "1") {
-       				shouldReload = true;
-       				playPollingReload();
-            	}
-       		}, 
-       		error: function( jqXhr ) {
-				if( jqXhr.status == 401 )
-					window.location = '/sign_in';
-			},
+       		url: "/dashboard/poll",
 			type: "GET", 
-			cache: false, 
-			complete: goPoll 
+			cache: false
 		});
+
+       	$poller.done(function(r) {
+   			if(r === 1 || r === "1") {
+   				shouldReload = true;
+   				playPollingReload();
+        	}
+   		});
+
+   		$poller.fail(function( jqXhr ) {
+			if( jqXhr.status == 401 )
+				window.location = '/sign_in';
+		});
+
+		$poller.always(goPoll);
 	}
 
 	$(document).on('show', '.modal', pausePollingReload);
