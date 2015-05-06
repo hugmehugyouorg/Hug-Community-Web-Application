@@ -455,7 +455,6 @@ $(function () {
 	}
 
 	function goPoll() {
-		console.log('goPoll');
 		if(!shouldReload) {
 			poll();
 		}
@@ -504,20 +503,10 @@ $(function () {
        $poller = $.ajax({ 
        		url: "/dashboard/poll",
 			type: "GET", 
-			cache: false,
-			success: function() {
-				console.log('success');
-			},
-			error: function() {
-				console.log('error');
-			},
-			complete: function() {
-				console.log('complete');
-			}
+			cache: false
 		});
 
        	$poller.done(function(r) {
-       		console.log('done');
    			if(r === 1 || r === "1") {
    				shouldReload = true;
    				playPollingReload();
@@ -525,15 +514,11 @@ $(function () {
    		});
 
    		$poller.fail(function( jqXhr ) {
-   			console.log('fail');
 			if( jqXhr.status == 401 )
 				window.location = '/sign_in';
 		});
 
 		$poller.always(goPoll);
-		setInterval(function(){
-			console.dir($poller);
-		},10000);
 	}
 
 	$(document).on('show', '.modal', pausePollingReload);
