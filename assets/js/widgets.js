@@ -421,10 +421,7 @@ $(function () {
 	var reloadAborted = false;
 	var needRefresh = false;
 	var $poller = null;
-	var ajaxCheckerTimer = null;
-	var $ajaxChecker = null;
-	var ajaxTimeCallMade = 0;
-	var pageUnloading = false;
+	var connected = false;
 
 	function pausePollingReload() {
 		pauseReload++;
@@ -530,43 +527,18 @@ $(function () {
 		});
 	}
 
-	function checkAjaxStillResponding() {
-	   var timeDiff = time() - ajaxTimeCallMade;
-	   console.log(timeDiff);
-	   if(ajaxTimeCallMade == 0 || timeDiff < 35) {
-	   	   ajaxTimeCallMade = time();
-	       $ajaxChecker = $.ajax({ 
-	       		url: "/",
-				type: "HEAD",
-				cache: false
-			});
-
-	       	$ajaxChecker.always(ajaxWorked);
-	    }
-	    else {
-	    	clearInterval(ajaxCheckerTimer);
-	    	location.reload(true);
-	    }
+	function updateOnlineStatus(event) {
+	    connected = navigator.onLine ? true : false;
+	    console.log( (connected ? "online" : "offline") );
 	}
-
-	function ajaxWorked(data_OR_jqXHR, textStatus, jqXHR_OR_errorThrown) {
-		if(textStatus === "" && !pageUnloading) {
-			clearInterval(ajaxCheckerTimer);
-			location.reload(true);
-		}
-		ajaxTimeCallMade == 0;
-	}
-
-	window.onbeforeunload = function() 
-	{ 
-	    pageUnloading = true;
-	} 
 
 	$(document).on('show', '.modal', pausePollingReload);
 
 	$(document).on('hidden', '.modal', playPollingReload);
 
-	ajaxCheckerTimer = setInterval(checkAjaxStillResponding, 30000);
+	window.addEventListener('online',  updateOnlineStatus);
+	window.addEventListener('offline', updateOnlineStatus);
 
-	poll();
+	updateOnlineStatus();
+	goPoll();
 });
