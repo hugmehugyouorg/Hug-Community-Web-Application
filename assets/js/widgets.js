@@ -423,6 +423,8 @@ $(function () {
 	var $poller = null;
 	var ajaxCheckerTimer = null;
 	var $ajaxChecker = null;
+	var ajaxTimeCallMade = 0;
+	var pageUnloading = false;
 
 	function pausePollingReload() {
 		pauseReload++;
@@ -529,7 +531,10 @@ $(function () {
 	}
 
 	function checkAjaxStillResponding() {
-	   if(!$ajaxChecker) {
+	   var timeDiff = time() - ajaxTimeCallMade;
+	   console.log(timeDiff);
+	   if(ajaxTimeCallMade == 0 || timeDiff < 35) {
+	   	   ajaxTimeCallMade = time();
 	       $ajaxChecker = $.ajax({ 
 	       		url: "/",
 				type: "HEAD",
@@ -544,15 +549,24 @@ $(function () {
 	    }
 	}
 
-	function ajaxWorked() {
-		$ajaxChecker = null;
+	function ajaxWorked(data_OR_jqXHR, textStatus, jqXHR_OR_errorThrown) {
+		if(textStatus === "" && !pageUnloading) {
+			clearInterval(ajaxCheckerTimer);
+			location.reload(true);
+		}
+		ajaxTimeCallMade == 0;
 	}
+
+	window.onbeforeunload = function() 
+	{ 
+	    pageUnloading = true;
+	} 
 
 	$(document).on('show', '.modal', pausePollingReload);
 
 	$(document).on('hidden', '.modal', playPollingReload);
 
-	ajaxCheckerTimer = setInterval(checkAjaxStillResponding, 15000);
+	ajaxCheckerTimer = setInterval(checkAjaxStillResponding, 30000);
 
 	poll();
 });
