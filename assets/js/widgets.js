@@ -421,6 +421,8 @@ $(function () {
 	var reloadAborted = false;
 	var needRefresh = false;
 	var $poller = null;
+	var ajaxCheckerTimer = null;
+	var $ajaxChecker = null;
 
 	function pausePollingReload() {
 		pauseReload++;
@@ -507,6 +509,7 @@ $(function () {
 		});
 
        	$poller.done(function(r) {
+       		$poller = null;
    			if(r === 1 || r === "1") {
    				shouldReload = true;
    				playPollingReload();
@@ -514,16 +517,42 @@ $(function () {
    		});
 
    		$poller.fail(function( jqXhr ) {
+   			$poller = null;
 			if( jqXhr.status == 401 )
 				window.location = '/sign_in';
 		});
 
-		$poller.always(goPoll);
+		$poller.always(function(){
+			$poller = null;
+			goPoll();
+		});
+	}
+
+	function checkAjaxStillResponding() {
+	   if(!$ajaxChecker) {
+	       $ajaxChecker = $.ajax({ 
+	       		url: "/",
+				type: "HEAD",
+				cache: false
+			});
+
+	       	$ajaxChecker.always(ajaxWorked);
+	    }
+	    else {
+	    	clearInterval(ajaxCheckerTimer);
+	    	location.reload(true);
+	    }
+	}
+
+	function ajaxWorked() {
+		$ajaxChecker = null;
 	}
 
 	$(document).on('show', '.modal', pausePollingReload);
 
 	$(document).on('hidden', '.modal', playPollingReload);
+
+	ajaxCheckerTimer = setInterval(checkAjaxStillResponding, 15000);
 
 	poll();
 });
