@@ -539,6 +539,8 @@ $(function () {
 	function updateOnlineStatus(event) {
 	    connected = navigator.onLine ? true : false;
 	    if(!connected) {
+	    	if(forceReload)
+				return;
 	    	forceReload = true;
 	    	if($poller)
 	    		$poller.abort();
@@ -562,7 +564,7 @@ $(function () {
 			  "hideMethod": "fadeOut"
 			});
 	    }
-	    else if(forceReload) {
+	    else if(forceReload && !hidden) {
 	    	setTimeout(function() {
 	    		location.reload(true);
 	    	}, 1500);
@@ -596,6 +598,8 @@ $(function () {
 	   	hidden = isHidden();
 
 		if(hidden) {
+			if(forceReload)
+				return;
 			forceReload = true;
 			if($poller)
 				$poller.abort();
@@ -619,7 +623,7 @@ $(function () {
 			  "hideMethod": "fadeOut"
 			});
 		}
-		else if(forceReload) {
+		else if(forceReload && connected) {
 			setTimeout(function() {
 	    		location.reload(true);
 	    	}, 1500);
