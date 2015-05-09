@@ -420,14 +420,19 @@ $(function () {
 	var shouldReload = false;
 	var reloadAborted = false;
 	var needRefresh = false;
+	var forceReload = false;
 	var $poller = null;
 	var connected = false;
+	var hidden = false;
 
 	function pausePollingReload() {
 		pauseReload++;
 	}
 
 	function playPollingReload() {
+		if(forceReload)
+			return;
+
 		if(pauseReload == 0 && shouldReload) {
 			toastr["error"]("The page will reload momentarily... click to cancel.", "Safety Team Updates!",
 			{
@@ -456,9 +461,10 @@ $(function () {
 	}
 
 	function goPoll() {
-		if(!shouldReload) {
-			poll();
-		}
+		if(forceReload || shouldReload)
+			return;
+
+		poll();
 	}
 
 	function toastCloseClick() {
@@ -466,6 +472,9 @@ $(function () {
 	}
 
 	function toastHidden() {
+		if(forceReload)
+			return;
+
 		if(!reloadAborted) {
 			location.reload(true);
 			return;
@@ -529,16 +538,68 @@ $(function () {
 
 	function updateOnlineStatus(event) {
 	    connected = navigator.onLine ? true : false;
-	    console.log( (connected ? "online" : "offline") );
+	    if(!connected) {
+	    	forceReload = true;
+	    	if($poller)
+	    		$poller.abort();
+	    }
+	    else if(forceReload) {
+	    	location.reload(true);
+	    }
+	}
+
+	function getHiddenProp(){
+	    var prefixes = ['webkit','moz','ms','o'];
+	    
+	    // if 'hidden' is natively supported just return it
+	    if ('hidden' in document) return 'hidden';
+	    
+	    // otherwise loop over all the known prefixes until we find one
+	    for (var i = 0; i < prefixes.length; i++){
+	        if ((prefixes[i] + 'Hidden') in document) 
+	            return prefixes[i] + 'Hidden';
+	    }
+
+	    // otherwise it's not supported
+	    return null;
+	}
+
+	function isHidden() {
+	    var prop = getHiddenProp();
+	    if (!prop) return false;
+	    
+	    return document[prop];
+	}
+
+	function visChange() {
+	   	hidden = isHidden();
+
+		if(hidden) {
+			forceReload = true;
+			if($poller)
+				$poller.abort();
+		}
+		else if(forceReload) {
+			location.reload(true);
+		}
+	}
+
+	function addHiddenEventListener() {
+		// use the property name to generate the prefixed event name
+		var visProp = getHiddenProp();
+		if (visProp) {
+		  var evtname = visProp.replace(/[H|h]idden/,'') + 'visibilitychange';
+		  document.addEventListener(evtname, visChange);
+		}
 	}
 
 	$(document).on('show', '.modal', pausePollingReload);
-
 	$(document).on('hidden', '.modal', playPollingReload);
-
 	window.addEventListener('online',  updateOnlineStatus);
 	window.addEventListener('offline', updateOnlineStatus);
+	addHiddenEventListener();
 
 	updateOnlineStatus();
+	visChange();
 	goPoll();
 });
