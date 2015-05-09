@@ -542,6 +542,25 @@ $(function () {
 	    	forceReload = true;
 	    	if($poller)
 	    		$poller.abort();
+	    	toastr["error"]("The page will reload momentarily...", "Safety Team Updates!", {
+			  "closeButton": false,
+			  "tapToDismiss": false,
+			  "debug": false,
+			  "newestOnTop": false,
+			  "progressBar": false,
+			  "positionClass": "toast-bottom-center",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "onHidden": null,
+			  "showDuration": "3000",
+			  "hideDuration": "0",
+			  "timeOut": "0",
+			  "extendedTimeOut": "0",
+			  "showEasing": "swing",
+			  "hideEasing": "linear",
+			  "showMethod": "fadeIn",
+			  "hideMethod": "fadeOut"
+			});
 	    }
 	    else if(forceReload) {
 	    	location.reload(true);
@@ -578,6 +597,25 @@ $(function () {
 			forceReload = true;
 			if($poller)
 				$poller.abort();
+			toastr["error"]("The page will reload momentarily...", "Safety Team Updates!", {
+			  "closeButton": false,
+			  "tapToDismiss": false,
+			  "debug": false,
+			  "newestOnTop": false,
+			  "progressBar": false,
+			  "positionClass": "toast-bottom-center",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "onHidden": null,
+			  "showDuration": "3000",
+			  "hideDuration": "0",
+			  "timeOut": "0",
+			  "extendedTimeOut": "0",
+			  "showEasing": "swing",
+			  "hideEasing": "linear",
+			  "showMethod": "fadeIn",
+			  "hideMethod": "fadeOut"
+			});
 		}
 		else if(forceReload) {
 			location.reload(true);
