@@ -447,7 +447,7 @@ $(function () {
 			  "onHidden": toastHidden,
 			  "showDuration": "300",
 			  "hideDuration": "1000",
-			  "timeOut": "15000",
+			  "timeOut": "7500",
 			  "extendedTimeOut": "5000",
 			  "showEasing": "swing",
 			  "hideEasing": "linear",
@@ -565,7 +565,7 @@ $(function () {
 	    else if(forceReload) {
 	    	setTimeout(function() {
 	    		location.reload(true);
-	    	}, 3000);
+	    	}, 1500);
 	    }
 	}
 
@@ -622,7 +622,7 @@ $(function () {
 		else if(forceReload) {
 			setTimeout(function() {
 	    		location.reload(true);
-	    	}, 3000);
+	    	}, 1500);
 		}
 	}
 
