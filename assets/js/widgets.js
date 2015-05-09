@@ -563,7 +563,9 @@ $(function () {
 			});
 	    }
 	    else if(forceReload) {
-	    	location.reload(true);
+	    	setTimeout(function() {
+	    		location.reload(true);
+	    	}, 3000);
 	    }
 	}
 
@@ -618,7 +620,9 @@ $(function () {
 			});
 		}
 		else if(forceReload) {
-			location.reload(true);
+			setTimeout(function() {
+	    		location.reload(true);
+	    	}, 3000);
 		}
 	}
 
